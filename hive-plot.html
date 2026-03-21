@@ -1,0 +1,1341 @@
+<!DOCTYPE html>
+<html lang="en-NZ">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hive Plot — SLT Knowledge Structure</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+    --bg: #0a0a1a;
+    --bg-edge: #0d1117;
+    --surface: rgba(255,255,255,0.04);
+    --surface-hover: rgba(255,255,255,0.08);
+    --border: rgba(255,255,255,0.08);
+    --text: #e6edf3;
+    --text-muted: rgba(255,255,255,0.5);
+    --diag: #e74c8b;
+    --assess: #4da6ff;
+    --interv: #34d399;
+    --accent: #7B2FF7;
+    --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: radial-gradient(ellipse at center, var(--bg) 0%, var(--bg-edge) 100%);
+    color: var(--text);
+    overflow: hidden;
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+}
+
+/* Loading Screen */
+#loading {
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(135deg, var(--bg) 0%, #1a0a2e 50%, var(--bg-edge) 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    opacity: 1;
+    transition: opacity 0.8s ease;
+}
+
+#loading.hide {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.loading-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 2rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--accent), var(--assess));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+}
+
+.loading-subtitle {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin-bottom: 2rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.loading-dots {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.loading-dots span {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: bounce 1.4s infinite ease-in-out both;
+}
+
+.loading-dots span:nth-child(1) { animation-delay: -0.32s; }
+.loading-dots span:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes bounce {
+    0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+    40% { transform: scale(1.2); opacity: 1; }
+}
+
+/* Header Bar */
+#header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 70px;
+    background: var(--surface);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 2rem;
+    z-index: 100;
+    box-shadow: 0 8px 32px rgba(123,47,247,0.08);
+}
+
+.header-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--accent), var(--assess));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.header-centre {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.search-container {
+    position: relative;
+}
+
+#search {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 0.625rem 1rem;
+    border-radius: 10px;
+    color: var(--text);
+    font-size: 0.875rem;
+    width: 300px;
+    font-family: 'Inter', sans-serif;
+    outline: none;
+    transition: var(--transition);
+}
+
+#search::placeholder {
+    color: var(--text-muted);
+}
+
+#search:focus {
+    border-color: var(--accent);
+    background: var(--surface-hover);
+}
+
+.search-badge {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--accent);
+    color: white;
+    font-size: 0.625rem;
+    font-weight: 600;
+    padding: 0.25rem 0.5rem;
+    border-radius: 24px;
+    font-family: 'Poppins', sans-serif;
+}
+
+.header-filters {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.filter-pill {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 0.5rem 1rem;
+    border-radius: 24px;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    font-weight: 500;
+    font-family: 'Poppins', sans-serif;
+    cursor: pointer;
+    transition: var(--transition);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.filter-pill:hover {
+    background: var(--surface-hover);
+    border-color: var(--accent);
+}
+
+.filter-pill.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+}
+
+/* Stats Bar */
+#stats-bar {
+    position: fixed;
+    top: 90px;
+    left: 2rem;
+    right: 2rem;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    z-index: 90;
+}
+
+.stat-card {
+    background: var(--surface);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.25rem 1.5rem;
+    box-shadow: 0 8px 32px rgba(123,47,247,0.08);
+    transition: var(--transition);
+}
+
+.stat-card:hover {
+    background: var(--surface-hover);
+    transform: translateY(-2px);
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.5rem;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    font-family: 'Poppins', sans-serif;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+}
+
+/* Canvas */
+canvas {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1;
+}
+
+/* Legend */
+#legend {
+    position: fixed;
+    bottom: 1.5rem;
+    left: 2rem;
+    background: var(--surface);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.25rem 1.5rem;
+    z-index: 100;
+    box-shadow: 0 8px 32px rgba(123,47,247,0.08);
+}
+
+.legend-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 1rem;
+}
+
+.legend-row {
+    display: flex;
+    align-items: center;
+    margin: 0.625rem 0;
+    font-size: 0.8125rem;
+    color: var(--text);
+}
+
+.legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 0.75rem;
+}
+
+.legend-hint {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.6875rem;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+/* Bottom Bar */
+#bottom-bar {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 2rem;
+    background: var(--surface);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1rem 1.5rem;
+    z-index: 100;
+    box-shadow: 0 8px 32px rgba(123,47,247,0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.bottom-status {
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+}
+
+.bottom-hint {
+    font-size: 0.6875rem;
+    color: var(--text-muted);
+    font-family: 'Poppins', sans-serif;
+}
+
+.kbd {
+    display: inline-block;
+    background: var(--surface-hover);
+    border: 1px solid var(--border);
+    padding: 0.125rem 0.375rem;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 0.625rem;
+    margin: 0 0.125rem;
+}
+
+/* Tooltip */
+#tooltip {
+    position: fixed;
+    display: none;
+    background: var(--surface);
+    backdrop-filter: blur(30px);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1rem 1.25rem;
+    max-width: 320px;
+    z-index: 200;
+    box-shadow: 0 8px 32px rgba(123,47,247,0.15);
+    pointer-events: none;
+    animation: tooltipIn 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+#tooltip.visible {
+    display: block;
+}
+
+@keyframes tooltipIn {
+    from { opacity: 0; transform: scale(0.9) translateY(8px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.tooltip-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+    line-height: 1.3;
+}
+
+.tooltip-badge {
+    display: inline-block;
+    font-size: 0.625rem;
+    font-weight: 600;
+    padding: 0.25rem 0.625rem;
+    border-radius: 24px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.75rem;
+    font-family: 'Poppins', sans-serif;
+}
+
+.tooltip-badge.diagnosis {
+    background: rgba(231, 76, 139, 0.2);
+    color: var(--diag);
+    border: 1px solid var(--diag);
+}
+
+.tooltip-badge.assessment {
+    background: rgba(77, 166, 255, 0.2);
+    color: var(--assess);
+    border: 1px solid var(--assess);
+}
+
+.tooltip-badge.intervention {
+    background: rgba(52, 211, 153, 0.2);
+    color: var(--interv);
+    border: 1px solid var(--interv);
+}
+
+.tooltip-desc {
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: var(--text-muted);
+    margin-bottom: 0.75rem;
+}
+
+.tooltip-connections {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+/* Detail Panel */
+#detail-panel {
+    position: fixed;
+    top: 0;
+    right: -420px;
+    width: 400px;
+    height: 100vh;
+    background: var(--surface);
+    backdrop-filter: blur(30px);
+    border-left: 1px solid var(--border);
+    z-index: 300;
+    transition: right var(--transition);
+    overflow-y: auto;
+    box-shadow: -8px 0 32px rgba(0,0,0,0.3);
+}
+
+#detail-panel.visible {
+    right: 0;
+}
+
+.detail-header {
+    padding: 2rem;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: var(--surface);
+    backdrop-filter: blur(30px);
+    z-index: 10;
+}
+
+.detail-close {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 1.5rem;
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: var(--transition);
+}
+
+.detail-close:hover {
+    background: var(--surface-hover);
+    color: var(--text);
+}
+
+.detail-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 0.75rem;
+    padding-right: 2rem;
+    line-height: 1.3;
+}
+
+.detail-badge {
+    display: inline-block;
+    font-size: 0.625rem;
+    font-weight: 600;
+    padding: 0.375rem 0.875rem;
+    border-radius: 24px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-family: 'Poppins', sans-serif;
+    margin-bottom: 1rem;
+}
+
+.detail-badge.diagnosis {
+    background: rgba(231, 76, 139, 0.2);
+    color: var(--diag);
+    border: 1px solid var(--diag);
+}
+
+.detail-badge.assessment {
+    background: rgba(77, 166, 255, 0.2);
+    color: var(--assess);
+    border: 1px solid var(--assess);
+}
+
+.detail-badge.intervention {
+    background: rgba(52, 211, 153, 0.2);
+    color: var(--interv);
+    border: 1px solid var(--interv);
+}
+
+.detail-content {
+    padding: 2rem;
+}
+
+.detail-desc {
+    font-size: 0.9375rem;
+    line-height: 1.65;
+    color: var(--text);
+    margin-bottom: 2rem;
+}
+
+.detail-section-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 1rem;
+}
+
+.detail-related {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+}
+
+.related-pill {
+    background: var(--surface-hover);
+    border: 1px solid var(--border);
+    padding: 0.5rem 0.875rem;
+    border-radius: 24px;
+    font-size: 0.8125rem;
+    color: var(--text);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.related-pill:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+}
+
+.detail-compass-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.875rem;
+    background: linear-gradient(135deg, var(--accent), var(--assess));
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-size: 0.875rem;
+    font-weight: 600;
+    font-family: 'Poppins', sans-serif;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.detail-compass-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(123,47,247,0.3);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    #stats-bar {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    #header {
+        flex-direction: column;
+        height: auto;
+        padding: 1rem;
+        gap: 1rem;
+    }
+
+    .header-centre {
+        width: 100%;
+        flex-direction: column;
+    }
+
+    #search {
+        width: 100%;
+    }
+
+    .header-filters {
+        width: 100%;
+        justify-content: center;
+    }
+
+    #detail-panel {
+        width: 100vw;
+        right: -100vw;
+    }
+}
+
+@media (max-width: 600px) {
+    #stats-bar {
+        grid-template-columns: 1fr;
+        top: auto;
+        bottom: 8rem;
+    }
+
+    #legend, #bottom-bar {
+        left: 1rem;
+        right: 1rem;
+        bottom: 1rem;
+    }
+
+    #bottom-bar {
+        bottom: 5rem;
+    }
+}
+</style>
+</head>
+<body>
+
+<!-- Loading Screen -->
+<div id="loading">
+    <div class="loading-title">SLT Knowledge Graph</div>
+    <div class="loading-subtitle">Hive Plot — Structural Analysis</div>
+    <div class="loading-dots">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+</div>
+
+<!-- Header Bar -->
+<div id="header">
+    <div class="header-title">Hive Plot</div>
+    <div class="header-centre">
+        <div class="search-container">
+            <input type="text" id="search" placeholder="Search nodes...">
+            <span class="search-badge" id="search-count">108</span>
+        </div>
+        <div class="header-filters">
+            <div class="filter-pill" data-cat="diagnosis">Diagnoses</div>
+            <div class="filter-pill" data-cat="assessment">Assessments</div>
+            <div class="filter-pill" data-cat="intervention">Interventions</div>
+        </div>
+    </div>
+    <div></div>
+</div>
+
+<!-- Stats Bar -->
+<div id="stats-bar">
+    <div class="stat-card">
+        <div class="stat-label">Total Nodes</div>
+        <div class="stat-value" id="stat-total">0</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Cross-Axis Edges</div>
+        <div class="stat-value" id="stat-edges">0</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Avg Connections</div>
+        <div class="stat-value" id="stat-avg">0</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Categories</div>
+        <div class="stat-value">3</div>
+    </div>
+</div>
+
+<!-- Canvas -->
+<canvas id="canvas"></canvas>
+
+<!-- Legend -->
+<div id="legend">
+    <div class="legend-title">Categories</div>
+    <div class="legend-row">
+        <div class="legend-dot" style="background: #e74c8b;"></div>
+        <span>Diagnoses (<span id="diag-count">22</span>)</span>
+    </div>
+    <div class="legend-row">
+        <div class="legend-dot" style="background: #4da6ff;"></div>
+        <span>Assessments (<span id="assess-count">39</span>)</span>
+    </div>
+    <div class="legend-row">
+        <div class="legend-dot" style="background: #34d399;"></div>
+        <span>Interventions (<span id="interv-count">47</span>)</span>
+    </div>
+    <div class="legend-hint">Axes show category structure</div>
+</div>
+
+<!-- Bottom Bar -->
+<div id="bottom-bar">
+    <div class="bottom-status" id="status-text">Hover to explore • Click for details</div>
+    <div class="bottom-hint">
+        <span class="kbd">R</span> Reset view
+        <span class="kbd">F</span> Toggle filters
+        <span class="kbd">1</span><span class="kbd">2</span><span class="kbd">3</span> Categories
+        <span class="kbd">Esc</span> Close
+    </div>
+</div>
+
+<!-- Tooltip -->
+<div id="tooltip">
+    <div class="tooltip-title"></div>
+    <div class="tooltip-badge"></div>
+    <div class="tooltip-desc"></div>
+    <div class="tooltip-connections"></div>
+</div>
+
+<!-- Detail Panel -->
+<div id="detail-panel">
+    <div class="detail-header">
+        <button class="detail-close">&times;</button>
+        <div class="detail-title"></div>
+        <div class="detail-badge"></div>
+    </div>
+    <div class="detail-content">
+        <div class="detail-desc"></div>
+        <div class="detail-section-title">Related Items</div>
+        <div class="detail-related"></div>
+        <button class="detail-compass-btn">
+            Open in Communication Compass
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M6 3L11 8L6 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </button>
+    </div>
+</div>
+
+<script>
+// ============================================================
+// DATA — 108 nodes (EXACT SAME DATASET)
+// ============================================================
+const N = [
+// DIAGNOSES (22)
+{i:'d1',t:'Developmental Language Disorder (DLD)',c:'diagnosis',d:'A neurodevelopmental disorder characterised by persistent difficulties in acquiring and using language across modalities.',r:['CELF','PLS','Language Sample Analysis','Modelling','Recasting','Shape Coding','Colourful Semantics']},
+{i:'d2',t:'Childhood Apraxia of Speech (CAS)',c:'diagnosis',d:'A motor speech disorder where children have difficulty planning and coordinating the precise movements needed for speech.',r:['PROMPT Therapy','Nuffield Dyspraxia Programme (NDP3)','AAC','GFTA','Stimulability Testing']},
+{i:'d3',t:'Phonological Disorder',c:'diagnosis',d:'A speech sound disorder characterised by predictable, rule-based errors affecting groups of sounds.',r:['Minimal Pairs Approach','Cycles Approach','Core Vocabulary Approach','GFTA','Phonological Assessment','Phonological Awareness']},
+{i:'d4',t:'Stuttering (Fluency Disorder)',c:'diagnosis',d:'Disruptions in the flow of speech characterised by repetitions, prolongations, and blocks.',r:['Lidcombe Program','Fluency Shaping','Stuttering Modification','OASES']},
+{i:'d5',t:'Selective Mutism',c:'diagnosis',d:'An anxiety disorder where a child consistently fails to speak in specific social situations despite speaking normally elsewhere.',r:['Sliding-In Technique','Brave Programme','Stimulus Fading']},
+{i:'d6',t:'Dysarthria',c:'diagnosis',d:'A motor speech disorder resulting from neurological damage affecting muscles used for speech.',r:['Oral Motor Exercises','AAC','Lee Silverman Voice Treatment (LSVT)']},
+{i:'d7',t:'Receptive Language Disorder',c:'diagnosis',d:'Difficulty understanding spoken language, affecting comprehension of vocabulary, grammar, and complex instructions.',r:['CELF','PLS','ROWPVT','Visual Supports','Scaffolding']},
+{i:'d8',t:'Expressive Language Disorder',c:'diagnosis',d:'Difficulty using words and sentences to express thoughts and needs.',r:['CELF','PLS','Focused Stimulation','Modelling','Milieu Teaching']},
+{i:'d9',t:'Articulation Disorder',c:'diagnosis',d:'Difficulty producing specific speech sounds correctly due to motor or placement issues.',r:['GFTA','Traditional Articulation Therapy','Phonetic Placement']},
+{i:'d10',t:'Language Delay',c:'diagnosis',d:'Slower-than-expected language development where skills emerge in typical sequence but at a delayed rate.',r:['Hanen Approach','Modelling','Expansion','Parallel Talk']},
+{i:'d11',t:'Social Communication Disorder',c:'diagnosis',d:'Persistent difficulties using verbal and nonverbal communication for social purposes.',r:['Social Thinking','PEERS Program','Video Modelling','Pragmatic Language Assessment']},
+{i:'d12',t:'Auditory Processing Disorder (APD)',c:'diagnosis',d:'Difficulty processing auditory information despite normal hearing.',r:['Auditory Training','Compensatory Strategies','FM Systems']},
+{i:'d13',t:'Voice Disorder (Dysphonia)',c:'diagnosis',d:'Abnormal voice quality, pitch, loudness, or resonance.',r:['Vocal Hygiene','Resonant Voice Therapy','GRBAS Scale']},
+{i:'d14',t:'Cleft Palate Speech',c:'diagnosis',d:'Speech difficulties from structural abnormalities of the palate.',r:['Nasometry','Pressure Consonant Assessment','Speech Surgery']},
+{i:'d15',t:'Specific Learning Disability',c:'diagnosis',d:'A neurological condition affecting reading, writing, or mathematical skills.',r:['Phonological Awareness','DIBELS','PAT-2']},
+{i:'d16',t:'Autism Spectrum Disorder',c:'diagnosis',d:'A neurodevelopmental condition characterised by differences in social communication and restricted interests.',r:['PECS','AAC','Social Stories','Visual Supports','ADOS-2']},
+{i:'d17',t:'Intellectual Disability',c:'diagnosis',d:'Significant limitations in both intellectual functioning and adaptive behaviour.',r:['AAC','Functional Communication Training','Makaton']},
+{i:'d18',t:'Hearing Loss',c:'diagnosis',d:'Reduced ability to hear sounds, affecting speech and language development.',r:['Auditory-Verbal Therapy','Sign Language','FM Systems','Cochlear Implant']},
+{i:'d19',t:'Traumatic Brain Injury',c:'diagnosis',d:'Acquired brain injury affecting cognitive-communication skills.',r:['Cognitive-Communication Therapy','AAC']},
+{i:'d20',t:'Literacy Difficulties',c:'diagnosis',d:'Challenges in developing reading and writing skills.',r:['Phonological Awareness','DIBELS','Vocabulary Assessment']},
+{i:'d21',t:'Feeding & Swallowing Difficulties',c:'diagnosis',d:'Difficulties with oral intake of food and liquids.',r:['Oral Motor Exercises','Food Chaining','SOS Approach']},
+{i:'d22',t:'Late Talker',c:'diagnosis',d:'Children aged 18\u201330 months with limited expressive vocabulary (<50 words).',r:['Hanen Approach','Modelling','Parent Coaching','Vocabulary Assessment']},
+// ASSESSMENTS (39)
+{i:'a1',t:'Standardised Assessment',c:'assessment',d:'A formal, norm-referenced test with standardised administration and scoring.',r:[]},
+{i:'a2',t:'CELF',c:'assessment',d:'Clinical Evaluation of Language Fundamentals — comprehensive language assessment.',r:['Developmental Language Disorder (DLD)','Receptive Language Disorder','Expressive Language Disorder']},
+{i:'a3',t:'PLS',c:'assessment',d:'Preschool Language Scales — for young children measuring comprehension and expression.',r:['Developmental Language Disorder (DLD)','Receptive Language Disorder','Expressive Language Disorder']},
+{i:'a4',t:'GFTA',c:'assessment',d:'Goldman-Fristoe Test of Articulation — consonant production assessment.',r:['Childhood Apraxia of Speech (CAS)','Phonological Disorder','Articulation Disorder']},
+{i:'a5',t:'ADOS-2',c:'assessment',d:'Autism Diagnostic Observation Schedule — gold standard for ASD.',r:['Autism Spectrum Disorder']},
+{i:'a6',t:'Norm-Referenced Assessment',c:'assessment',d:'Assessment comparing performance to same-age peers.',r:[]},
+{i:'a7',t:'Criterion-Referenced Assessment',c:'assessment',d:'Assessment against specific criteria or learning objectives.',r:[]},
+{i:'a8',t:'Language Sample Analysis',c:'assessment',d:'Analysis of spontaneous speech for MLU and vocabulary diversity.',r:['Developmental Language Disorder (DLD)']},
+{i:'a9',t:'Dynamic Assessment',c:'assessment',d:'Test-teach-retest format examining learning potential.',r:[]},
+{i:'a10',t:'Oral Motor Assessment',c:'assessment',d:'Examination of oral structures and movements.',r:[]},
+{i:'a11',t:'Fluency Assessment',c:'assessment',d:'Assessment of stuttering frequency, type, and severity.',r:[]},
+{i:'a12',t:'Pragmatic Language Assessment',c:'assessment',d:'Assessment of social communication skills.',r:['Social Communication Disorder']},
+{i:'a13',t:'ROWPVT',c:'assessment',d:'Receptive One-Word Picture Vocabulary Test.',r:['Receptive Language Disorder']},
+{i:'a14',t:'EOWPVT',c:'assessment',d:'Expressive One-Word Picture Vocabulary Test.',r:[]},
+{i:'a15',t:'MLU',c:'assessment',d:'Mean Length of Utterance — grammatical complexity measure.',r:[]},
+{i:'a16',t:'Phonological Assessment',c:'assessment',d:'Identifies phonological error patterns.',r:['Phonological Disorder']},
+{i:'a17',t:'Stimulability Testing',c:'assessment',d:'Assesses ability to produce target sounds with cues.',r:['Childhood Apraxia of Speech (CAS)']},
+{i:'a18',t:'Informal Assessment',c:'assessment',d:'Non-standardised observation tailored to individual needs.',r:[]},
+{i:'a19',t:'Narrative Assessment',c:'assessment',d:'Assessment of story-telling abilities.',r:[]},
+{i:'a20',t:'Play-Based Assessment',c:'assessment',d:'Assessment through observation of play.',r:[]},
+{i:'a21',t:'KSPT',c:'assessment',d:'Kaufman Speech Praxis Test — identifies CAS.',r:[]},
+{i:'a22',t:'VMPAC',c:'assessment',d:'Verbal Motor Production Assessment for Children.',r:[]},
+{i:'a23',t:'PIPA',c:'assessment',d:'Preschool & Primary Inventory of Phonological Awareness.',r:[]},
+{i:'a24',t:'PAT-2',c:'assessment',d:'Photo Articulation Test.',r:['Specific Learning Disability']},
+{i:'a25',t:'DIBELS',c:'assessment',d:'Dynamic Indicators of Basic Early Literacy Skills.',r:['Specific Learning Disability','Literacy Difficulties']},
+{i:'a26',t:'Vocabulary Assessment',c:'assessment',d:'Assessment of receptive and expressive vocabulary.',r:['Late Talker','Literacy Difficulties']},
+{i:'a27',t:'Phonological Awareness Assessment',c:'assessment',d:'Assessment of sound awareness and manipulation.',r:[]},
+{i:'a28',t:'OASES',c:'assessment',d:'Overall Assessment of the Speaker\u2019s Experience of Stuttering.',r:['Stuttering (Fluency Disorder)']},
+{i:'a29',t:'Nasometry',c:'assessment',d:'Acoustic measurement of nasality.',r:['Cleft Palate Speech']},
+{i:'a30',t:'Pressure Consonant Assessment',c:'assessment',d:'Assessment of pressure-sensitive consonant production.',r:['Cleft Palate Speech']},
+{i:'a31',t:'GRBAS Scale',c:'assessment',d:'Perceptual rating scale for voice quality.',r:['Voice Disorder (Dysphonia)']},
+{i:'a32',t:'Auditory Training',c:'assessment',d:'Exercises improving auditory discrimination.',r:['Auditory Processing Disorder (APD)']},
+{i:'a33',t:'Hearing Screening',c:'assessment',d:'Brief assessment to identify hearing loss.',r:[]},
+{i:'a34',t:'Speech Intelligibility Assessment',c:'assessment',d:'Measures how well speech is understood.',r:[]},
+{i:'a35',t:'Functional Communication Assessment',c:'assessment',d:'Real-world communication abilities assessment.',r:[]},
+{i:'a36',t:'Milestone Screening',c:'assessment',d:'Screening tool for developmental delays.',r:[]},
+{i:'a37',t:'Parent Questionnaire',c:'assessment',d:'Parent report of communication skills.',r:[]},
+{i:'a38',t:'FM System Assessment',c:'assessment',d:'Assessment of assistive listening benefit.',r:[]},
+// INTERVENTIONS (47)
+{i:'i1',t:'Modelling',c:'intervention',d:'Demonstrating target language without requiring imitation.',r:['Developmental Language Disorder (DLD)','Expressive Language Disorder','Language Delay','Late Talker']},
+{i:'i2',t:'Recasting',c:'intervention',d:'Reformulating a child\u2019s utterance to provide a correct model.',r:['Developmental Language Disorder (DLD)']},
+{i:'i3',t:'Expansion',c:'intervention',d:'Adding elements to a child\u2019s utterance while maintaining meaning.',r:['Language Delay']},
+{i:'i4',t:'Hanen Approach',c:'intervention',d:'Parent-implemented intervention using Observe, Wait, Listen.',r:['Language Delay','Late Talker']},
+{i:'i5',t:'PROMPT Therapy',c:'intervention',d:'Tactile-kinaesthetic approach for motor speech disorders.',r:['Childhood Apraxia of Speech (CAS)']},
+{i:'i6',t:'Nuffield Dyspraxia Programme (NDP3)',c:'intervention',d:'Structured intervention for childhood apraxia of speech.',r:['Childhood Apraxia of Speech (CAS)']},
+{i:'i7',t:'Minimal Pairs Approach',c:'intervention',d:'Using word pairs differing by one sound to highlight contrasts.',r:['Phonological Disorder']},
+{i:'i8',t:'Cycles Approach',c:'intervention',d:'Targeting error patterns in time-based cycles.',r:['Phonological Disorder']},
+{i:'i9',t:'Core Vocabulary Approach',c:'intervention',d:'Targeting consistent production of functional words.',r:['Phonological Disorder']},
+{i:'i10',t:'Lidcombe Program',c:'intervention',d:'Parent-delivered behavioural treatment for early stuttering.',r:['Stuttering (Fluency Disorder)']},
+{i:'i11',t:'Fluency Shaping',c:'intervention',d:'Teaching slow, controlled speech patterns.',r:['Stuttering (Fluency Disorder)']},
+{i:'i12',t:'Stuttering Modification',c:'intervention',d:'Techniques to stutter more easily and reduce avoidance.',r:['Stuttering (Fluency Disorder)']},
+{i:'i13',t:'Sliding-In Technique',c:'intervention',d:'Gradual exposure for selective mutism.',r:['Selective Mutism']},
+{i:'i14',t:'Brave Programme',c:'intervention',d:'CBT intervention for selective mutism.',r:['Selective Mutism']},
+{i:'i15',t:'Shape Coding',c:'intervention',d:'Visual system using shapes to teach sentence structure.',r:['Developmental Language Disorder (DLD)']},
+{i:'i16',t:'Colourful Semantics',c:'intervention',d:'Colour-coded approach to teach sentence structure.',r:['Developmental Language Disorder (DLD)']},
+{i:'i17',t:'AAC',c:'intervention',d:'Augmentative and Alternative Communication — supplementing or replacing speech.',r:['Childhood Apraxia of Speech (CAS)','Dysarthria','Autism Spectrum Disorder','Intellectual Disability','Traumatic Brain Injury']},
+{i:'i18',t:'PECS',c:'intervention',d:'Picture Exchange Communication System.',r:['Autism Spectrum Disorder']},
+{i:'i19',t:'Social Thinking',c:'intervention',d:'Framework for teaching social cognition.',r:['Social Communication Disorder']},
+{i:'i20',t:'Social Stories',c:'intervention',d:'Short stories teaching appropriate social responses.',r:['Autism Spectrum Disorder']},
+{i:'i21',t:'Video Modelling',c:'intervention',d:'Using video to demonstrate target behaviours.',r:['Social Communication Disorder']},
+{i:'i22',t:'Visual Supports',c:'intervention',d:'Visual aids to support comprehension and communication.',r:['Receptive Language Disorder','Autism Spectrum Disorder']},
+{i:'i23',t:'Scaffolding',c:'intervention',d:'Graded support helping children achieve beyond their level.',r:['Receptive Language Disorder']},
+{i:'i24',t:'Focused Stimulation',c:'intervention',d:'Intensive modelling of targets in meaningful contexts.',r:['Expressive Language Disorder']},
+{i:'i25',t:'Milieu Teaching',c:'intervention',d:'Naturalistic intervention using environmental arrangement.',r:['Expressive Language Disorder']},
+{i:'i26',t:'Makaton',c:'intervention',d:'Speech, signs, and symbols programme.',r:['Intellectual Disability']},
+{i:'i27',t:'Parent Coaching',c:'intervention',d:'Training parents in language facilitation strategies.',r:['Late Talker']},
+{i:'i28',t:'Oral Motor Exercises',c:'intervention',d:'Exercises for oral structure strength and coordination.',r:['Dysarthria','Feeding & Swallowing Difficulties']},
+{i:'i29',t:'Traditional Articulation Therapy',c:'intervention',d:'Structured therapy targeting correct sound production.',r:['Articulation Disorder']},
+{i:'i30',t:'Phonetic Placement',c:'intervention',d:'Teaching correct tongue/lip placement for sounds.',r:['Articulation Disorder']},
+{i:'i31',t:'Parallel Talk',c:'intervention',d:'Describing what the child is doing to model language.',r:['Language Delay']},
+{i:'i32',t:'Auditory-Verbal Therapy',c:'intervention',d:'Developing listening and spoken language for hearing loss.',r:['Hearing Loss']},
+{i:'i33',t:'Vocal Hygiene',c:'intervention',d:'Promoting healthy voice use.',r:['Voice Disorder (Dysphonia)']},
+{i:'i34',t:'Resonant Voice Therapy',c:'intervention',d:'Easy, forward-focused voice production.',r:['Voice Disorder (Dysphonia)']},
+{i:'i35',t:'Stimulus Fading',c:'intervention',d:'Gradual removal of prompts for independence.',r:['Selective Mutism']},
+{i:'i36',t:'Lee Silverman Voice Treatment (LSVT)',c:'intervention',d:'Intensive voice treatment for dysarthria.',r:['Dysarthria']},
+{i:'i37',t:'Phonological Awareness',c:'intervention',d:'Teaching sound awareness: rhyming, segmenting, blending.',r:['Phonological Disorder','Specific Learning Disability','Literacy Difficulties']},
+{i:'i38',t:'PEERS Program',c:'intervention',d:'Evidence-based social skills intervention.',r:['Social Communication Disorder']},
+{i:'i39',t:'Compensatory Strategies',c:'intervention',d:'Alternative methods to bypass communication difficulties.',r:['Auditory Processing Disorder (APD)']},
+{i:'i40',t:'FM Systems',c:'intervention',d:'Assistive listening technology.',r:['Auditory Processing Disorder (APD)','Hearing Loss']},
+{i:'i41',t:'Speech Surgery',c:'intervention',d:'Surgical correction of speech-affecting structures.',r:['Cleft Palate Speech']},
+{i:'i42',t:'Functional Communication Training',c:'intervention',d:'Teaching functional communication alternatives.',r:['Intellectual Disability']},
+{i:'i43',t:'Sign Language',c:'intervention',d:'Visual-manual language for Deaf communities.',r:['Hearing Loss']},
+{i:'i44',t:'Cochlear Implant',c:'intervention',d:'Implanted device for severe hearing loss.',r:['Hearing Loss']},
+{i:'i45',t:'Cognitive-Communication Therapy',c:'intervention',d:'Targeting cognitive processes affecting communication.',r:['Traumatic Brain Injury']},
+{i:'i46',t:'Food Chaining',c:'intervention',d:'Gradual food introduction based on sensory similarities.',r:['Feeding & Swallowing Difficulties']},
+{i:'i47',t:'SOS Approach',c:'intervention',d:'Sequential Oral Sensory feeding approach.',r:['Feeding & Swallowing Difficulties']},
+];
+
+// ============================================================
+// BUILD EDGES + COMPUTE DEGREE — BIDIRECTIONAL
+// ============================================================
+const edges = [];
+const byTitle = {};
+N.forEach(n => { byTitle[n.t] = n; n.deg = 0; });
+
+N.forEach(n => {
+    n.r.forEach(rt => {
+        const target = byTitle[rt];
+        if (target && !edges.find(e => (e.a === n && e.b === target) || (e.a === target && e.b === n))) {
+            edges.push({a: n, b: target});
+            n.deg++;
+            target.deg++;
+        }
+    });
+});
+
+// ============================================================
+// HIVE PLOT LAYOUT
+// ============================================================
+let W = window.innerWidth;
+let H = window.innerHeight;
+let cx = W / 2;
+let cy = H / 2;
+let minRadius = Math.min(W, H) * 0.15;
+let maxRadius = Math.min(W, H) * 0.42;
+
+// Separate nodes by category
+let diagnoses = N.filter(n => n.c === 'diagnosis');
+let assessments = N.filter(n => n.c === 'assessment');
+let interventions = N.filter(n => n.c === 'intervention');
+
+// Position nodes on each axis
+function positionOnAxis(nodes, angleDeg, minR, maxR) {
+    nodes.sort((a, b) => b.deg - a.deg);
+    const angleRad = angleDeg * Math.PI / 180;
+    nodes.forEach((n, i) => {
+        const t = nodes.length > 1 ? i / (nodes.length - 1) : 0.5;
+        const radius = minR + t * (maxR - minR);
+        n.x = cx + Math.cos(angleRad) * radius;
+        n.y = cy + Math.sin(angleRad) * radius;
+        n.axisRadius = radius;
+        n.axisAngle = angleRad;
+    });
+}
+
+function recalculateLayout() {
+    W = window.innerWidth;
+    H = window.innerHeight;
+    cx = W / 2;
+    cy = H / 2;
+    minRadius = Math.min(W, H) * 0.15;
+    maxRadius = Math.min(W, H) * 0.42;
+
+    positionOnAxis(diagnoses, -90, minRadius, maxRadius);
+    positionOnAxis(assessments, 150, minRadius, maxRadius);
+    positionOnAxis(interventions, 30, minRadius, maxRadius);
+}
+
+recalculateLayout();
+
+// ============================================================
+// RENDERING
+// ============================================================
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const dpr = devicePixelRatio || 1;
+
+function resizeCanvas() {
+    canvas.width = W * dpr;
+    canvas.height = H * dpr;
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+
+resizeCanvas();
+
+// Colours
+const COL = {
+    diagnosis: '#e74c8b',
+    assessment: '#4da6ff',
+    intervention: '#34d399'
+};
+
+let hoveredNode = null;
+let activeFilters = new Set();
+
+// ============================================================
+// DRAW
+// ============================================================
+function draw() {
+    ctx.clearRect(0, 0, W, H);
+
+    // Draw axis lines
+    ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+    ctx.lineWidth = 1;
+
+    [-90, 150, 30].forEach(angle => {
+        const rad = angle * Math.PI / 180;
+        ctx.beginPath();
+        ctx.moveTo(cx + Math.cos(rad) * minRadius, cy + Math.sin(rad) * minRadius);
+        ctx.lineTo(cx + Math.cos(rad) * maxRadius, cy + Math.sin(rad) * maxRadius);
+        ctx.stroke();
+    });
+
+    // Draw axis endpoint labels
+    ctx.font = '600 14px Poppins';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    const labelOffset = maxRadius * 1.12;
+
+    ctx.fillStyle = COL.diagnosis;
+    ctx.fillText(`Diagnoses (${diagnoses.length})`, cx, cy - labelOffset);
+
+    ctx.fillStyle = COL.assessment;
+    const assX = cx + Math.cos(150 * Math.PI / 180) * labelOffset;
+    const assY = cy + Math.sin(150 * Math.PI / 180) * labelOffset;
+    ctx.fillText(`Assessments (${assessments.length})`, assX, assY);
+
+    ctx.fillStyle = COL.intervention;
+    const intX = cx + Math.cos(30 * Math.PI / 180) * labelOffset;
+    const intY = cy + Math.sin(30 * Math.PI / 180) * labelOffset;
+    ctx.fillText(`Interventions (${interventions.length})`, intX, intY);
+
+    // Filter visible nodes
+    let visibleNodes = N;
+    if (activeFilters.size > 0) {
+        visibleNodes = N.filter(n => activeFilters.has(n.c));
+    }
+
+    // Draw edges (only cross-axis connections)
+    const crossAxisEdges = edges.filter(e => {
+        if (activeFilters.size > 0 && (!activeFilters.has(e.a.c) || !activeFilters.has(e.b.c))) {
+            return false;
+        }
+        return e.a.c !== e.b.c;
+    });
+
+    crossAxisEdges.forEach(e => {
+        const isHighlighted = hoveredNode && (e.a === hoveredNode || e.b === hoveredNode);
+
+        if (!isHighlighted && hoveredNode) {
+            ctx.globalAlpha = 0.03;
+        } else if (isHighlighted) {
+            ctx.globalAlpha = 0.7;
+        } else {
+            ctx.globalAlpha = 0.15;
+        }
+
+        ctx.strokeStyle = isHighlighted ? COL[e.a.c] : COL[e.a.c];
+        ctx.lineWidth = isHighlighted ? 2 : 1;
+
+        // Quadratic bezier curve
+        const dx = e.b.x - e.a.x;
+        const dy = e.b.y - e.a.y;
+        const len = Math.sqrt(dx * dx + dy * dy);
+        const mx = (e.a.x + e.b.x) / 2;
+        const my = (e.a.y + e.b.y) / 2;
+        const perpX = -dy / len;
+        const perpY = dx / len;
+        const offset = len * 0.12;
+        const cpx = mx + perpX * offset;
+        const cpy = my + perpY * offset;
+
+        ctx.beginPath();
+        ctx.moveTo(e.a.x, e.a.y);
+        ctx.quadraticCurveTo(cpx, cpy, e.b.x, e.b.y);
+        ctx.stroke();
+    });
+
+    ctx.globalAlpha = 1;
+
+    // Draw nodes
+    visibleNodes.forEach(n => {
+        const isHighlighted = n === hoveredNode;
+        const isConnected = hoveredNode && edges.some(e =>
+            (e.a === hoveredNode && e.b === n) || (e.b === hoveredNode && e.a === n)
+        );
+
+        if (hoveredNode && !isHighlighted && !isConnected) {
+            ctx.globalAlpha = 0.15;
+        } else {
+            ctx.globalAlpha = 1;
+        }
+
+        // Node size based on degree (4-12px)
+        const baseSize = 4;
+        const maxSize = 12;
+        const r = baseSize + Math.min(n.deg / 10, 1) * (maxSize - baseSize);
+
+        // Node glow on hover
+        if (isHighlighted) {
+            ctx.shadowColor = COL[n.c];
+            ctx.shadowBlur = 20;
+        }
+
+        ctx.fillStyle = COL[n.c];
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, r, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.shadowBlur = 0;
+
+        // Label for high-degree nodes or hovered node
+        if (n.deg > 3 || isHighlighted) {
+            ctx.globalAlpha = isHighlighted ? 1 : 0.6;
+            ctx.font = isHighlighted ? '600 11px Inter' : '400 9px Inter';
+            ctx.fillStyle = '#fff';
+
+            // Position label along axis direction
+            const angle = n.axisAngle;
+            const labelDist = r + 10;
+            const lx = n.x + Math.cos(angle) * labelDist;
+            const ly = n.y + Math.sin(angle) * labelDist;
+
+            // Adjust alignment based on angle
+            if (Math.abs(angle) < Math.PI / 2) {
+                ctx.textAlign = 'left';
+            } else {
+                ctx.textAlign = 'right';
+            }
+            ctx.textBasline = 'middle';
+
+            // Shorten label if needed
+            let label = n.t;
+            if (label.length > 35 && !isHighlighted) {
+                label = label.substring(0, 32) + '...';
+            }
+
+            ctx.fillText(label, lx, ly);
+        }
+    });
+
+    ctx.globalAlpha = 1;
+}
+
+// ============================================================
+// INTERACTION
+// ============================================================
+const tooltip = document.getElementById('tooltip');
+const detailPanel = document.getElementById('detail-panel');
+
+canvas.addEventListener('mousemove', e => {
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const my = e.clientY - rect.top;
+
+    let found = null;
+    for (const n of N) {
+        if (activeFilters.size > 0 && !activeFilters.has(n.c)) continue;
+
+        const dx = n.x - mx;
+        const dy = n.y - my;
+        const r = 4 + Math.min(n.deg / 10, 1) * 8;
+        if (Math.sqrt(dx * dx + dy * dy) < r + 6) {
+            found = n;
+            break;
+        }
+    }
+
+    if (found !== hoveredNode) {
+        hoveredNode = found;
+        canvas.style.cursor = hoveredNode ? 'pointer' : 'default';
+
+        if (hoveredNode) {
+            showTooltip(hoveredNode, e.clientX, e.clientY);
+        } else {
+            hideTooltip();
+        }
+
+        requestAnimationFrame(draw);
+    } else if (hoveredNode) {
+        // Update tooltip position
+        tooltip.style.left = Math.min(e.clientX + 16, W - 340) + 'px';
+        tooltip.style.top = Math.min(e.clientY + 16, H - 200) + 'px';
+    }
+});
+
+canvas.addEventListener('click', e => {
+    if (hoveredNode) {
+        showDetailPanel(hoveredNode);
+    }
+});
+
+canvas.addEventListener('mouseleave', () => {
+    if (hoveredNode) {
+        hoveredNode = null;
+        hideTooltip();
+        requestAnimationFrame(draw);
+    }
+});
+
+// Tooltip
+function showTooltip(node, x, y) {
+    tooltip.querySelector('.tooltip-title').textContent = node.t;
+
+    const badge = tooltip.querySelector('.tooltip-badge');
+    badge.textContent = node.c;
+    badge.className = 'tooltip-badge ' + node.c;
+
+    tooltip.querySelector('.tooltip-desc').textContent = node.d;
+    tooltip.querySelector('.tooltip-connections').textContent = `${node.deg} connections`;
+
+    tooltip.style.left = Math.min(x + 16, W - 340) + 'px';
+    tooltip.style.top = Math.min(y + 16, H - 200) + 'px';
+    tooltip.classList.add('visible');
+}
+
+function hideTooltip() {
+    tooltip.classList.remove('visible');
+}
+
+// Detail Panel
+function showDetailPanel(node) {
+    detailPanel.querySelector('.detail-title').textContent = node.t;
+
+    const badge = detailPanel.querySelector('.detail-badge');
+    badge.textContent = node.c;
+    badge.className = 'detail-badge ' + node.c;
+
+    detailPanel.querySelector('.detail-desc').textContent = node.d;
+
+    const relatedContainer = detailPanel.querySelector('.detail-related');
+    relatedContainer.innerHTML = '';
+    node.r.forEach(rt => {
+        const pill = document.createElement('div');
+        pill.className = 'related-pill';
+        pill.textContent = rt;
+        pill.addEventListener('click', () => {
+            const target = byTitle[rt];
+            if (target) {
+                hoveredNode = target;
+                showDetailPanel(target);
+                requestAnimationFrame(draw);
+            }
+        });
+        relatedContainer.appendChild(pill);
+    });
+
+    detailPanel.querySelector('.detail-compass-btn').onclick = () => {
+        window.open('communication-compass-v29.html#term=' + encodeURIComponent(node.t), '_blank');
+    };
+
+    detailPanel.classList.add('visible');
+    hideTooltip();
+}
+
+function hideDetailPanel() {
+    detailPanel.classList.remove('visible');
+}
+
+detailPanel.querySelector('.detail-close').addEventListener('click', hideDetailPanel);
+
+// Search
+const searchInput = document.getElementById('search');
+const searchCount = document.getElementById('search-count');
+
+searchInput.addEventListener('input', e => {
+    const query = e.target.value.toLowerCase();
+
+    if (!query) {
+        hoveredNode = null;
+        searchCount.textContent = N.length;
+        requestAnimationFrame(draw);
+        return;
+    }
+
+    const matches = N.filter(n => n.t.toLowerCase().includes(query));
+    searchCount.textContent = matches.length;
+
+    if (matches.length > 0) {
+        hoveredNode = matches[0];
+        requestAnimationFrame(draw);
+    }
+});
+
+// Filter Pills
+document.querySelectorAll('.filter-pill').forEach(pill => {
+    pill.addEventListener('click', () => {
+        const cat = pill.dataset.cat;
+
+        if (activeFilters.has(cat)) {
+            activeFilters.delete(cat);
+            pill.classList.remove('active');
+        } else {
+            activeFilters.add(cat);
+            pill.classList.add('active');
+        }
+
+        updateStats();
+        requestAnimationFrame(draw);
+    });
+});
+
+// Stats
+function animateValue(elem, start, end, duration) {
+    const range = end - start;
+    const increment = range / (duration / 16);
+    let current = start;
+
+    const timer = setInterval(() => {
+        current += increment;
+        if ((increment > 0 && current >= end) || (increment < 0 && current <= end)) {
+            current = end;
+            clearInterval(timer);
+        }
+        elem.textContent = Math.round(current);
+    }, 16);
+}
+
+function updateStats() {
+    let visibleNodes = N;
+    if (activeFilters.size > 0) {
+        visibleNodes = N.filter(n => activeFilters.has(n.c));
+    }
+
+    const crossEdges = edges.filter(e => {
+        if (activeFilters.size > 0 && (!activeFilters.has(e.a.c) || !activeFilters.has(e.b.c))) {
+            return false;
+        }
+        return e.a.c !== e.b.c;
+    });
+
+    const totalDegree = visibleNodes.reduce((sum, n) => sum + n.deg, 0);
+    const avgConnections = visibleNodes.length > 0 ? totalDegree / visibleNodes.length : 0;
+
+    document.getElementById('stat-total').textContent = visibleNodes.length;
+    document.getElementById('stat-edges').textContent = crossEdges.length;
+    document.getElementById('stat-avg').textContent = avgConnections.toFixed(1);
+}
+
+// Keyboard Shortcuts
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+        hideDetailPanel();
+        hoveredNode = null;
+        requestAnimationFrame(draw);
+    } else if (e.key === 'r' || e.key === 'R') {
+        activeFilters.clear();
+        document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+        hoveredNode = null;
+        updateStats();
+        requestAnimationFrame(draw);
+    } else if (e.key === 'f' || e.key === 'F') {
+        searchInput.focus();
+    } else if (e.key === '1') {
+        document.querySelector('[data-cat="diagnosis"]').click();
+    } else if (e.key === '2') {
+        document.querySelector('[data-cat="assessment"]').click();
+    } else if (e.key === '3') {
+        document.querySelector('[data-cat="intervention"]').click();
+    }
+});
+
+// Resize handling
+window.addEventListener('resize', () => {
+    recalculateLayout();
+    resizeCanvas();
+    requestAnimationFrame(draw);
+});
+
+// Initial draw and stats
+updateStats();
+requestAnimationFrame(draw);
+
+// Loading screen
+setTimeout(() => {
+  const ld = document.getElementById('loading');
+  ld.style.opacity = '0';
+  ld.style.pointerEvents = 'none';
+  setTimeout(() => { ld.style.display = 'none'; }, 900);
+}, 1200);
+</script>
+</body>
+</html>

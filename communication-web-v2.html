@@ -1,0 +1,1964 @@
+<!DOCTYPE html>
+<html lang="en-NZ">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Communication Web — SLT Knowledge Graph</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a1a;
+  --bg-edge: #0d1117;
+  --surface: rgba(255,255,255,0.04);
+  --surface-hover: rgba(255,255,255,0.08);
+  --border: rgba(255,255,255,0.08);
+  --text: #e6edf3;
+  --text-muted: rgba(255,255,255,0.5);
+  --diag: #e74c8b;
+  --assess: #4da6ff;
+  --interv: #34d399;
+  --accent: #7B2FF7;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background: radial-gradient(ellipse at center, var(--bg) 0%, var(--bg-edge) 100%);
+  color: var(--text);
+  overflow: hidden;
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+}
+
+canvas {
+  display: block;
+  cursor: grab;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+canvas.grabbing {
+  cursor: grabbing;
+}
+
+/* Loading Screen */
+#loading {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse at center, var(--bg) 0%, var(--bg-edge) 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  opacity: 1;
+  transition: opacity 0.8s ease;
+}
+
+#loading.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.loading-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.loading-subtitle {
+  font-family: 'Poppins', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--assess) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 32px;
+}
+
+.loading-dots {
+  display: flex;
+  gap: 8px;
+}
+
+.loading-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+.loading-dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.loading-dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.3; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+/* Glass morphism utility */
+.glass {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Header Bar */
+#header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 68px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.header-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--assess) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.header-center {
+  flex: 1;
+  max-width: 480px;
+  margin: 0 auto;
+  position: relative;
+}
+
+#search-box {
+  width: 100%;
+  height: 42px;
+  background: var(--surface-hover);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  gap: 10px;
+  transition: all 0.2s ease;
+}
+
+#search-box:focus-within {
+  background: rgba(255,255,255,0.10);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(123,47,247,0.15);
+}
+
+.search-icon {
+  width: 18px;
+  height: 18px;
+  opacity: 0.4;
+}
+
+#search-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  font-size: 14px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  outline: none;
+}
+
+#search-input::placeholder {
+  color: var(--text-muted);
+}
+
+.search-count {
+  font-size: 11px;
+  font-weight: 600;
+  font-family: 'Poppins', sans-serif;
+  padding: 3px 8px;
+  background: var(--accent);
+  color: white;
+  border-radius: 6px;
+  min-width: 24px;
+  text-align: center;
+}
+
+#search-clear {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  transition: all 0.15s;
+}
+
+#search-clear:hover {
+  background: var(--surface-hover);
+  color: var(--text);
+}
+
+.header-right {
+  display: flex;
+  gap: 8px;
+}
+
+.filter-pill {
+  font-family: 'Poppins', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: capitalize;
+  letter-spacing: 0.02em;
+}
+
+.filter-pill:hover {
+  background: var(--surface-hover);
+  color: var(--text);
+}
+
+.filter-pill.active.diagnosis {
+  background: var(--diag);
+  border-color: var(--diag);
+  color: white;
+}
+
+.filter-pill.active.assessment {
+  background: var(--assess);
+  border-color: var(--assess);
+  color: white;
+}
+
+.filter-pill.active.intervention {
+  background: var(--interv);
+  border-color: var(--interv);
+  color: white;
+}
+
+/* Stats Bar */
+#stats-bar {
+  position: fixed;
+  top: 84px;
+  left: 24px;
+  right: 24px;
+  height: 80px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  z-index: 90;
+}
+
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stat-label {
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.stat-value {
+  font-family: 'Poppins', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Legend */
+#legend {
+  position: fixed;
+  bottom: 24px;
+  left: 24px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 18px 20px;
+  z-index: 90;
+  min-width: 240px;
+}
+
+.legend-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 14px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.legend-item:last-child {
+  margin-bottom: 0;
+}
+
+.legend-swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.legend-label {
+  flex: 1;
+  color: var(--text);
+}
+
+.legend-count {
+  font-family: 'Poppins', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.legend-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 14px 0;
+}
+
+.legend-size {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.legend-size-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 10px;
+}
+
+.size-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.size-dot {
+  border-radius: 50%;
+  background: var(--text-muted);
+}
+
+.size-dot.small { width: 6px; height: 6px; }
+.size-dot.medium { width: 10px; height: 10px; }
+.size-dot.large { width: 16px; height: 16px; }
+
+.size-arrow {
+  color: var(--text-muted);
+  font-size: 14px;
+  margin: 0 4px;
+}
+
+.size-text {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.legend-hint {
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+/* Zoom Controls */
+#zoom-controls {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 90;
+}
+
+.zoom-btn {
+  width: 44px;
+  height: 44px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: var(--text);
+  font-size: 20px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.zoom-btn:hover {
+  background: var(--surface-hover);
+  border-color: var(--accent);
+}
+
+.zoom-btn:active {
+  transform: scale(0.95);
+}
+
+.zoom-level {
+  font-family: 'Poppins', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-align: center;
+  margin-top: 4px;
+  font-variant-numeric: tabular-nums;
+}
+
+.zoom-fit {
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 10px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.zoom-fit:hover {
+  background: var(--surface-hover);
+  border-color: var(--accent);
+}
+
+/* Physics Controls */
+#physics-controls {
+  position: fixed;
+  bottom: 280px;
+  right: 24px;
+  width: 280px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  z-index: 90;
+  overflow: hidden;
+  max-height: 44px;
+  transition: max-height 0.3s ease;
+}
+
+#physics-controls.expanded {
+  max-height: 280px;
+}
+
+.physics-header {
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.physics-header:hover {
+  background: var(--surface-hover);
+}
+
+.physics-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.physics-icon {
+  font-size: 16px;
+}
+
+.physics-toggle {
+  font-size: 16px;
+  color: var(--text-muted);
+  transition: transform 0.3s ease;
+}
+
+#physics-controls.expanded .physics-toggle {
+  transform: rotate(180deg);
+}
+
+.physics-body {
+  padding: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.physics-control {
+  margin-bottom: 18px;
+}
+
+.physics-control:last-child {
+  margin-bottom: 0;
+}
+
+.physics-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.physics-value {
+  font-family: 'Poppins', sans-serif;
+  color: var(--text);
+}
+
+.physics-slider {
+  width: 100%;
+  height: 6px;
+  background: var(--surface-hover);
+  border-radius: 3px;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.physics-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  background: var(--accent);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.physics-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 0 4px rgba(123,47,247,0.2);
+}
+
+.physics-slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  background: var(--accent);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.physics-slider::-moz-range-thumb:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 0 4px rgba(123,47,247,0.2);
+}
+
+.physics-reset {
+  width: 100%;
+  padding: 10px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.physics-reset:hover {
+  background: var(--surface-hover);
+  border-color: var(--accent);
+}
+
+/* Detail Panel */
+#detail-panel {
+  position: fixed;
+  top: 0;
+  right: -420px;
+  width: 420px;
+  height: 100vh;
+  background: var(--surface);
+  border-left: 1px solid var(--border);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  z-index: 200;
+  padding: 32px;
+  overflow-y: auto;
+  transition: right 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+#detail-panel.open {
+  right: 0;
+}
+
+.panel-close {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  width: 36px;
+  height: 36px;
+  background: var(--surface-hover);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  color: var(--text);
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.panel-close:hover {
+  background: var(--border);
+  transform: rotate(90deg);
+}
+
+.panel-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.3;
+  margin-bottom: 12px;
+  padding-right: 44px;
+}
+
+.panel-badge {
+  display: inline-block;
+  font-family: 'Poppins', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 20px;
+}
+
+.panel-badge.diagnosis {
+  background: rgba(231,76,139,0.15);
+  color: var(--diag);
+  border: 1px solid rgba(231,76,139,0.3);
+}
+
+.panel-badge.assessment {
+  background: rgba(77,166,255,0.15);
+  color: var(--assess);
+  border: 1px solid rgba(77,166,255,0.3);
+}
+
+.panel-badge.intervention {
+  background: rgba(52,211,153,0.15);
+  color: var(--interv);
+  border: 1px solid rgba(52,211,153,0.3);
+}
+
+.panel-description {
+  font-size: 14px;
+  line-height: 1.7;
+  color: rgba(255,255,255,0.75);
+  margin-bottom: 28px;
+}
+
+.panel-section-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 12px;
+}
+
+.panel-connections {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 28px;
+}
+
+.connection-pill {
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 10px 14px;
+  background: var(--surface-hover);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.connection-pill:hover {
+  background: var(--border);
+  border-color: var(--accent);
+  transform: translateX(4px);
+}
+
+.panel-button {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, var(--accent) 0%, #0284c7 100%);
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.panel-button:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(123,47,247,0.3);
+}
+
+/* Bottom Status Bar */
+#bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 44px;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 24px;
+  gap: 24px;
+}
+
+.bottom-hint {
+  font-size: 11px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.bottom-hint strong {
+  font-weight: 600;
+  color: var(--text);
+  font-family: 'Poppins', sans-serif;
+}
+
+.bottom-separator {
+  color: var(--border);
+}
+
+/* Tooltip */
+#tooltip {
+  position: fixed;
+  pointer-events: none;
+  z-index: 300;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+#tooltip.visible {
+  opacity: 1;
+}
+
+.tooltip-content {
+  background: rgba(13, 17, 23, 0.95);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 12px 16px;
+  max-width: 280px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+
+.tooltip-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.tooltip-meta {
+  font-size: 11px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tooltip-badge {
+  font-family: 'Poppins', sans-serif;
+  font-size: 9px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.tooltip-badge.diagnosis {
+  background: rgba(231,76,139,0.2);
+  color: var(--diag);
+}
+
+.tooltip-badge.assessment {
+  background: rgba(77,166,255,0.2);
+  color: var(--assess);
+}
+
+.tooltip-badge.intervention {
+  background: rgba(52,211,153,0.2);
+  color: var(--interv);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  #header {
+    flex-direction: column;
+    height: auto;
+    padding: 16px;
+    gap: 12px;
+  }
+
+  .header-left {
+    width: 100%;
+  }
+
+  .header-center {
+    width: 100%;
+    max-width: none;
+  }
+
+  .header-right {
+    width: 100%;
+    justify-content: flex-start;
+    overflow-x: auto;
+  }
+
+  #stats-bar {
+    top: 140px;
+    grid-template-columns: repeat(2, 1fr);
+    height: auto;
+  }
+
+  #detail-panel {
+    width: 100%;
+    right: -100%;
+  }
+
+  #detail-panel.open {
+    right: 0;
+  }
+
+  #physics-controls {
+    width: 240px;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- Loading Screen -->
+<div id="loading">
+  <div class="loading-title">SLT Knowledge Graph</div>
+  <div class="loading-subtitle">Communication Web — Force-Directed Network</div>
+  <div class="loading-dots">
+    <div class="loading-dot"></div>
+    <div class="loading-dot"></div>
+    <div class="loading-dot"></div>
+  </div>
+</div>
+
+<!-- Canvas -->
+<canvas id="canvas"></canvas>
+
+<!-- Header -->
+<div id="header">
+  <div class="header-left">
+    <div class="header-title">Communication Web</div>
+  </div>
+  <div class="header-center">
+    <div id="search-box">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/>
+        <path d="m21 21-4.35-4.35"/>
+      </svg>
+      <input type="text" id="search-input" placeholder="Search terms..." autocomplete="off">
+      <span class="search-count" id="search-count" style="display:none;">0</span>
+      <button id="search-clear">&times;</button>
+    </div>
+  </div>
+  <div class="header-right">
+    <button class="filter-pill active diagnosis" data-cat="diagnosis">Diagnoses</button>
+    <button class="filter-pill active assessment" data-cat="assessment">Assessments</button>
+    <button class="filter-pill active intervention" data-cat="intervention">Interventions</button>
+  </div>
+</div>
+
+<!-- Stats Bar -->
+<div id="stats-bar">
+  <div class="stat-card">
+    <div class="stat-label">Total Nodes</div>
+    <div class="stat-value" id="stat-nodes">108</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Active Edges</div>
+    <div class="stat-value" id="stat-edges">137</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Network Density</div>
+    <div class="stat-value" id="stat-density">2.4%</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Clusters</div>
+    <div class="stat-value" id="stat-clusters">3</div>
+  </div>
+</div>
+
+<!-- Legend -->
+<div id="legend">
+  <div class="legend-title">Categories</div>
+  <div class="legend-item">
+    <div class="legend-swatch" style="background:var(--diag)"></div>
+    <div class="legend-label">Diagnoses</div>
+    <div class="legend-count" id="count-diagnosis">22</div>
+  </div>
+  <div class="legend-item">
+    <div class="legend-swatch" style="background:var(--assess)"></div>
+    <div class="legend-label">Assessments</div>
+    <div class="legend-count" id="count-assessment">39</div>
+  </div>
+  <div class="legend-item">
+    <div class="legend-swatch" style="background:var(--interv)"></div>
+    <div class="legend-label">Interventions</div>
+    <div class="legend-count" id="count-intervention">47</div>
+  </div>
+
+  <div class="legend-divider"></div>
+
+  <div class="legend-size-label">Node Size</div>
+  <div class="size-indicator">
+    <div class="size-dot small"></div>
+    <span class="size-arrow">→</span>
+    <div class="size-dot medium"></div>
+    <span class="size-arrow">→</span>
+    <div class="size-dot large"></div>
+    <span class="size-text" style="margin-left:8px;">Connections</span>
+  </div>
+
+  <div class="legend-hint">
+    <strong>Drag</strong> nodes · <strong>Scroll</strong> to zoom · <strong>Click</strong> for details
+  </div>
+</div>
+
+<!-- Zoom Controls -->
+<div id="zoom-controls">
+  <button class="zoom-btn" id="zoom-in">+</button>
+  <button class="zoom-btn" id="zoom-out">−</button>
+  <div class="zoom-level" id="zoom-level">100%</div>
+  <button class="zoom-fit" id="zoom-fit">Fit View</button>
+</div>
+
+<!-- Physics Controls -->
+<div id="physics-controls">
+  <div class="physics-header" id="physics-toggle">
+    <div class="physics-title">
+      <span class="physics-icon">⚙</span>
+      Physics
+    </div>
+    <span class="physics-toggle">▼</span>
+  </div>
+  <div class="physics-body">
+    <div class="physics-control">
+      <div class="physics-label">
+        <span>Repulsion</span>
+        <span class="physics-value" id="repulsion-value">300</span>
+      </div>
+      <input type="range" class="physics-slider" id="repulsion-slider" min="100" max="600" value="300" step="10">
+    </div>
+    <div class="physics-control">
+      <div class="physics-label">
+        <span>Edge Length</span>
+        <span class="physics-value" id="edge-length-value">120</span>
+      </div>
+      <input type="range" class="physics-slider" id="edge-length-slider" min="60" max="200" value="120" step="5">
+    </div>
+    <div class="physics-control">
+      <div class="physics-label">
+        <span>Gravity</span>
+        <span class="physics-value" id="gravity-value">0.02</span>
+      </div>
+      <input type="range" class="physics-slider" id="gravity-slider" min="0" max="0.05" value="0.02" step="0.005">
+    </div>
+    <button class="physics-reset" id="physics-reset">Reset Physics</button>
+  </div>
+</div>
+
+<!-- Detail Panel -->
+<div id="detail-panel">
+  <button class="panel-close" id="panel-close">&times;</button>
+  <div class="panel-title" id="panel-title"></div>
+  <div class="panel-badge" id="panel-badge"></div>
+  <div class="panel-description" id="panel-description"></div>
+  <div class="panel-section-title">Connected Terms (<span id="panel-connection-count">0</span>)</div>
+  <div class="panel-connections" id="panel-connections"></div>
+  <button class="panel-button" id="panel-open-compass">
+    Open in Communication Compass
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+      <polyline points="15 3 21 3 21 9"/>
+      <line x1="10" y1="14" x2="21" y2="3"/>
+    </svg>
+  </button>
+</div>
+
+<!-- Tooltip -->
+<div id="tooltip">
+  <div class="tooltip-content">
+    <div class="tooltip-title" id="tooltip-title"></div>
+    <div class="tooltip-meta">
+      <span class="tooltip-badge" id="tooltip-badge"></span>
+      <span id="tooltip-connections"></span>
+    </div>
+  </div>
+</div>
+
+<!-- Bottom Bar -->
+<div id="bottom-bar">
+  <div class="bottom-hint"><strong>R</strong> Reset</div>
+  <span class="bottom-separator">·</span>
+  <div class="bottom-hint"><strong>F</strong> Fullscreen</div>
+  <span class="bottom-separator">·</span>
+  <div class="bottom-hint"><strong>1-3</strong> Toggle categories</div>
+  <span class="bottom-separator">·</span>
+  <div class="bottom-hint"><strong>Space</strong> Pause simulation</div>
+  <span class="bottom-separator">·</span>
+  <div class="bottom-hint"><strong>Esc</strong> Close panel</div>
+</div>
+
+<script>
+// ============================================================
+// DATA — 108 nodes (EXACT same dataset)
+// ============================================================
+const NODES = [
+// DIAGNOSES (22)
+{id:'d1',title:'Developmental Language Disorder (DLD)',category:'diagnosis',description:'A neurodevelopmental disorder characterised by persistent difficulties in acquiring and using language across modalities.',related:['CELF','PLS','Language Sample Analysis','Modelling','Recasting','Shape Coding','Colourful Semantics']},
+{id:'d2',title:'Childhood Apraxia of Speech (CAS)',category:'diagnosis',description:'A motor speech disorder where children have difficulty planning and coordinating the precise movements needed for speech.',related:['PROMPT Therapy','Nuffield Dyspraxia Programme (NDP3)','AAC','GFTA','Stimulability Testing']},
+{id:'d3',title:'Phonological Disorder',category:'diagnosis',description:'A speech sound disorder characterised by predictable, rule-based errors affecting groups of sounds.',related:['Minimal Pairs Approach','Cycles Approach','Core Vocabulary Approach','GFTA','Phonological Assessment','Phonological Awareness']},
+{id:'d4',title:'Stuttering (Fluency Disorder)',category:'diagnosis',description:'Disruptions in the flow of speech characterised by repetitions, prolongations, and blocks.',related:['Lidcombe Program','Fluency Shaping','Stuttering Modification','OASES']},
+{id:'d5',title:'Selective Mutism',category:'diagnosis',description:'An anxiety disorder where a child consistently fails to speak in specific social situations despite speaking normally elsewhere.',related:['Sliding-In Technique','Brave Programme','Stimulus Fading']},
+{id:'d6',title:'Dysarthria',category:'diagnosis',description:'A motor speech disorder resulting from neurological damage affecting muscles used for speech.',related:['Oral Motor Exercises','AAC','Lee Silverman Voice Treatment (LSVT)']},
+{id:'d7',title:'Receptive Language Disorder',category:'diagnosis',description:'Difficulty understanding spoken language, affecting comprehension of vocabulary, grammar, and complex instructions.',related:['CELF','PLS','ROWPVT','Visual Supports','Scaffolding']},
+{id:'d8',title:'Expressive Language Disorder',category:'diagnosis',description:'Difficulty using words and sentences to express thoughts and needs.',related:['CELF','PLS','Focused Stimulation','Modelling','Milieu Teaching']},
+{id:'d9',title:'Articulation Disorder',category:'diagnosis',description:'Difficulty producing specific speech sounds correctly due to motor or placement issues.',related:['GFTA','Traditional Articulation Therapy','Phonetic Placement']},
+{id:'d10',title:'Language Delay',category:'diagnosis',description:'Slower-than-expected language development where skills emerge in typical sequence but at a delayed rate.',related:['Hanen Approach','Modelling','Expansion','Parallel Talk']},
+{id:'d11',title:'Social Communication Disorder',category:'diagnosis',description:'Persistent difficulties using verbal and nonverbal communication for social purposes.',related:['Social Thinking','PEERS Program','Video Modelling','Pragmatic Language Assessment']},
+{id:'d12',title:'Auditory Processing Disorder (APD)',category:'diagnosis',description:'Difficulty processing auditory information despite normal hearing.',related:['Auditory Training','Compensatory Strategies','FM Systems']},
+{id:'d13',title:'Voice Disorder (Dysphonia)',category:'diagnosis',description:'Abnormal voice quality, pitch, loudness, or resonance.',related:['Vocal Hygiene','Resonant Voice Therapy','GRBAS Scale']},
+{id:'d14',title:'Cleft Palate Speech',category:'diagnosis',description:'Speech difficulties from structural abnormalities of the palate.',related:['Nasometry','Pressure Consonant Assessment','Speech Surgery']},
+{id:'d15',title:'Specific Learning Disability',category:'diagnosis',description:'A neurological condition affecting reading, writing, or mathematical skills.',related:['Phonological Awareness','DIBELS','PAT-2']},
+{id:'d16',title:'Autism Spectrum Disorder',category:'diagnosis',description:'A neurodevelopmental condition characterised by differences in social communication and restricted interests.',related:['PECS','AAC','Social Stories','Visual Supports','ADOS-2']},
+{id:'d17',title:'Intellectual Disability',category:'diagnosis',description:'Significant limitations in both intellectual functioning and adaptive behaviour.',related:['AAC','Functional Communication Training','Makaton']},
+{id:'d18',title:'Hearing Loss',category:'diagnosis',description:'Reduced ability to hear sounds, affecting speech and language development.',related:['Auditory-Verbal Therapy','Sign Language','FM Systems','Cochlear Implant']},
+{id:'d19',title:'Traumatic Brain Injury',category:'diagnosis',description:'Acquired brain injury affecting cognitive-communication skills.',related:['Cognitive-Communication Therapy','AAC']},
+{id:'d20',title:'Literacy Difficulties',category:'diagnosis',description:'Challenges in developing reading and writing skills.',related:['Phonological Awareness','DIBELS','Vocabulary Assessment']},
+{id:'d21',title:'Feeding & Swallowing Difficulties',category:'diagnosis',description:'Difficulties with oral intake of food and liquids.',related:['Oral Motor Exercises','Food Chaining','SOS Approach']},
+{id:'d22',title:'Late Talker',category:'diagnosis',description:'Children aged 18\u201330 months with limited expressive vocabulary (<50 words).',related:['Hanen Approach','Modelling','Parent Coaching','Vocabulary Assessment']},
+// ASSESSMENTS (39)
+{id:'a1',title:'Standardised Assessment',category:'assessment',description:'A formal, norm-referenced test with standardised administration and scoring.',related:[]},
+{id:'a2',title:'CELF',category:'assessment',description:'Clinical Evaluation of Language Fundamentals \u2014 comprehensive language assessment.',related:['Developmental Language Disorder (DLD)','Receptive Language Disorder','Expressive Language Disorder']},
+{id:'a3',title:'PLS',category:'assessment',description:'Preschool Language Scales \u2014 for young children measuring comprehension and expression.',related:['Developmental Language Disorder (DLD)','Receptive Language Disorder','Expressive Language Disorder']},
+{id:'a4',title:'GFTA',category:'assessment',description:'Goldman-Fristoe Test of Articulation \u2014 consonant production assessment.',related:['Childhood Apraxia of Speech (CAS)','Phonological Disorder','Articulation Disorder']},
+{id:'a5',title:'ADOS-2',category:'assessment',description:'Autism Diagnostic Observation Schedule \u2014 gold standard for ASD.',related:['Autism Spectrum Disorder']},
+{id:'a6',title:'Norm-Referenced Assessment',category:'assessment',description:'Assessment comparing performance to same-age peers.',related:[]},
+{id:'a7',title:'Criterion-Referenced Assessment',category:'assessment',description:'Assessment against specific criteria or learning objectives.',related:[]},
+{id:'a8',title:'Language Sample Analysis',category:'assessment',description:'Analysis of spontaneous speech for MLU and vocabulary diversity.',related:['Developmental Language Disorder (DLD)']},
+{id:'a9',title:'Dynamic Assessment',category:'assessment',description:'Test-teach-retest format examining learning potential.',related:[]},
+{id:'a10',title:'Oral Motor Assessment',category:'assessment',description:'Examination of oral structures and movements.',related:[]},
+{id:'a11',title:'Fluency Assessment',category:'assessment',description:'Assessment of stuttering frequency, type, and severity.',related:[]},
+{id:'a12',title:'Pragmatic Language Assessment',category:'assessment',description:'Assessment of social communication skills.',related:['Social Communication Disorder']},
+{id:'a13',title:'ROWPVT',category:'assessment',description:'Receptive One-Word Picture Vocabulary Test.',related:['Receptive Language Disorder']},
+{id:'a14',title:'EOWPVT',category:'assessment',description:'Expressive One-Word Picture Vocabulary Test.',related:[]},
+{id:'a15',title:'MLU',category:'assessment',description:'Mean Length of Utterance \u2014 grammatical complexity measure.',related:[]},
+{id:'a16',title:'Phonological Assessment',category:'assessment',description:'Identifies phonological error patterns.',related:['Phonological Disorder']},
+{id:'a17',title:'Stimulability Testing',category:'assessment',description:'Assesses ability to produce target sounds with cues.',related:['Childhood Apraxia of Speech (CAS)']},
+{id:'a18',title:'Informal Assessment',category:'assessment',description:'Non-standardised observation tailored to individual needs.',related:[]},
+{id:'a19',title:'Narrative Assessment',category:'assessment',description:'Assessment of story-telling abilities.',related:[]},
+{id:'a20',title:'Play-Based Assessment',category:'assessment',description:'Assessment through observation of play.',related:[]},
+{id:'a21',title:'KSPT',category:'assessment',description:'Kaufman Speech Praxis Test \u2014 identifies CAS.',related:[]},
+{id:'a22',title:'VMPAC',category:'assessment',description:'Verbal Motor Production Assessment for Children.',related:[]},
+{id:'a23',title:'PIPA',category:'assessment',description:'Preschool & Primary Inventory of Phonological Awareness.',related:[]},
+{id:'a24',title:'PAT-2',category:'assessment',description:'Photo Articulation Test.',related:['Specific Learning Disability']},
+{id:'a25',title:'DIBELS',category:'assessment',description:'Dynamic Indicators of Basic Early Literacy Skills.',related:['Specific Learning Disability','Literacy Difficulties']},
+{id:'a26',title:'Vocabulary Assessment',category:'assessment',description:'Assessment of receptive and expressive vocabulary.',related:['Late Talker','Literacy Difficulties']},
+{id:'a27',title:'Phonological Awareness Assessment',category:'assessment',description:'Assessment of sound awareness and manipulation.',related:[]},
+{id:'a28',title:'OASES',category:'assessment',description:'Overall Assessment of the Speaker\u2019s Experience of Stuttering.',related:['Stuttering (Fluency Disorder)']},
+{id:'a29',title:'Nasometry',category:'assessment',description:'Acoustic measurement of nasality.',related:['Cleft Palate Speech']},
+{id:'a30',title:'Pressure Consonant Assessment',category:'assessment',description:'Assessment of pressure-sensitive consonant production.',related:['Cleft Palate Speech']},
+{id:'a31',title:'GRBAS Scale',category:'assessment',description:'Perceptual rating scale for voice quality.',related:['Voice Disorder (Dysphonia)']},
+{id:'a32',title:'Auditory Training',category:'assessment',description:'Exercises improving auditory discrimination.',related:['Auditory Processing Disorder (APD)']},
+{id:'a33',title:'Hearing Screening',category:'assessment',description:'Brief assessment to identify hearing loss.',related:[]},
+{id:'a34',title:'Speech Intelligibility Assessment',category:'assessment',description:'Measures how well speech is understood.',related:[]},
+{id:'a35',title:'Functional Communication Assessment',category:'assessment',description:'Real-world communication abilities assessment.',related:[]},
+{id:'a36',title:'Milestone Screening',category:'assessment',description:'Screening tool for developmental delays.',related:[]},
+{id:'a37',title:'Parent Questionnaire',category:'assessment',description:'Parent report of communication skills.',related:[]},
+{id:'a38',title:'FM System Assessment',category:'assessment',description:'Assessment of assistive listening benefit.',related:[]},
+// INTERVENTIONS (47)
+{id:'i1',title:'Modelling',category:'intervention',description:'Demonstrating target language without requiring imitation.',related:['Developmental Language Disorder (DLD)','Expressive Language Disorder','Language Delay','Late Talker']},
+{id:'i2',title:'Recasting',category:'intervention',description:'Reformulating a child\u2019s utterance to provide a correct model.',related:['Developmental Language Disorder (DLD)']},
+{id:'i3',title:'Expansion',category:'intervention',description:'Adding elements to a child\u2019s utterance while maintaining meaning.',related:['Language Delay']},
+{id:'i4',title:'Hanen Approach',category:'intervention',description:'Parent-implemented intervention using Observe, Wait, Listen.',related:['Language Delay','Late Talker']},
+{id:'i5',title:'PROMPT Therapy',category:'intervention',description:'Tactile-kinaesthetic approach for motor speech disorders.',related:['Childhood Apraxia of Speech (CAS)']},
+{id:'i6',title:'Nuffield Dyspraxia Programme (NDP3)',category:'intervention',description:'Structured intervention for childhood apraxia of speech.',related:['Childhood Apraxia of Speech (CAS)']},
+{id:'i7',title:'Minimal Pairs Approach',category:'intervention',description:'Using word pairs differing by one sound to highlight contrasts.',related:['Phonological Disorder']},
+{id:'i8',title:'Cycles Approach',category:'intervention',description:'Targeting error patterns in time-based cycles.',related:['Phonological Disorder']},
+{id:'i9',title:'Core Vocabulary Approach',category:'intervention',description:'Targeting consistent production of functional words.',related:['Phonological Disorder']},
+{id:'i10',title:'Lidcombe Program',category:'intervention',description:'Parent-delivered behavioural treatment for early stuttering.',related:['Stuttering (Fluency Disorder)']},
+{id:'i11',title:'Fluency Shaping',category:'intervention',description:'Teaching slow, controlled speech patterns.',related:['Stuttering (Fluency Disorder)']},
+{id:'i12',title:'Stuttering Modification',category:'intervention',description:'Techniques to stutter more easily and reduce avoidance.',related:['Stuttering (Fluency Disorder)']},
+{id:'i13',title:'Sliding-In Technique',category:'intervention',description:'Gradual exposure for selective mutism.',related:['Selective Mutism']},
+{id:'i14',title:'Brave Programme',category:'intervention',description:'CBT intervention for selective mutism.',related:['Selective Mutism']},
+{id:'i15',title:'Shape Coding',category:'intervention',description:'Visual system using shapes to teach sentence structure.',related:['Developmental Language Disorder (DLD)']},
+{id:'i16',title:'Colourful Semantics',category:'intervention',description:'Colour-coded approach to teach sentence structure.',related:['Developmental Language Disorder (DLD)']},
+{id:'i17',title:'AAC',category:'intervention',description:'Augmentative and Alternative Communication \u2014 supplementing or replacing speech.',related:['Childhood Apraxia of Speech (CAS)','Dysarthria','Autism Spectrum Disorder','Intellectual Disability','Traumatic Brain Injury']},
+{id:'i18',title:'PECS',category:'intervention',description:'Picture Exchange Communication System.',related:['Autism Spectrum Disorder']},
+{id:'i19',title:'Social Thinking',category:'intervention',description:'Framework for teaching social cognition.',related:['Social Communication Disorder']},
+{id:'i20',title:'Social Stories',category:'intervention',description:'Short stories teaching appropriate social responses.',related:['Autism Spectrum Disorder']},
+{id:'i21',title:'Video Modelling',category:'intervention',description:'Using video to demonstrate target behaviours.',related:['Social Communication Disorder']},
+{id:'i22',title:'Visual Supports',category:'intervention',description:'Visual aids to support comprehension and communication.',related:['Receptive Language Disorder','Autism Spectrum Disorder']},
+{id:'i23',title:'Scaffolding',category:'intervention',description:'Graded support helping children achieve beyond their level.',related:['Receptive Language Disorder']},
+{id:'i24',title:'Focused Stimulation',category:'intervention',description:'Intensive modelling of targets in meaningful contexts.',related:['Expressive Language Disorder']},
+{id:'i25',title:'Milieu Teaching',category:'intervention',description:'Naturalistic intervention using environmental arrangement.',related:['Expressive Language Disorder']},
+{id:'i26',title:'Makaton',category:'intervention',description:'Speech, signs, and symbols programme.',related:['Intellectual Disability']},
+{id:'i27',title:'Parent Coaching',category:'intervention',description:'Training parents in language facilitation strategies.',related:['Late Talker']},
+{id:'i28',title:'Oral Motor Exercises',category:'intervention',description:'Exercises for oral structure strength and coordination.',related:['Dysarthria','Feeding & Swallowing Difficulties']},
+{id:'i29',title:'Traditional Articulation Therapy',category:'intervention',description:'Structured therapy targeting correct sound production.',related:['Articulation Disorder']},
+{id:'i30',title:'Phonetic Placement',category:'intervention',description:'Teaching correct tongue/lip placement for sounds.',related:['Articulation Disorder']},
+{id:'i31',title:'Parallel Talk',category:'intervention',description:'Describing what the child is doing to model language.',related:['Language Delay']},
+{id:'i32',title:'Auditory-Verbal Therapy',category:'intervention',description:'Developing listening and spoken language for hearing loss.',related:['Hearing Loss']},
+{id:'i33',title:'Vocal Hygiene',category:'intervention',description:'Promoting healthy voice use.',related:['Voice Disorder (Dysphonia)']},
+{id:'i34',title:'Resonant Voice Therapy',category:'intervention',description:'Easy, forward-focused voice production.',related:['Voice Disorder (Dysphonia)']},
+{id:'i35',title:'Stimulus Fading',category:'intervention',description:'Gradual removal of prompts for independence.',related:['Selective Mutism']},
+{id:'i36',title:'Lee Silverman Voice Treatment (LSVT)',category:'intervention',description:'Intensive voice treatment for dysarthria.',related:['Dysarthria']},
+{id:'i37',title:'Phonological Awareness',category:'intervention',description:'Teaching sound awareness: rhyming, segmenting, blending.',related:['Phonological Disorder','Specific Learning Disability','Literacy Difficulties']},
+{id:'i38',title:'PEERS Program',category:'intervention',description:'Evidence-based social skills intervention.',related:['Social Communication Disorder']},
+{id:'i39',title:'Compensatory Strategies',category:'intervention',description:'Alternative methods to bypass communication difficulties.',related:['Auditory Processing Disorder (APD)']},
+{id:'i40',title:'FM Systems',category:'intervention',description:'Assistive listening technology.',related:['Auditory Processing Disorder (APD)','Hearing Loss']},
+{id:'i41',title:'Speech Surgery',category:'intervention',description:'Surgical correction of speech-affecting structures.',related:['Cleft Palate Speech']},
+{id:'i42',title:'Functional Communication Training',category:'intervention',description:'Teaching functional communication alternatives.',related:['Intellectual Disability']},
+{id:'i43',title:'Sign Language',category:'intervention',description:'Visual-manual language for Deaf communities.',related:['Hearing Loss']},
+{id:'i44',title:'Cochlear Implant',category:'intervention',description:'Implanted device for severe hearing loss.',related:['Hearing Loss']},
+{id:'i45',title:'Cognitive-Communication Therapy',category:'intervention',description:'Targeting cognitive processes affecting communication.',related:['Traumatic Brain Injury']},
+{id:'i46',title:'Food Chaining',category:'intervention',description:'Gradual food introduction based on sensory similarities.',related:['Feeding & Swallowing Difficulties']},
+{id:'i47',title:'SOS Approach',category:'intervention',description:'Sequential Oral Sensory feeding approach.',related:['Feeding & Swallowing Difficulties']},
+];
+
+// ============================================================
+// BUILD GRAPH
+// ============================================================
+const nodeByTitle = {};
+const edges = [];
+
+NODES.forEach(n => {
+  nodeByTitle[n.title] = n;
+  n.x = 0;
+  n.y = 0;
+  n.vx = 0;
+  n.vy = 0;
+  n.degree = 0;
+});
+
+NODES.forEach(n => {
+  n.related.forEach(relTitle => {
+    const target = nodeByTitle[relTitle];
+    if (target && !edges.find(e => (e.source === n && e.target === target) || (e.source === target && e.target === n))) {
+      edges.push({ source: n, target: target });
+      n.degree++;
+      target.degree++;
+    }
+  });
+});
+
+// Compute node sizes based on degree
+NODES.forEach(n => {
+  const base = n.category === 'diagnosis' ? 12 : 6;
+  n.radius = base + Math.sqrt(n.degree) * 2;
+});
+
+// ============================================================
+// PHYSICS SIMULATION
+// ============================================================
+let physicsParams = {
+  charge: -300,
+  linkDistance: 120,
+  linkStrength: 0.01,
+  gravity: 0.02,
+  damping: 0.92
+};
+
+const defaultPhysicsParams = { ...physicsParams };
+
+function initPositions() {
+  const W = 2400, H = 1800;
+  let seed = 12345;
+  function rng() {
+    seed = (seed * 16807) % 2147483647;
+    return (seed - 1) / 2147483646;
+  }
+  NODES.forEach(n => {
+    n.x = W * 0.1 + rng() * W * 0.8;
+    n.y = H * 0.1 + rng() * H * 0.8;
+    n.vx = 0;
+    n.vy = 0;
+  });
+}
+
+let simulationRunning = true;
+
+function tickSimulation() {
+  if (!simulationRunning) return;
+
+  const cx = 1200, cy = 900;
+
+  // Repulsion between all nodes
+  for (let i = 0; i < NODES.length; i++) {
+    for (let j = i + 1; j < NODES.length; j++) {
+      const a = NODES[i], b = NODES[j];
+      let dx = b.x - a.x, dy = b.y - a.y;
+      let dist2 = dx * dx + dy * dy;
+      if (dist2 < 1) dist2 = 1;
+      const dist = Math.sqrt(dist2);
+      const force = physicsParams.charge / dist2;
+      const fx = force * dx / dist;
+      const fy = force * dy / dist;
+      a.vx -= fx;
+      a.vy -= fy;
+      b.vx += fx;
+      b.vy += fy;
+    }
+  }
+
+  // Spring attraction along edges
+  edges.forEach(e => {
+    const dx = e.target.x - e.source.x;
+    const dy = e.target.y - e.source.y;
+    const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+    const force = (dist - physicsParams.linkDistance) * physicsParams.linkStrength;
+    const fx = force * dx / dist;
+    const fy = force * dy / dist;
+    e.source.vx += fx;
+    e.source.vy += fy;
+    e.target.vx -= fx;
+    e.target.vy -= fy;
+  });
+
+  // Gravity to centre
+  NODES.forEach(n => {
+    n.vx += (cx - n.x) * physicsParams.gravity;
+    n.vy += (cy - n.y) * physicsParams.gravity;
+  });
+
+  // Apply damping and integrate
+  NODES.forEach(n => {
+    n.vx *= physicsParams.damping;
+    n.vy *= physicsParams.damping;
+    n.x += n.vx;
+    n.y += n.vy;
+  });
+
+  // Collision detection
+  for (let i = 0; i < NODES.length; i++) {
+    for (let j = i + 1; j < NODES.length; j++) {
+      const a = NODES[i], b = NODES[j];
+      const dx = b.x - a.x, dy = b.y - a.y;
+      const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+      const minDist = a.radius + b.radius + 4;
+      if (dist < minDist) {
+        const push = (minDist - dist) / 2;
+        const nx = dx / dist, ny = dy / dist;
+        a.x -= nx * push;
+        a.y -= ny * push;
+        b.x += nx * push;
+        b.y += ny * push;
+      }
+    }
+  }
+}
+
+// Pre-warm simulation
+initPositions();
+for (let i = 0; i < 400; i++) {
+  tickSimulation();
+}
+
+// ============================================================
+// RENDERING
+// ============================================================
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+let canvasW = window.innerWidth;
+let canvasH = window.innerHeight;
+
+let camera = { x: 0, y: 0, scale: 1.0 };
+let dragging = false;
+let dragNode = null;
+let dragStartX = 0, dragStartY = 0;
+let hoveredNode = null;
+let selectedNode = null;
+
+const COLORS = {
+  diagnosis: '#e74c8b',
+  assessment: '#4da6ff',
+  intervention: '#34d399'
+};
+
+function resize() {
+  const dpr = window.devicePixelRatio || 2;
+  canvasW = window.innerWidth;
+  canvasH = window.innerHeight;
+  canvas.width = canvasW * dpr;
+  canvas.height = canvasH * dpr;
+  canvas.style.width = canvasW + 'px';
+  canvas.style.height = canvasH + 'px';
+  ctx.scale(dpr, dpr);
+
+  // Centre view on first load
+  if (camera.x === 0 && camera.y === 0) {
+    fitToView();
+  }
+}
+
+function worldToScreen(wx, wy) {
+  return {
+    x: wx * camera.scale + camera.x,
+    y: wy * camera.scale + camera.y
+  };
+}
+
+function screenToWorld(sx, sy) {
+  return {
+    x: (sx - camera.x) / camera.scale,
+    y: (sy - camera.y) / camera.scale
+  };
+}
+
+function fitToView() {
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  NODES.forEach(n => {
+    minX = Math.min(minX, n.x);
+    minY = Math.min(minY, n.y);
+    maxX = Math.max(maxX, n.x);
+    maxY = Math.max(maxY, n.y);
+  });
+  const graphW = maxX - minX;
+  const graphH = maxY - minY;
+  const graphCX = (minX + maxX) / 2;
+  const graphCY = (minY + maxY) / 2;
+
+  const scaleX = (canvasW - 400) / graphW;
+  const scaleY = (canvasH - 400) / graphH;
+  camera.scale = Math.min(scaleX, scaleY, 1.0);
+
+  camera.x = canvasW / 2 - graphCX * camera.scale;
+  camera.y = canvasH / 2 - graphCY * camera.scale;
+
+  updateZoomDisplay();
+}
+
+function updateZoomDisplay() {
+  document.getElementById('zoom-level').textContent = Math.round(camera.scale * 100) + '%';
+}
+
+// ============================================================
+// FILTERS & SEARCH
+// ============================================================
+let activeCategories = { diagnosis: true, assessment: true, intervention: true };
+let searchTerm = '';
+let searchMatches = [];
+
+function updateStats() {
+  const visibleNodes = NODES.filter(n => activeCategories[n.category]);
+  const visibleEdges = edges.filter(e => activeCategories[e.source.category] && activeCategories[e.target.category]);
+
+  document.getElementById('stat-nodes').textContent = visibleNodes.length;
+  document.getElementById('stat-edges').textContent = visibleEdges.length;
+
+  const maxEdges = visibleNodes.length * (visibleNodes.length - 1) / 2;
+  const density = maxEdges > 0 ? (visibleEdges.length / maxEdges * 100).toFixed(1) : 0;
+  document.getElementById('stat-density').textContent = density + '%';
+
+  const diagCount = NODES.filter(n => n.category === 'diagnosis' && activeCategories.diagnosis).length;
+  const assessCount = NODES.filter(n => n.category === 'assessment' && activeCategories.assessment).length;
+  const intervCount = NODES.filter(n => n.category === 'intervention' && activeCategories.intervention).length;
+
+  document.getElementById('count-diagnosis').textContent = diagCount;
+  document.getElementById('count-assessment').textContent = assessCount;
+  document.getElementById('count-intervention').textContent = intervCount;
+}
+
+document.querySelectorAll('.filter-pill').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const cat = btn.dataset.cat;
+    activeCategories[cat] = !activeCategories[cat];
+    btn.classList.toggle('active');
+    updateStats();
+  });
+});
+
+const searchInput = document.getElementById('search-input');
+const searchClear = document.getElementById('search-clear');
+const searchCount = document.getElementById('search-count');
+
+searchInput.addEventListener('input', e => {
+  searchTerm = e.target.value.toLowerCase().trim();
+  if (searchTerm) {
+    searchMatches = NODES.filter(n => n.title.toLowerCase().includes(searchTerm));
+    searchClear.style.display = 'block';
+    searchCount.style.display = 'inline-block';
+    searchCount.textContent = searchMatches.length;
+  } else {
+    searchMatches = [];
+    searchClear.style.display = 'none';
+    searchCount.style.display = 'none';
+  }
+});
+
+searchClear.addEventListener('click', () => {
+  searchInput.value = '';
+  searchTerm = '';
+  searchMatches = [];
+  searchClear.style.display = 'none';
+  searchCount.style.display = 'none';
+});
+
+searchInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && searchMatches.length > 0) {
+    const node = searchMatches[0];
+    camera.scale = 1.5;
+    camera.x = canvasW / 2 - node.x * camera.scale;
+    camera.y = canvasH / 2 - node.y * camera.scale;
+    updateZoomDisplay();
+    showDetailPanel(node);
+  }
+});
+
+// ============================================================
+// MOUSE & TOUCH INTERACTION
+// ============================================================
+canvas.addEventListener('mousedown', e => {
+  const wp = screenToWorld(e.clientX, e.clientY);
+
+  // Check if clicking a node
+  for (let i = NODES.length - 1; i >= 0; i--) {
+    const n = NODES[i];
+    if (!activeCategories[n.category]) continue;
+    const dx = wp.x - n.x;
+    const dy = wp.y - n.y;
+    if (dx * dx + dy * dy < n.radius * n.radius) {
+      dragNode = n;
+      dragStartX = e.clientX;
+      dragStartY = e.clientY;
+      canvas.style.cursor = 'grabbing';
+      return;
+    }
+  }
+
+  // Otherwise, pan
+  dragging = true;
+  dragStartX = e.clientX;
+  dragStartY = e.clientY;
+  canvas.classList.add('grabbing');
+});
+
+canvas.addEventListener('mousemove', e => {
+  if (dragNode) {
+    const wp = screenToWorld(e.clientX, e.clientY);
+    dragNode.x = wp.x;
+    dragNode.y = wp.y;
+    dragNode.vx = 0;
+    dragNode.vy = 0;
+    return;
+  }
+
+  if (dragging) {
+    camera.x += e.clientX - dragStartX;
+    camera.y += e.clientY - dragStartY;
+    dragStartX = e.clientX;
+    dragStartY = e.clientY;
+    return;
+  }
+
+  // Hover detection
+  const wp = screenToWorld(e.clientX, e.clientY);
+  hoveredNode = null;
+  for (let i = NODES.length - 1; i >= 0; i--) {
+    const n = NODES[i];
+    if (!activeCategories[n.category]) continue;
+    const dx = wp.x - n.x;
+    const dy = wp.y - n.y;
+    if (dx * dx + dy * dy < n.radius * n.radius) {
+      hoveredNode = n;
+      showTooltip(n, e.clientX, e.clientY);
+      canvas.style.cursor = 'pointer';
+      return;
+    }
+  }
+
+  hideTooltip();
+  canvas.style.cursor = dragging ? 'grabbing' : 'grab';
+});
+
+window.addEventListener('mouseup', () => {
+  if (dragNode) {
+    dragNode = null;
+    canvas.style.cursor = 'grab';
+  }
+  dragging = false;
+  canvas.classList.remove('grabbing');
+});
+
+canvas.addEventListener('click', e => {
+  if (dragNode) return;
+
+  const wp = screenToWorld(e.clientX, e.clientY);
+  for (let i = NODES.length - 1; i >= 0; i--) {
+    const n = NODES[i];
+    if (!activeCategories[n.category]) continue;
+    const dx = wp.x - n.x;
+    const dy = wp.y - n.y;
+    if (dx * dx + dy * dy < n.radius * n.radius) {
+      showDetailPanel(n);
+      return;
+    }
+  }
+
+  closeDetailPanel();
+});
+
+canvas.addEventListener('wheel', e => {
+  e.preventDefault();
+  const mx = e.clientX, my = e.clientY;
+  const before = screenToWorld(mx, my);
+  const delta = e.deltaY > 0 ? 0.9 : 1.1;
+  camera.scale = Math.max(0.1, Math.min(5, camera.scale * delta));
+  const after = screenToWorld(mx, my);
+  camera.x += (after.x - before.x) * camera.scale;
+  camera.y += (after.y - before.y) * camera.scale;
+  updateZoomDisplay();
+}, { passive: false });
+
+// Zoom controls
+document.getElementById('zoom-in').addEventListener('click', () => {
+  const cx = canvasW / 2, cy = canvasH / 2;
+  const before = screenToWorld(cx, cy);
+  camera.scale = Math.min(5, camera.scale * 1.3);
+  const after = screenToWorld(cx, cy);
+  camera.x += (after.x - before.x) * camera.scale;
+  camera.y += (after.y - before.y) * camera.scale;
+  updateZoomDisplay();
+});
+
+document.getElementById('zoom-out').addEventListener('click', () => {
+  const cx = canvasW / 2, cy = canvasH / 2;
+  const before = screenToWorld(cx, cy);
+  camera.scale = Math.max(0.1, camera.scale / 1.3);
+  const after = screenToWorld(cx, cy);
+  camera.x += (after.x - before.x) * camera.scale;
+  camera.y += (after.y - before.y) * camera.scale;
+  updateZoomDisplay();
+});
+
+document.getElementById('zoom-fit').addEventListener('click', fitToView);
+
+// Physics controls
+document.getElementById('physics-toggle').addEventListener('click', () => {
+  document.getElementById('physics-controls').classList.toggle('expanded');
+});
+
+document.getElementById('repulsion-slider').addEventListener('input', e => {
+  physicsParams.charge = -parseFloat(e.target.value);
+  document.getElementById('repulsion-value').textContent = e.target.value;
+});
+
+document.getElementById('edge-length-slider').addEventListener('input', e => {
+  physicsParams.linkDistance = parseFloat(e.target.value);
+  document.getElementById('edge-length-value').textContent = e.target.value;
+});
+
+document.getElementById('gravity-slider').addEventListener('input', e => {
+  physicsParams.gravity = parseFloat(e.target.value);
+  document.getElementById('gravity-value').textContent = parseFloat(e.target.value).toFixed(3);
+});
+
+document.getElementById('physics-reset').addEventListener('click', () => {
+  physicsParams = { ...defaultPhysicsParams };
+  document.getElementById('repulsion-slider').value = 300;
+  document.getElementById('repulsion-value').textContent = '300';
+  document.getElementById('edge-length-slider').value = 120;
+  document.getElementById('edge-length-value').textContent = '120';
+  document.getElementById('gravity-slider').value = 0.02;
+  document.getElementById('gravity-value').textContent = '0.020';
+  initPositions();
+  for (let i = 0; i < 400; i++) tickSimulation();
+});
+
+// ============================================================
+// TOOLTIP
+// ============================================================
+const tooltip = document.getElementById('tooltip');
+
+function showTooltip(node, x, y) {
+  document.getElementById('tooltip-title').textContent = node.title;
+  const badge = document.getElementById('tooltip-badge');
+  badge.textContent = node.category;
+  badge.className = 'tooltip-badge ' + node.category;
+  document.getElementById('tooltip-connections').textContent = node.degree + ' connections';
+
+  tooltip.style.left = (x + 16) + 'px';
+  tooltip.style.top = (y - 40) + 'px';
+  tooltip.classList.add('visible');
+}
+
+function hideTooltip() {
+  tooltip.classList.remove('visible');
+}
+
+// ============================================================
+// DETAIL PANEL
+// ============================================================
+const detailPanel = document.getElementById('detail-panel');
+
+function showDetailPanel(node) {
+  selectedNode = node;
+  document.getElementById('panel-title').textContent = node.title;
+  const badge = document.getElementById('panel-badge');
+  badge.textContent = node.category;
+  badge.className = 'panel-badge ' + node.category;
+  document.getElementById('panel-description').textContent = node.description;
+  document.getElementById('panel-connection-count').textContent = node.related.length;
+
+  const connectionsDiv = document.getElementById('panel-connections');
+  connectionsDiv.innerHTML = '';
+
+  if (node.related.length === 0) {
+    connectionsDiv.innerHTML = '<div style="color:var(--text-muted);font-size:13px;">No direct connections</div>';
+  } else {
+    node.related.forEach(relTitle => {
+      const relNode = nodeByTitle[relTitle];
+      if (relNode) {
+        const pill = document.createElement('div');
+        pill.className = 'connection-pill';
+        pill.textContent = relTitle;
+        pill.addEventListener('click', () => {
+          camera.scale = 1.2;
+          camera.x = canvasW / 2 - relNode.x * camera.scale;
+          camera.y = canvasH / 2 - relNode.y * camera.scale;
+          updateZoomDisplay();
+          showDetailPanel(relNode);
+        });
+        connectionsDiv.appendChild(pill);
+      }
+    });
+  }
+
+  document.getElementById('panel-open-compass').onclick = () => {
+    window.open('communication-compass-v31.html#term=' + encodeURIComponent(node.title), '_blank');
+  };
+
+  detailPanel.classList.add('open');
+}
+
+function closeDetailPanel() {
+  selectedNode = null;
+  detailPanel.classList.remove('open');
+}
+
+document.getElementById('panel-close').addEventListener('click', closeDetailPanel);
+
+// ============================================================
+// KEYBOARD SHORTCUTS
+// ============================================================
+window.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    closeDetailPanel();
+  }
+  if (e.key === 'r' || e.key === 'R') {
+    fitToView();
+    initPositions();
+    for (let i = 0; i < 400; i++) tickSimulation();
+  }
+  if (e.key === 'f' || e.key === 'F') {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen();
+    } else {
+      document.exitFullscreen();
+    }
+  }
+  if (e.key === ' ') {
+    e.preventDefault();
+    simulationRunning = !simulationRunning;
+  }
+  if (e.key === '1') {
+    document.querySelector('[data-cat="diagnosis"]').click();
+  }
+  if (e.key === '2') {
+    document.querySelector('[data-cat="assessment"]').click();
+  }
+  if (e.key === '3') {
+    document.querySelector('[data-cat="intervention"]').click();
+  }
+});
+
+// ============================================================
+// SEMANTIC ZOOM
+// ============================================================
+function shouldShowLabel(node, zoom) {
+  if (zoom < 0.5) {
+    return node.category === 'diagnosis' && node.degree > 5;
+  } else if (zoom < 1.5) {
+    if (node.category === 'diagnosis') return true;
+    return node.degree > 2;
+  } else {
+    return true;
+  }
+}
+
+// ============================================================
+// RENDER LOOP
+// ============================================================
+let animFrame = 0;
+
+function render() {
+  tickSimulation();
+
+  ctx.clearRect(0, 0, canvasW, canvasH);
+
+  // Draw edges
+  edges.forEach(e => {
+    if (!activeCategories[e.source.category] || !activeCategories[e.target.category]) return;
+
+    const sp = worldToScreen(e.source.x, e.source.y);
+    const tp = worldToScreen(e.target.x, e.target.y);
+
+    // Cull off-screen
+    if ((sp.x < -50 && tp.x < -50) || (sp.x > canvasW + 50 && tp.x > canvasW + 50) ||
+        (sp.y < -50 && tp.y < -50) || (sp.y > canvasH + 50 && tp.y > canvasH + 50)) {
+      return;
+    }
+
+    const isHighlighted = e.source === hoveredNode || e.target === hoveredNode ||
+                         e.source === selectedNode || e.target === selectedNode;
+
+    const color = e.source.category === 'diagnosis' ? COLORS.diagnosis :
+                  e.target.category === 'diagnosis' ? COLORS.diagnosis :
+                  COLORS[e.source.category];
+
+    ctx.strokeStyle = color;
+    ctx.globalAlpha = isHighlighted ? 0.5 : Math.min(0.1, camera.scale * 0.15);
+    ctx.lineWidth = isHighlighted ? 2 : 1;
+
+    ctx.beginPath();
+    ctx.moveTo(sp.x, sp.y);
+    ctx.lineTo(tp.x, tp.y);
+    ctx.stroke();
+  });
+
+  ctx.globalAlpha = 1;
+
+  // Draw nodes
+  const sortedNodes = [...NODES].sort((a, b) => {
+    const aOrder = a.category === 'diagnosis' ? 2 : a.category === 'assessment' ? 1 : 0;
+    const bOrder = b.category === 'diagnosis' ? 2 : b.category === 'assessment' ? 1 : 0;
+    return aOrder - bOrder;
+  });
+
+  animFrame += 0.03;
+
+  sortedNodes.forEach(n => {
+    if (!activeCategories[n.category]) return;
+
+    const sp = worldToScreen(n.x, n.y);
+    const r = n.radius * camera.scale;
+
+    // Cull
+    if (sp.x < -r * 2 || sp.x > canvasW + r * 2 || sp.y < -r * 2 || sp.y > canvasH + r * 2) {
+      return;
+    }
+
+    const isHighlighted = n === hoveredNode || n === selectedNode;
+    const isSearchMatch = searchMatches.includes(n);
+    const color = COLORS[n.category];
+
+    // Dimming for search
+    let opacity = 1.0;
+    if (searchTerm && !isSearchMatch) {
+      opacity = 0.15;
+    }
+
+    // Glow for highlighted
+    if (isHighlighted || isSearchMatch) {
+      ctx.shadowBlur = r * 1.2;
+      ctx.shadowColor = isSearchMatch ? '#ffffff' : color;
+    }
+
+    // Node circle
+    ctx.fillStyle = isHighlighted ? color + '80' : color + '20';
+    ctx.strokeStyle = isSearchMatch ? '#ffffff' : color;
+    ctx.lineWidth = isHighlighted || isSearchMatch ? 2 : 1;
+    ctx.globalAlpha = opacity;
+
+    ctx.beginPath();
+    ctx.arc(sp.x, sp.y, r, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.shadowBlur = 0;
+
+    // Label
+    if (r > 8 && shouldShowLabel(n, camera.scale)) {
+      const fontSize = Math.max(8, Math.min(14, r * 0.6));
+      ctx.font = `${n.category === 'diagnosis' ? 600 : 500} ${fontSize}px 'Inter', sans-serif`;
+      ctx.fillStyle = '#e6edf3';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      let label = n.title;
+      const maxW = r * 2;
+      if (ctx.measureText(label).width > maxW) {
+        while (label.length > 3 && ctx.measureText(label + '…').width > maxW) {
+          label = label.slice(0, -1);
+        }
+        label += '…';
+      }
+
+      ctx.fillText(label, sp.x, sp.y);
+    }
+
+    ctx.globalAlpha = 1;
+  });
+
+  requestAnimationFrame(render);
+}
+
+// ============================================================
+// INIT
+// ============================================================
+window.addEventListener('resize', resize);
+resize();
+updateStats();
+
+// Hide loading screen
+setTimeout(() => {
+  const ld = document.getElementById('loading');
+  ld.style.opacity = '0';
+  ld.style.pointerEvents = 'none';
+  setTimeout(() => { ld.style.display = 'none'; }, 900);
+  render();
+}, 1200);
+</script>
+
+</body>
+</html>

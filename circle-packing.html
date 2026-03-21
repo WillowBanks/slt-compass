@@ -1,0 +1,1651 @@
+<!DOCTYPE html>
+<html lang="en-NZ">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SLT Knowledge Graph — Circle Packing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a1a;
+  --bg-edge: #0d1117;
+  --surface: rgba(255, 255, 255, 0.04);
+  --surface-hover: rgba(255, 255, 255, 0.08);
+  --border: rgba(255, 255, 255, 0.08);
+  --text: #e6edf3;
+  --text-muted: rgba(255, 255, 255, 0.5);
+  --diag: #e74c8b;
+  --assess: #4da6ff;
+  --interv: #34d399;
+  --accent: #7B2FF7;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: radial-gradient(circle at center, var(--bg) 0%, var(--bg-edge) 100%);
+  color: var(--text);
+  overflow: hidden;
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+}
+
+/* Loading Screen */
+#loading-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  transition: opacity 800ms ease;
+}
+
+#loading-screen.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.loading-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  margin-bottom: 8px;
+  background: linear-gradient(135deg, var(--accent), var(--assess));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.loading-subtitle {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-bottom: 32px;
+}
+
+.loading-dots {
+  display: flex;
+  gap: 8px;
+}
+
+.loading-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+.loading-dot:nth-child(2) { animation-delay: 0.2s; }
+.loading-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.3; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.1); }
+}
+
+/* Header Bar */
+#header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 70px;
+  background: var(--surface);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  gap: 24px;
+  z-index: 100;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.header-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--accent), var(--assess));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.3px;
+}
+
+.header-search {
+  flex: 1;
+  max-width: 400px;
+  position: relative;
+}
+
+#search {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 11px 16px 11px 42px;
+  font-size: 14px;
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+#search::placeholder {
+  color: var(--text-muted);
+}
+
+#search:focus {
+  background: var(--surface-hover);
+  border-color: rgba(123, 47, 247, 0.4);
+  box-shadow: 0 0 0 3px rgba(123, 47, 247, 0.1);
+}
+
+.search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.header-filters {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.filter-pill {
+  padding: 8px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Poppins', sans-serif;
+}
+
+.filter-pill:hover {
+  background: var(--surface-hover);
+}
+
+.filter-pill.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
+
+/* Breadcrumb */
+#breadcrumb {
+  position: fixed;
+  top: 80px;
+  left: 24px;
+  right: 24px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+  z-index: 90;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+#breadcrumb::-webkit-scrollbar {
+  height: 4px;
+}
+
+#breadcrumb::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 2px;
+}
+
+.crumb {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  padding: 6px 10px;
+  border-radius: 6px;
+}
+
+.crumb:hover {
+  color: var(--text);
+  background: var(--surface);
+}
+
+.crumb.active {
+  color: var(--accent);
+  background: rgba(123, 47, 247, 0.1);
+}
+
+.breadcrumb-sep {
+  color: var(--border);
+  user-select: none;
+  flex-shrink: 0;
+}
+
+/* Stats Bar */
+#stats {
+  position: fixed;
+  top: 130px;
+  left: 24px;
+  right: 24px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  z-index: 90;
+}
+
+.stat-card {
+  background: var(--surface);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.stat-card:hover {
+  background: var(--surface-hover);
+  transform: translateY(-1px);
+}
+
+.stat-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-bottom: 6px;
+  font-family: 'Poppins', sans-serif;
+}
+
+.stat-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text);
+  font-family: 'Poppins', sans-serif;
+  letter-spacing: -0.5px;
+}
+
+/* Main Canvas */
+#canvas {
+  position: fixed;
+  top: 70px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  cursor: pointer;
+  display: block;
+}
+
+/* Legend */
+#legend {
+  position: fixed;
+  bottom: 80px;
+  left: 24px;
+  background: var(--surface);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  z-index: 90;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.legend-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+.legend-items {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--text);
+}
+
+.legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.legend-hint {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  line-height: 1.5;
+}
+
+/* Bottom Bar */
+#bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 50px;
+  background: var(--surface);
+  backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  gap: 24px;
+  z-index: 100;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.bottom-status {
+  flex: 1;
+}
+
+.bottom-hints {
+  display: flex;
+  gap: 20px;
+}
+
+.hint {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.hint-key {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Tooltip */
+#tooltip {
+  position: fixed;
+  display: none;
+  background: rgba(13, 17, 23, 0.97);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 16px;
+  max-width: 320px;
+  z-index: 200;
+  pointer-events: none;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+#tooltip.visible {
+  display: block;
+}
+
+.tooltip-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 6px;
+  font-family: 'Poppins', sans-serif;
+}
+
+.tooltip-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 3px 10px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  font-family: 'Poppins', sans-serif;
+}
+
+.tooltip-badge.diagnosis { background: rgba(231, 76, 139, 0.2); color: var(--diag); }
+.tooltip-badge.assessment { background: rgba(77, 166, 255, 0.2); color: var(--assess); }
+.tooltip-badge.intervention { background: rgba(52, 211, 153, 0.2); color: var(--interv); }
+
+.tooltip-desc {
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+
+/* Detail Panel */
+#detail-panel {
+  position: fixed;
+  top: 70px;
+  right: -420px;
+  width: 400px;
+  bottom: 50px;
+  background: var(--surface);
+  backdrop-filter: blur(20px);
+  border-left: 1px solid var(--border);
+  overflow-y: auto;
+  z-index: 150;
+  transition: right 0.3s ease;
+  box-shadow: -4px 0 24px rgba(0, 0, 0, 0.2);
+}
+
+#detail-panel.visible {
+  right: 0;
+}
+
+#detail-panel::-webkit-scrollbar {
+  width: 8px;
+}
+
+#detail-panel::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+.panel-header {
+  padding: 24px;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  background: var(--surface);
+  backdrop-filter: blur(20px);
+  z-index: 1;
+}
+
+.panel-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 24px;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.panel-close:hover {
+  background: var(--surface-hover);
+  color: var(--text);
+}
+
+.panel-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 10px;
+  padding-right: 40px;
+  line-height: 1.3;
+}
+
+.panel-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-family: 'Poppins', sans-serif;
+}
+
+.panel-badge.diagnosis { background: rgba(231, 76, 139, 0.15); color: var(--diag); }
+.panel-badge.assessment { background: rgba(77, 166, 255, 0.15); color: var(--assess); }
+.panel-badge.intervention { background: rgba(52, 211, 153, 0.15); color: var(--interv); }
+
+.panel-content {
+  padding: 24px;
+}
+
+.panel-section {
+  margin-bottom: 24px;
+}
+
+.panel-section-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+.panel-desc {
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text);
+}
+
+.panel-related {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.related-pill {
+  font-size: 12px;
+  padding: 6px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: var(--text);
+}
+
+.related-pill:hover {
+  background: var(--surface-hover);
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.panel-button {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, var(--accent), var(--assess));
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'Poppins', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(123, 47, 247, 0.3);
+}
+
+.panel-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(123, 47, 247, 0.4);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  #header {
+    padding: 0 16px;
+    height: 60px;
+  }
+
+  .header-title {
+    font-size: 16px;
+  }
+
+  .header-search {
+    max-width: 200px;
+  }
+
+  .header-filters {
+    display: none;
+  }
+
+  #breadcrumb {
+    top: 70px;
+    left: 16px;
+    right: 16px;
+  }
+
+  #stats {
+    top: 110px;
+    left: 16px;
+    right: 16px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .stat-card {
+    padding: 12px;
+  }
+
+  .stat-value {
+    font-size: 22px;
+  }
+
+  #legend {
+    left: 16px;
+    bottom: 70px;
+  }
+
+  #detail-panel {
+    width: 100%;
+    right: -100%;
+  }
+
+  #detail-panel.visible {
+    right: 0;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- Loading Screen -->
+<div id="loading-screen">
+  <div class="loading-title">SLT Knowledge Graph</div>
+  <div class="loading-subtitle">Circle Packing — Hierarchical View</div>
+  <div class="loading-dots">
+    <div class="loading-dot"></div>
+    <div class="loading-dot"></div>
+    <div class="loading-dot"></div>
+  </div>
+</div>
+
+<!-- Header -->
+<div id="header">
+  <div class="header-title">Circle Packing</div>
+  <div class="header-search">
+    <svg class="search-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+      <circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.5"/>
+      <path d="M11 11L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+    <input type="text" id="search" placeholder="Search nodes...">
+  </div>
+  <div class="header-filters">
+    <div class="filter-pill active" data-category="all">All</div>
+    <div class="filter-pill" data-category="diagnosis">Diagnosis</div>
+    <div class="filter-pill" data-category="assessment">Assessment</div>
+    <div class="filter-pill" data-category="intervention">Intervention</div>
+  </div>
+</div>
+
+<!-- Breadcrumb -->
+<div id="breadcrumb"></div>
+
+<!-- Stats -->
+<div id="stats">
+  <div class="stat-card">
+    <div class="stat-label">Hierarchy Depth</div>
+    <div class="stat-value" id="stat-depth">4</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Current Level</div>
+    <div class="stat-value" id="stat-level">0</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Visible Items</div>
+    <div class="stat-value" id="stat-visible">108</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Total Nodes</div>
+    <div class="stat-value" id="stat-total">108</div>
+  </div>
+</div>
+
+<!-- Canvas -->
+<canvas id="canvas"></canvas>
+
+<!-- Legend -->
+<div id="legend">
+  <div class="legend-title">Categories</div>
+  <div class="legend-items">
+    <div class="legend-item">
+      <div class="legend-dot" style="background: var(--diag)"></div>
+      <span>Diagnosis</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background: var(--assess)"></div>
+      <span>Assessment</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background: var(--interv)"></div>
+      <span>Intervention</span>
+    </div>
+  </div>
+  <div class="legend-hint">
+    Click to zoom • Double-click for details<br>
+    Circle size = connection count
+  </div>
+</div>
+
+<!-- Bottom Bar -->
+<div id="bottom-bar">
+  <div class="bottom-status" id="status">Ready</div>
+  <div class="bottom-hints">
+    <div class="hint">
+      <span class="hint-key">R</span>
+      <span>Reset zoom</span>
+    </div>
+    <div class="hint">
+      <span class="hint-key">F</span>
+      <span>Fullscreen</span>
+    </div>
+    <div class="hint">
+      <span class="hint-key">Esc</span>
+      <span>Zoom out</span>
+    </div>
+  </div>
+</div>
+
+<!-- Tooltip -->
+<div id="tooltip">
+  <div class="tooltip-title"></div>
+  <div class="tooltip-badge"></div>
+  <div class="tooltip-desc"></div>
+</div>
+
+<!-- Detail Panel -->
+<div id="detail-panel">
+  <div class="panel-header">
+    <button class="panel-close">&times;</button>
+    <div class="panel-title"></div>
+    <div class="panel-badge"></div>
+  </div>
+  <div class="panel-content">
+    <div class="panel-section">
+      <div class="panel-section-title">Description</div>
+      <div class="panel-desc"></div>
+    </div>
+    <div class="panel-section" id="panel-related-section">
+      <div class="panel-section-title">Related Items</div>
+      <div class="panel-related"></div>
+    </div>
+    <button class="panel-button">Open in Communication Compass &rarr;</button>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// DATA — 108 nodes
+// ============================================================
+const N = [
+// DIAGNOSES (22)
+{i:'d1',t:'Developmental Language Disorder (DLD)',c:'diagnosis',d:'A neurodevelopmental disorder characterised by persistent difficulties in acquiring and using language across modalities.',r:['CELF','PLS','Language Sample Analysis','Modelling','Recasting','Shape Coding','Colourful Semantics']},
+{i:'d2',t:'Childhood Apraxia of Speech (CAS)',c:'diagnosis',d:'A motor speech disorder where children have difficulty planning and coordinating the precise movements needed for speech.',r:['PROMPT Therapy','Nuffield Dyspraxia Programme (NDP3)','AAC','GFTA','Stimulability Testing']},
+{i:'d3',t:'Phonological Disorder',c:'diagnosis',d:'A speech sound disorder characterised by predictable, rule-based errors affecting groups of sounds.',r:['Minimal Pairs Approach','Cycles Approach','Core Vocabulary Approach','GFTA','Phonological Assessment','Phonological Awareness']},
+{i:'d4',t:'Stuttering (Fluency Disorder)',c:'diagnosis',d:'Disruptions in the flow of speech characterised by repetitions, prolongations, and blocks.',r:['Lidcombe Program','Fluency Shaping','Stuttering Modification','OASES']},
+{i:'d5',t:'Selective Mutism',c:'diagnosis',d:'An anxiety disorder where a child consistently fails to speak in specific social situations despite speaking normally elsewhere.',r:['Sliding-In Technique','Brave Programme','Stimulus Fading']},
+{i:'d6',t:'Dysarthria',c:'diagnosis',d:'A motor speech disorder resulting from neurological damage affecting muscles used for speech.',r:['Oral Motor Exercises','AAC','Lee Silverman Voice Treatment (LSVT)']},
+{i:'d7',t:'Receptive Language Disorder',c:'diagnosis',d:'Difficulty understanding spoken language, affecting comprehension of vocabulary, grammar, and complex instructions.',r:['CELF','PLS','ROWPVT','Visual Supports','Scaffolding']},
+{i:'d8',t:'Expressive Language Disorder',c:'diagnosis',d:'Difficulty using words and sentences to express thoughts and needs.',r:['CELF','PLS','Focused Stimulation','Modelling','Milieu Teaching']},
+{i:'d9',t:'Articulation Disorder',c:'diagnosis',d:'Difficulty producing specific speech sounds correctly due to motor or placement issues.',r:['GFTA','Traditional Articulation Therapy','Phonetic Placement']},
+{i:'d10',t:'Language Delay',c:'diagnosis',d:'Slower-than-expected language development where skills emerge in typical sequence but at a delayed rate.',r:['Hanen Approach','Modelling','Expansion','Parallel Talk']},
+{i:'d11',t:'Social Communication Disorder',c:'diagnosis',d:'Persistent difficulties using verbal and nonverbal communication for social purposes.',r:['Social Thinking','PEERS Program','Video Modelling','Pragmatic Language Assessment']},
+{i:'d12',t:'Auditory Processing Disorder (APD)',c:'diagnosis',d:'Difficulty processing auditory information despite normal hearing.',r:['Auditory Training','Compensatory Strategies','FM Systems']},
+{i:'d13',t:'Voice Disorder (Dysphonia)',c:'diagnosis',d:'Abnormal voice quality, pitch, loudness, or resonance.',r:['Vocal Hygiene','Resonant Voice Therapy','GRBAS Scale']},
+{i:'d14',t:'Cleft Palate Speech',c:'diagnosis',d:'Speech difficulties from structural abnormalities of the palate.',r:['Nasometry','Pressure Consonant Assessment','Speech Surgery']},
+{i:'d15',t:'Specific Learning Disability',c:'diagnosis',d:'A neurological condition affecting reading, writing, or mathematical skills.',r:['Phonological Awareness','DIBELS','PAT-2']},
+{i:'d16',t:'Autism Spectrum Disorder',c:'diagnosis',d:'A neurodevelopmental condition characterised by differences in social communication and restricted interests.',r:['PECS','AAC','Social Stories','Visual Supports','ADOS-2']},
+{i:'d17',t:'Intellectual Disability',c:'diagnosis',d:'Significant limitations in both intellectual functioning and adaptive behaviour.',r:['AAC','Functional Communication Training','Makaton']},
+{i:'d18',t:'Hearing Loss',c:'diagnosis',d:'Reduced ability to hear sounds, affecting speech and language development.',r:['Auditory-Verbal Therapy','Sign Language','FM Systems','Cochlear Implant']},
+{i:'d19',t:'Traumatic Brain Injury',c:'diagnosis',d:'Acquired brain injury affecting cognitive-communication skills.',r:['Cognitive-Communication Therapy','AAC']},
+{i:'d20',t:'Literacy Difficulties',c:'diagnosis',d:'Challenges in developing reading and writing skills.',r:['Phonological Awareness','DIBELS','Vocabulary Assessment']},
+{i:'d21',t:'Feeding & Swallowing Difficulties',c:'diagnosis',d:'Difficulties with oral intake of food and liquids.',r:['Oral Motor Exercises','Food Chaining','SOS Approach']},
+{i:'d22',t:'Late Talker',c:'diagnosis',d:'Children aged 18\u201330 months with limited expressive vocabulary (<50 words).',r:['Hanen Approach','Modelling','Parent Coaching','Vocabulary Assessment']},
+// ASSESSMENTS (39)
+{i:'a1',t:'Standardised Assessment',c:'assessment',d:'A formal, norm-referenced test with standardised administration and scoring.',r:[]},
+{i:'a2',t:'CELF',c:'assessment',d:'Clinical Evaluation of Language Fundamentals — comprehensive language assessment.',r:['Developmental Language Disorder (DLD)','Receptive Language Disorder','Expressive Language Disorder']},
+{i:'a3',t:'PLS',c:'assessment',d:'Preschool Language Scales — for young children measuring comprehension and expression.',r:['Developmental Language Disorder (DLD)','Receptive Language Disorder','Expressive Language Disorder']},
+{i:'a4',t:'GFTA',c:'assessment',d:'Goldman-Fristoe Test of Articulation — consonant production assessment.',r:['Childhood Apraxia of Speech (CAS)','Phonological Disorder','Articulation Disorder']},
+{i:'a5',t:'ADOS-2',c:'assessment',d:'Autism Diagnostic Observation Schedule — gold standard for ASD.',r:['Autism Spectrum Disorder']},
+{i:'a6',t:'Norm-Referenced Assessment',c:'assessment',d:'Assessment comparing performance to same-age peers.',r:[]},
+{i:'a7',t:'Criterion-Referenced Assessment',c:'assessment',d:'Assessment against specific criteria or learning objectives.',r:[]},
+{i:'a8',t:'Language Sample Analysis',c:'assessment',d:'Analysis of spontaneous speech for MLU and vocabulary diversity.',r:['Developmental Language Disorder (DLD)']},
+{i:'a9',t:'Dynamic Assessment',c:'assessment',d:'Test-teach-retest format examining learning potential.',r:[]},
+{i:'a10',t:'Oral Motor Assessment',c:'assessment',d:'Examination of oral structures and movements.',r:[]},
+{i:'a11',t:'Fluency Assessment',c:'assessment',d:'Assessment of stuttering frequency, type, and severity.',r:[]},
+{i:'a12',t:'Pragmatic Language Assessment',c:'assessment',d:'Assessment of social communication skills.',r:['Social Communication Disorder']},
+{i:'a13',t:'ROWPVT',c:'assessment',d:'Receptive One-Word Picture Vocabulary Test.',r:['Receptive Language Disorder']},
+{i:'a14',t:'EOWPVT',c:'assessment',d:'Expressive One-Word Picture Vocabulary Test.',r:[]},
+{i:'a15',t:'MLU',c:'assessment',d:'Mean Length of Utterance — grammatical complexity measure.',r:[]},
+{i:'a16',t:'Phonological Assessment',c:'assessment',d:'Identifies phonological error patterns.',r:['Phonological Disorder']},
+{i:'a17',t:'Stimulability Testing',c:'assessment',d:'Assesses ability to produce target sounds with cues.',r:['Childhood Apraxia of Speech (CAS)']},
+{i:'a18',t:'Informal Assessment',c:'assessment',d:'Non-standardised observation tailored to individual needs.',r:[]},
+{i:'a19',t:'Narrative Assessment',c:'assessment',d:'Assessment of story-telling abilities.',r:[]},
+{i:'a20',t:'Play-Based Assessment',c:'assessment',d:'Assessment through observation of play.',r:[]},
+{i:'a21',t:'KSPT',c:'assessment',d:'Kaufman Speech Praxis Test — identifies CAS.',r:[]},
+{i:'a22',t:'VMPAC',c:'assessment',d:'Verbal Motor Production Assessment for Children.',r:[]},
+{i:'a23',t:'PIPA',c:'assessment',d:'Preschool & Primary Inventory of Phonological Awareness.',r:[]},
+{i:'a24',t:'PAT-2',c:'assessment',d:'Photo Articulation Test.',r:['Specific Learning Disability']},
+{i:'a25',t:'DIBELS',c:'assessment',d:'Dynamic Indicators of Basic Early Literacy Skills.',r:['Specific Learning Disability','Literacy Difficulties']},
+{i:'a26',t:'Vocabulary Assessment',c:'assessment',d:'Assessment of receptive and expressive vocabulary.',r:['Late Talker','Literacy Difficulties']},
+{i:'a27',t:'Phonological Awareness Assessment',c:'assessment',d:'Assessment of sound awareness and manipulation.',r:[]},
+{i:'a28',t:'OASES',c:'assessment',d:'Overall Assessment of the Speaker\u2019s Experience of Stuttering.',r:['Stuttering (Fluency Disorder)']},
+{i:'a29',t:'Nasometry',c:'assessment',d:'Acoustic measurement of nasality.',r:['Cleft Palate Speech']},
+{i:'a30',t:'Pressure Consonant Assessment',c:'assessment',d:'Assessment of pressure-sensitive consonant production.',r:['Cleft Palate Speech']},
+{i:'a31',t:'GRBAS Scale',c:'assessment',d:'Perceptual rating scale for voice quality.',r:['Voice Disorder (Dysphonia)']},
+{i:'a32',t:'Auditory Training',c:'assessment',d:'Exercises improving auditory discrimination.',r:['Auditory Processing Disorder (APD)']},
+{i:'a33',t:'Hearing Screening',c:'assessment',d:'Brief assessment to identify hearing loss.',r:[]},
+{i:'a34',t:'Speech Intelligibility Assessment',c:'assessment',d:'Measures how well speech is understood.',r:[]},
+{i:'a35',t:'Functional Communication Assessment',c:'assessment',d:'Real-world communication abilities assessment.',r:[]},
+{i:'a36',t:'Milestone Screening',c:'assessment',d:'Screening tool for developmental delays.',r:[]},
+{i:'a37',t:'Parent Questionnaire',c:'assessment',d:'Parent report of communication skills.',r:[]},
+{i:'a38',t:'FM System Assessment',c:'assessment',d:'Assessment of assistive listening benefit.',r:[]},
+// INTERVENTIONS (47)
+{i:'i1',t:'Modelling',c:'intervention',d:'Demonstrating target language without requiring imitation.',r:['Developmental Language Disorder (DLD)','Expressive Language Disorder','Language Delay','Late Talker']},
+{i:'i2',t:'Recasting',c:'intervention',d:'Reformulating a child\u2019s utterance to provide a correct model.',r:['Developmental Language Disorder (DLD)']},
+{i:'i3',t:'Expansion',c:'intervention',d:'Adding elements to a child\u2019s utterance while maintaining meaning.',r:['Language Delay']},
+{i:'i4',t:'Hanen Approach',c:'intervention',d:'Parent-implemented intervention using Observe, Wait, Listen.',r:['Language Delay','Late Talker']},
+{i:'i5',t:'PROMPT Therapy',c:'intervention',d:'Tactile-kinaesthetic approach for motor speech disorders.',r:['Childhood Apraxia of Speech (CAS)']},
+{i:'i6',t:'Nuffield Dyspraxia Programme (NDP3)',c:'intervention',d:'Structured intervention for childhood apraxia of speech.',r:['Childhood Apraxia of Speech (CAS)']},
+{i:'i7',t:'Minimal Pairs Approach',c:'intervention',d:'Using word pairs differing by one sound to highlight contrasts.',r:['Phonological Disorder']},
+{i:'i8',t:'Cycles Approach',c:'intervention',d:'Targeting error patterns in time-based cycles.',r:['Phonological Disorder']},
+{i:'i9',t:'Core Vocabulary Approach',c:'intervention',d:'Targeting consistent production of functional words.',r:['Phonological Disorder']},
+{i:'i10',t:'Lidcombe Program',c:'intervention',d:'Parent-delivered behavioural treatment for early stuttering.',r:['Stuttering (Fluency Disorder)']},
+{i:'i11',t:'Fluency Shaping',c:'intervention',d:'Teaching slow, controlled speech patterns.',r:['Stuttering (Fluency Disorder)']},
+{i:'i12',t:'Stuttering Modification',c:'intervention',d:'Techniques to stutter more easily and reduce avoidance.',r:['Stuttering (Fluency Disorder)']},
+{i:'i13',t:'Sliding-In Technique',c:'intervention',d:'Gradual exposure for selective mutism.',r:['Selective Mutism']},
+{i:'i14',t:'Brave Programme',c:'intervention',d:'CBT intervention for selective mutism.',r:['Selective Mutism']},
+{i:'i15',t:'Shape Coding',c:'intervention',d:'Visual system using shapes to teach sentence structure.',r:['Developmental Language Disorder (DLD)']},
+{i:'i16',t:'Colourful Semantics',c:'intervention',d:'Colour-coded approach to teach sentence structure.',r:['Developmental Language Disorder (DLD)']},
+{i:'i17',t:'AAC',c:'intervention',d:'Augmentative and Alternative Communication — supplementing or replacing speech.',r:['Childhood Apraxia of Speech (CAS)','Dysarthria','Autism Spectrum Disorder','Intellectual Disability','Traumatic Brain Injury']},
+{i:'i18',t:'PECS',c:'intervention',d:'Picture Exchange Communication System.',r:['Autism Spectrum Disorder']},
+{i:'i19',t:'Social Thinking',c:'intervention',d:'Framework for teaching social cognition.',r:['Social Communication Disorder']},
+{i:'i20',t:'Social Stories',c:'intervention',d:'Short stories teaching appropriate social responses.',r:['Autism Spectrum Disorder']},
+{i:'i21',t:'Video Modelling',c:'intervention',d:'Using video to demonstrate target behaviours.',r:['Social Communication Disorder']},
+{i:'i22',t:'Visual Supports',c:'intervention',d:'Visual aids to support comprehension and communication.',r:['Receptive Language Disorder','Autism Spectrum Disorder']},
+{i:'i23',t:'Scaffolding',c:'intervention',d:'Graded support helping children achieve beyond their level.',r:['Receptive Language Disorder']},
+{i:'i24',t:'Focused Stimulation',c:'intervention',d:'Intensive modelling of targets in meaningful contexts.',r:['Expressive Language Disorder']},
+{i:'i25',t:'Milieu Teaching',c:'intervention',d:'Naturalistic intervention using environmental arrangement.',r:['Expressive Language Disorder']},
+{i:'i26',t:'Makaton',c:'intervention',d:'Speech, signs, and symbols programme.',r:['Intellectual Disability']},
+{i:'i27',t:'Parent Coaching',c:'intervention',d:'Training parents in language facilitation strategies.',r:['Late Talker']},
+{i:'i28',t:'Oral Motor Exercises',c:'intervention',d:'Exercises for oral structure strength and coordination.',r:['Dysarthria','Feeding & Swallowing Difficulties']},
+{i:'i29',t:'Traditional Articulation Therapy',c:'intervention',d:'Structured therapy targeting correct sound production.',r:['Articulation Disorder']},
+{i:'i30',t:'Phonetic Placement',c:'intervention',d:'Teaching correct tongue/lip placement for sounds.',r:['Articulation Disorder']},
+{i:'i31',t:'Parallel Talk',c:'intervention',d:'Describing what the child is doing to model language.',r:['Language Delay']},
+{i:'i32',t:'Auditory-Verbal Therapy',c:'intervention',d:'Developing listening and spoken language for hearing loss.',r:['Hearing Loss']},
+{i:'i33',t:'Vocal Hygiene',c:'intervention',d:'Promoting healthy voice use.',r:['Voice Disorder (Dysphonia)']},
+{i:'i34',t:'Resonant Voice Therapy',c:'intervention',d:'Easy, forward-focused voice production.',r:['Voice Disorder (Dysphonia)']},
+{i:'i35',t:'Stimulus Fading',c:'intervention',d:'Gradual removal of prompts for independence.',r:['Selective Mutism']},
+{i:'i36',t:'Lee Silverman Voice Treatment (LSVT)',c:'intervention',d:'Intensive voice treatment for dysarthria.',r:['Dysarthria']},
+{i:'i37',t:'Phonological Awareness',c:'intervention',d:'Teaching sound awareness: rhyming, segmenting, blending.',r:['Phonological Disorder','Specific Learning Disability','Literacy Difficulties']},
+{i:'i38',t:'PEERS Program',c:'intervention',d:'Evidence-based social skills intervention.',r:['Social Communication Disorder']},
+{i:'i39',t:'Compensatory Strategies',c:'intervention',d:'Alternative methods to bypass communication difficulties.',r:['Auditory Processing Disorder (APD)']},
+{i:'i40',t:'FM Systems',c:'intervention',d:'Assistive listening technology.',r:['Auditory Processing Disorder (APD)','Hearing Loss']},
+{i:'i41',t:'Speech Surgery',c:'intervention',d:'Surgical correction of speech-affecting structures.',r:['Cleft Palate Speech']},
+{i:'i42',t:'Functional Communication Training',c:'intervention',d:'Teaching functional communication alternatives.',r:['Intellectual Disability']},
+{i:'i43',t:'Sign Language',c:'intervention',d:'Visual-manual language for Deaf communities.',r:['Hearing Loss']},
+{i:'i44',t:'Cochlear Implant',c:'intervention',d:'Implanted device for severe hearing loss.',r:['Hearing Loss']},
+{i:'i45',t:'Cognitive-Communication Therapy',c:'intervention',d:'Targeting cognitive processes affecting communication.',r:['Traumatic Brain Injury']},
+{i:'i46',t:'Food Chaining',c:'intervention',d:'Gradual food introduction based on sensory similarities.',r:['Feeding & Swallowing Difficulties']},
+{i:'i47',t:'SOS Approach',c:'intervention',d:'Sequential Oral Sensory feeding approach.',r:['Feeding & Swallowing Difficulties']},
+];
+
+// ============================================================
+// BUILD HIERARCHY
+// ============================================================
+const byTitle = {};
+N.forEach(n => { byTitle[n.t] = n; });
+
+const linkedItems = new Set();
+
+function buildHierarchy() {
+  const root = {
+    id: 'root',
+    name: 'Communication Web',
+    category: 'root',
+    description: 'Hierarchical view of 108 SLT concepts',
+    children: [],
+    parent: null,
+    degree: 0
+  };
+
+  const diagnosesGroup = {
+    id: 'diagnoses',
+    name: 'Diagnoses',
+    category: 'group',
+    description: '22 communication disorders',
+    children: [],
+    parent: root,
+    degree: 0
+  };
+  root.children.push(diagnosesGroup);
+
+  N.filter(n => n.c === 'diagnosis').forEach(diag => {
+    const diagNode = {
+      id: diag.i,
+      name: diag.t,
+      category: diag.c,
+      description: diag.d,
+      relatedTitles: diag.r,
+      children: [],
+      parent: diagnosesGroup,
+      degree: diag.r.length
+    };
+    diagnosesGroup.children.push(diagNode);
+
+    diag.r.forEach(rt => {
+      const related = byTitle[rt];
+      if (related) {
+        linkedItems.add(related.t);
+        const childNode = {
+          id: related.i,
+          name: related.t,
+          category: related.c,
+          description: related.d,
+          relatedTitles: related.r,
+          children: [],
+          parent: diagNode,
+          degree: related.r.length
+        };
+        diagNode.children.push(childNode);
+      }
+    });
+  });
+
+  const orphanAssessments = N.filter(n => n.c === 'assessment' && !linkedItems.has(n.t));
+  if (orphanAssessments.length > 0) {
+    const orphanAssGroup = {
+      id: 'orphan-assessments',
+      name: 'Other Assessments',
+      category: 'group',
+      description: 'Assessments not linked to specific diagnoses',
+      children: [],
+      parent: root,
+      degree: 0
+    };
+    root.children.push(orphanAssGroup);
+    orphanAssessments.forEach(item => {
+      const node = {
+        id: item.i,
+        name: item.t,
+        category: item.c,
+        description: item.d,
+        relatedTitles: item.r,
+        children: [],
+        parent: orphanAssGroup,
+        degree: item.r.length
+      };
+      orphanAssGroup.children.push(node);
+    });
+  }
+
+  const orphanInterventions = N.filter(n => n.c === 'intervention' && !linkedItems.has(n.t));
+  if (orphanInterventions.length > 0) {
+    const orphanIntGroup = {
+      id: 'orphan-interventions',
+      name: 'Other Interventions',
+      category: 'group',
+      description: 'Interventions not linked to specific diagnoses',
+      children: [],
+      parent: root,
+      degree: 0
+    };
+    root.children.push(orphanIntGroup);
+    orphanInterventions.forEach(item => {
+      const node = {
+        id: item.i,
+        name: item.t,
+        category: item.c,
+        description: item.d,
+        relatedTitles: item.r,
+        children: [],
+        parent: orphanIntGroup,
+        degree: item.r.length
+      };
+      orphanIntGroup.children.push(node);
+    });
+  }
+
+  return root;
+}
+
+const rootNode = buildHierarchy();
+
+// ============================================================
+// CIRCLE PACKING UTILITY
+// ============================================================
+function circleCircleIntersection(x1, y1, r1, x2, y2, r2) {
+  const dx = x2 - x1;
+  const dy = y2 - y1;
+  const d = Math.sqrt(dx * dx + dy * dy);
+
+  if (d > r1 + r2 || d < Math.abs(r1 - r2) || d === 0) {
+    return [];
+  }
+
+  const a = (r1 * r1 - r2 * r2 + d * d) / (2 * d);
+  const h = Math.sqrt(r1 * r1 - a * a);
+
+  const px = x1 + (dx * a) / d;
+  const py = y1 + (dy * a) / d;
+
+  return [
+    { x: px + (dy * h) / d, y: py - (dx * h) / d },
+    { x: px - (dy * h) / d, y: py + (dx * h) / d }
+  ];
+}
+
+function packCircles(circles) {
+  if (circles.length === 0) return;
+  if (circles.length === 1) {
+    circles[0].x = 0;
+    circles[0].y = 0;
+    return;
+  }
+
+  circles[0].x = 0;
+  circles[0].y = 0;
+  circles[1].x = circles[0].r + circles[1].r;
+  circles[1].y = 0;
+
+  for (let i = 2; i < circles.length; i++) {
+    let bestX = 0, bestY = 0, bestDist = Infinity;
+
+    for (let j = 0; j < i; j++) {
+      for (let k = j + 1; k < i; k++) {
+        const positions = circleCircleIntersection(
+          circles[j].x, circles[j].y, circles[j].r + circles[i].r,
+          circles[k].x, circles[k].y, circles[k].r + circles[i].r
+        );
+
+        for (const pos of positions) {
+          let valid = true;
+          for (let m = 0; m < i; m++) {
+            const dx = pos.x - circles[m].x;
+            const dy = pos.y - circles[m].y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < circles[m].r + circles[i].r - 0.1) {
+              valid = false;
+              break;
+            }
+          }
+          if (valid) {
+            const dist = Math.sqrt(pos.x * pos.x + pos.y * pos.y);
+            if (dist < bestDist) {
+              bestDist = dist;
+              bestX = pos.x;
+              bestY = pos.y;
+            }
+          }
+        }
+      }
+    }
+
+    circles[i].x = bestX;
+    circles[i].y = bestY;
+  }
+}
+
+// ============================================================
+// COMPUTE CIRCLE PACKING FOR ENTIRE TREE
+// ============================================================
+function computePacking(node) {
+  if (node.children.length === 0) {
+    const baseRadius = 20;
+    const degreeBoost = Math.sqrt(node.degree || 1) * 4;
+    node.r = baseRadius + degreeBoost;
+    node.x = 0;
+    node.y = 0;
+    return;
+  }
+
+  node.children.forEach(child => computePacking(child));
+
+  const childCircles = node.children.map(child => ({
+    node: child,
+    r: child.r,
+    x: 0,
+    y: 0
+  }));
+
+  packCircles(childCircles);
+
+  childCircles.forEach(cc => {
+    cc.node.x = cc.x;
+    cc.node.y = cc.y;
+  });
+
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  node.children.forEach(child => {
+    minX = Math.min(minX, child.x - child.r);
+    minY = Math.min(minY, child.y - child.r);
+    maxX = Math.max(maxX, child.x + child.r);
+    maxY = Math.max(maxY, child.y + child.r);
+  });
+
+  const cx = (minX + maxX) / 2;
+  const cy = (minY + maxY) / 2;
+  let maxDist = 0;
+  node.children.forEach(child => {
+    const dx = child.x - cx;
+    const dy = child.y - cy;
+    const dist = Math.sqrt(dx * dx + dy * dy) + child.r;
+    maxDist = Math.max(maxDist, dist);
+  });
+
+  node.children.forEach(child => {
+    child.x -= cx;
+    child.y -= cy;
+  });
+
+  node.r = maxDist + 10;
+  node.x = 0;
+  node.y = 0;
+}
+
+computePacking(rootNode);
+
+function setAbsolutePositions(node, px = 0, py = 0) {
+  node.absX = px + node.x;
+  node.absY = py + node.y;
+  node.children.forEach(child => {
+    setAbsolutePositions(child, node.absX, node.absY);
+  });
+}
+
+setAbsolutePositions(rootNode, 0, 0);
+
+// ============================================================
+// COLOURS
+// ============================================================
+const COLOURS = {
+  diagnosis: '#e74c8b',
+  assessment: '#4da6ff',
+  intervention: '#34d399',
+  group: '#888',
+  root: '#666'
+};
+
+// ============================================================
+// CANVAS & RENDERING
+// ============================================================
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const dpr = devicePixelRatio || 1;
+
+let W = innerWidth;
+let H = innerHeight - 70 - 50;
+
+function resizeCanvas() {
+  W = innerWidth;
+  H = innerHeight - 70 - 50;
+  canvas.width = W * dpr;
+  canvas.height = H * dpr;
+  canvas.style.width = W + 'px';
+  canvas.style.height = H + 'px';
+  ctx.scale(dpr, dpr);
+}
+
+resizeCanvas();
+addEventListener('resize', resizeCanvas);
+
+let viewX = 0;
+let viewY = 0;
+let viewScale = 1;
+
+let currentNode = rootNode;
+
+let animating = false;
+let animStartTime = 0;
+let animDuration = 500;
+let animStartX = 0, animStartY = 0, animStartScale = 1;
+let animTargetX = 0, animTargetY = 0, animTargetScale = 1;
+
+function centreView(node) {
+  animating = true;
+  animStartTime = performance.now();
+  animStartX = viewX;
+  animStartY = viewY;
+  animStartScale = viewScale;
+
+  const targetSize = Math.min(W, H) * 0.7;
+  animTargetScale = targetSize / (node.r * 2);
+
+  animTargetX = W / 2 - node.absX * animTargetScale;
+  animTargetY = H / 2 - node.absY * animTargetScale;
+}
+
+function easeInOutCubic(t) {
+  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+}
+
+function updateAnimation() {
+  if (!animating) return;
+
+  const elapsed = performance.now() - animStartTime;
+  const t = Math.min(1, elapsed / animDuration);
+  const eased = easeInOutCubic(t);
+
+  viewX = animStartX + (animTargetX - animStartX) * eased;
+  viewY = animStartY + (animTargetY - animStartY) * eased;
+  viewScale = animStartScale + (animTargetScale - animStartScale) * eased;
+
+  if (t >= 1) {
+    animating = false;
+  }
+}
+
+function collectNodes(node, list = []) {
+  list.push(node);
+  node.children.forEach(child => collectNodes(child, list));
+  return list;
+}
+
+function getNodeColour(node) {
+  if (node.category === 'root' || node.category === 'group') return COLOURS[node.category];
+  return COLOURS[node.category] || '#888';
+}
+
+function drawNode(node, ctx) {
+  const sx = node.absX * viewScale + viewX;
+  const sy = node.absY * viewScale + viewY;
+  const sr = node.r * viewScale;
+
+  if (sx + sr < 0 || sx - sr > W || sy + sr < 0 || sy - sr > H) return;
+
+  const colour = getNodeColour(node);
+
+  if (node.children.length > 0) {
+    ctx.fillStyle = colour + '0D';
+    ctx.beginPath();
+    ctx.arc(sx, sy, sr, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.strokeStyle = colour + '4D';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(sx, sy, sr, 0, Math.PI * 2);
+    ctx.stroke();
+  } else {
+    const opacity = Math.min(0.9, 0.4 + (node.degree / 10) * 0.5);
+    const alpha = Math.floor(opacity * 255).toString(16).padStart(2, '0');
+    ctx.fillStyle = colour + alpha;
+    ctx.beginPath();
+    ctx.arc(sx, sy, sr, 0, Math.PI * 2);
+    ctx.fill();
+
+    if (hoveredNode === node) {
+      ctx.strokeStyle = colour;
+      ctx.lineWidth = 3;
+      ctx.shadowBlur = 15;
+      ctx.shadowColor = colour;
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+    }
+  }
+
+  if (sr > 12) {
+    ctx.fillStyle = '#fff';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.shadowBlur = 0;
+
+    const fontSize = Math.max(9, Math.min(14, sr * 0.3));
+    ctx.font = `${fontSize}px Inter, sans-serif`;
+
+    const words = node.name.split(' ');
+    const lines = [];
+    let line = '';
+
+    words.forEach(word => {
+      const test = line ? line + ' ' + word : word;
+      if (ctx.measureText(test).width > sr * 1.6 && line) {
+        lines.push(line);
+        line = word;
+      } else {
+        line = test;
+      }
+    });
+    if (line) lines.push(line);
+
+    const lineHeight = fontSize * 1.3;
+    const totalHeight = lines.length * lineHeight;
+
+    if (totalHeight < sr * 1.8) {
+      const startY = sy - ((lines.length - 1) * lineHeight) / 2;
+      lines.forEach((l, i) => {
+        ctx.fillText(l, sx, startY + i * lineHeight);
+      });
+    }
+  }
+}
+
+function render() {
+  updateAnimation();
+
+  ctx.clearRect(0, 0, W, H);
+
+  const nodesToDraw = collectNodes(currentNode);
+  nodesToDraw.forEach(node => drawNode(node, ctx));
+
+  requestAnimationFrame(render);
+}
+
+centreView(rootNode);
+requestAnimationFrame(render);
+
+// ============================================================
+// BREADCRUMB
+// ============================================================
+function updateBreadcrumb() {
+  const breadcrumb = document.getElementById('breadcrumb');
+  const path = [];
+  let node = currentNode;
+  while (node) {
+    path.unshift(node);
+    node = node.parent;
+  }
+
+  breadcrumb.innerHTML = path.map((n, i) => {
+    const isActive = i === path.length - 1;
+    return `<span class="crumb ${isActive ? 'active' : ''}" data-id="${n.id}">${n.name}</span>`;
+  }).join('<span class="breadcrumb-sep">&rsaquo;</span>');
+
+  breadcrumb.querySelectorAll('.crumb').forEach(crumb => {
+    crumb.addEventListener('click', () => {
+      const id = crumb.dataset.id;
+      const targetNode = findNodeById(rootNode, id);
+      if (targetNode) {
+        currentNode = targetNode;
+        centreView(targetNode);
+        updateBreadcrumb();
+        updateStats();
+      }
+    });
+  });
+}
+
+function findNodeById(node, id) {
+  if (node.id === id) return node;
+  for (const child of node.children) {
+    const found = findNodeById(child, id);
+    if (found) return found;
+  }
+  return null;
+}
+
+updateBreadcrumb();
+
+// ============================================================
+// STATS
+// ============================================================
+function getDepth(node, d = 0) {
+  if (node.children.length === 0) return d;
+  return Math.max(...node.children.map(c => getDepth(c, d + 1)));
+}
+
+function getLevel(node) {
+  let level = 0;
+  let current = node;
+  while (current.parent) {
+    level++;
+    current = current.parent;
+  }
+  return level;
+}
+
+function updateStats() {
+  const depth = getDepth(rootNode);
+  const level = getLevel(currentNode);
+  const visible = collectNodes(currentNode).length;
+  const total = collectNodes(rootNode).length;
+
+  document.getElementById('stat-depth').textContent = depth;
+  document.getElementById('stat-level').textContent = level;
+  document.getElementById('stat-visible').textContent = visible;
+  document.getElementById('stat-total').textContent = total;
+}
+
+updateStats();
+
+// ============================================================
+// INTERACTION
+// ============================================================
+let hoveredNode = null;
+let clickTimeout = null;
+
+canvas.addEventListener('mousemove', e => {
+  const rect = canvas.getBoundingClientRect();
+  const mx = e.clientX - rect.left;
+  const my = e.clientY - rect.top;
+
+  const wx = (mx - viewX) / viewScale;
+  const wy = (my - viewY) / viewScale;
+
+  hoveredNode = null;
+  const nodesToCheck = collectNodes(currentNode);
+  for (let i = nodesToCheck.length - 1; i >= 0; i--) {
+    const node = nodesToCheck[i];
+    const dx = wx - node.absX;
+    const dy = wy - node.absY;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist < node.r) {
+      hoveredNode = node;
+      break;
+    }
+  }
+
+  const tooltip = document.getElementById('tooltip');
+  if (hoveredNode && hoveredNode !== currentNode && hoveredNode.category !== 'group') {
+    tooltip.querySelector('.tooltip-title').textContent = hoveredNode.name;
+
+    const badge = tooltip.querySelector('.tooltip-badge');
+    badge.textContent = hoveredNode.category;
+    badge.className = 'tooltip-badge ' + hoveredNode.category;
+
+    tooltip.querySelector('.tooltip-desc').textContent = hoveredNode.description || '';
+    tooltip.style.left = (e.clientX + 16) + 'px';
+    tooltip.style.top = (e.clientY + 16) + 'px';
+    tooltip.classList.add('visible');
+
+    canvas.style.cursor = 'pointer';
+  } else {
+    tooltip.classList.remove('visible');
+    canvas.style.cursor = hoveredNode ? 'pointer' : 'default';
+  }
+
+  document.getElementById('status').textContent = hoveredNode ? hoveredNode.name : 'Ready';
+});
+
+canvas.addEventListener('click', e => {
+  if (clickTimeout) {
+    clearTimeout(clickTimeout);
+    clickTimeout = null;
+
+    if (hoveredNode && hoveredNode.category !== 'group' && hoveredNode.category !== 'root') {
+      showDetailPanel(hoveredNode);
+    }
+    return;
+  }
+
+  clickTimeout = setTimeout(() => {
+    clickTimeout = null;
+
+    if (hoveredNode) {
+      if (hoveredNode.children.length > 0) {
+        currentNode = hoveredNode;
+        centreView(hoveredNode);
+        updateBreadcrumb();
+        updateStats();
+        document.getElementById('tooltip').classList.remove('visible');
+      }
+    } else {
+      if (currentNode.parent) {
+        currentNode = currentNode.parent;
+        centreView(currentNode);
+        updateBreadcrumb();
+        updateStats();
+      }
+    }
+  }, 250);
+});
+
+// ============================================================
+// DETAIL PANEL
+// ============================================================
+function showDetailPanel(node) {
+  const panel = document.getElementById('detail-panel');
+
+  panel.querySelector('.panel-title').textContent = node.name;
+
+  const badge = panel.querySelector('.panel-badge');
+  badge.textContent = node.category;
+  badge.className = 'panel-badge ' + node.category;
+
+  panel.querySelector('.panel-desc').textContent = node.description || 'No description available.';
+
+  const relatedContainer = panel.querySelector('.panel-related');
+  const relatedSection = document.getElementById('panel-related-section');
+
+  if (node.relatedTitles && node.relatedTitles.length > 0) {
+    relatedSection.style.display = 'block';
+    relatedContainer.innerHTML = '';
+    node.relatedTitles.forEach(rt => {
+      const pill = document.createElement('div');
+      pill.className = 'related-pill';
+      pill.textContent = rt;
+      pill.addEventListener('click', () => {
+        const foundNode = findNodeByTitle(rootNode, rt);
+        if (foundNode && foundNode.parent) {
+          currentNode = foundNode.parent;
+          centreView(foundNode.parent);
+          updateBreadcrumb();
+          updateStats();
+          panel.classList.remove('visible');
+        }
+      });
+      relatedContainer.appendChild(pill);
+    });
+  } else {
+    relatedSection.style.display = 'none';
+  }
+
+  panel.querySelector('.panel-button').onclick = () => {
+    window.open('communication-compass-v29.html#term=' + encodeURIComponent(node.name), '_blank');
+  };
+
+  panel.classList.add('visible');
+  document.getElementById('tooltip').classList.remove('visible');
+}
+
+function findNodeByTitle(node, title) {
+  if (node.name === title) return node;
+  for (const child of node.children) {
+    const found = findNodeByTitle(child, title);
+    if (found) return found;
+  }
+  return null;
+}
+
+document.querySelector('.panel-close').addEventListener('click', () => {
+  document.getElementById('detail-panel').classList.remove('visible');
+});
+
+// ============================================================
+// SEARCH
+// ============================================================
+const searchInput = document.getElementById('search');
+searchInput.addEventListener('input', e => {
+  const query = e.target.value.toLowerCase().trim();
+  if (query.length < 2) return;
+
+  const match = findNodeByQuery(rootNode, query);
+  if (match) {
+    if (match.parent) {
+      currentNode = match.parent;
+      centreView(match.parent);
+      updateBreadcrumb();
+      updateStats();
+    }
+  }
+});
+
+function findNodeByQuery(node, query) {
+  if (node.name.toLowerCase().includes(query)) return node;
+  for (const child of node.children) {
+    const found = findNodeByQuery(child, query);
+    if (found) return found;
+  }
+  return null;
+}
+
+// ============================================================
+// KEYBOARD SHORTCUTS
+// ============================================================
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    const panel = document.getElementById('detail-panel');
+    if (panel.classList.contains('visible')) {
+      panel.classList.remove('visible');
+    } else if (currentNode.parent) {
+      currentNode = currentNode.parent;
+      centreView(currentNode);
+      updateBreadcrumb();
+      updateStats();
+    }
+  } else if (e.key === 'r' || e.key === 'R') {
+    currentNode = rootNode;
+    centreView(rootNode);
+    updateBreadcrumb();
+    updateStats();
+  } else if (e.key === 'f' || e.key === 'F') {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen();
+    } else {
+      document.exitFullscreen();
+    }
+  }
+});
+
+// ============================================================
+// FILTERS
+// ============================================================
+document.querySelectorAll('.filter-pill').forEach(pill => {
+  pill.addEventListener('click', () => {
+    document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+    pill.classList.add('active');
+
+    const category = pill.dataset.category;
+    // Filter implementation would go here
+    // For now, just visual feedback
+  });
+});
+
+// ============================================================
+// LOADING SCREEN
+// ============================================================
+setTimeout(() => {
+  const ld = document.getElementById('loading-screen');
+  ld.style.opacity = '0';
+  ld.style.pointerEvents = 'none';
+  setTimeout(() => { ld.style.display = 'none'; }, 900);
+}, 1200);
+</script>
+
+</body>
+</html>

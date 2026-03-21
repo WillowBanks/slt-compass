@@ -1,0 +1,259 @@
+# Interactive Knowledge Graph Visualisation Design Patterns
+Research compiled: 2026-03-19
+
+## 1. FORCE-DIRECTED LAYOUT PHYSICS
+
+Core Algorithm: Velocity Verlet Integration
+- Constant unit time step: Δt = 1
+- Constant unit mass: m = 1
+- Force F = acceleration a (simplified)
+
+THREE PRIMARY FORCES:
+
+Link Force (Attraction)
+- Default strength: 1.0 (range 0–1)
+- Pulls connected nodes together
+- For responsive: 0.8–1.0
+- For loose/exploratory: 0.3–0.5
+- Rest length: 40–100 px
+
+Many-Body Force (Repulsion)
+- Default: -30 (negative = repulsion)
+- All nodes repel all other nodes
+- Small graphs (<100 nodes): -50 to -100
+- Medium (100–500): -30 to -50
+- Large (500+): -20 to -30
+- Based on Coulomb's law: F = k(Q1Q2/r²)
+
+Center Force
+- Default: 0.1 (pulls toward canvas center)
+- Prevents drift off-screen
+
+DAMPING & COOLING:
+
+velocityDecay: 0.4 (default)
+- Simulates friction/medium resistance
+- For responsive UI: 0.3–0.4
+- For floating effect: 0.6–0.8
+
+alphaDecay: 0.0228 (default)
+- Cooling rate, how fast system settles
+- Faster: 0.05–0.1 (50–100 ticks to converge)
+- Smooth: 0.01–0.03 (longer visual effect)
+
+alphaMin: 0 (default)
+- Minimum energy before stopping
+- Set 0.001–0.01 to pause when settled
+- Keep 0 for continuous motion
+
+PRACTICAL JAVASCRIPT VALUES:
+
+const simulation = {
+  linkStrength: 0.8,
+  chargeStrength: -60,
+  velocityDecay: 0.4,
+  alphaDecay: 0.0228,
+  alphaMin: 0.001,
+  centreForce: 0.1,
+  cooldownTime: 15000  // 15 seconds
+};
+
+---
+
+## 2. CONNECTION LINE AESTHETICS
+
+Line Style
+- Thickness: 0.5–1.5 px (thin)
+- Curve type: Quadratic Bézier (organic, less clutter)
+- Straight: faster, cleaner (dense graphs)
+- Cubic Bézier: smoothest but 2x cost
+
+Transparency & Opacity
+- Default: 0.15–0.35 (semi-transparent, recessed)
+- Hover: 0.8–1.0 (bring forward)
+- Cluster edges: 0.1 (very faint)
+
+Colour Coding (Dark Theme)
+- Primary: #4a90e2 (blue) @ 0.25 alpha
+- Strong/important: #00d084 (green) @ 0.3 alpha
+- Weak: #666666 (grey) @ 0.15 alpha
+- Accent/hover: #ffff00 (yellow) @ 0.8 alpha
+- Very faint: #333333 (dark grey) @ 0.1 alpha
+
+Bézier Quadratic Implementation:
+const dx = b.x - a.x;
+const dy = b.y - a.y;
+const mx = (a.x + b.x) / 2 + (dy * 0.2);
+const my = (a.y + b.y) / 2 - (dx * 0.2);
+ctx.quadraticCurveTo(mx, my, b.x, b.y);
+
+---
+
+## 3. NODE SIZING & SPACING
+
+Sizing Hierarchy
+- Large (importance): 12–20 px radius (high-degree nodes)
+- Medium (normal): 6–10 px radius
+- Small (details): 2–4 px radius
+
+Sizing by Degree:
+const radius = Math.sqrt(node.connections.length) * 1.5 + 4;
+
+Spacing & Distance
+- Minimum distance (collision): 8–12 px
+- Ideal link length (rest): 40–80 px
+  - Tight: 40–50 px
+  - Spacious: 60–80 px
+  - Large graphs (500+): 100–150 px
+- Node density: 3–8 nodes per 10,000 px²
+
+---
+
+## 4. SEMANTIC ZOOM & LEVEL-OF-DETAIL
+
+Three-Layer Approach:
+
+TIER 1: Overview (0.3–0.8x zoom)
+- Show: only degree > 3 nodes (hubs)
+- Hide: leaf nodes, low-degree connections
+- Lines: opacity 0.1
+- Labels: none
+- Purpose: global structure
+
+TIER 2: Explore (0.8–2.0x zoom)
+- Show: all nodes and connections
+- Lines: opacity 0.25
+- Labels: category tags only
+- Purpose: navigate
+
+TIER 3: Detail (2.0x+ zoom)
+- Show: nodes + full metadata
+- Lines: opacity 0.35–0.5
+- Labels: full names, relationships
+- Purpose: inspect
+
+Implementation:
+
+function shouldRenderNode(node, zoom) {
+  if (zoom < 0.5) return node.degree > 5;
+  if (zoom < 1.2) return node.degree > 2;
+  return true;
+}
+
+Focus+Context:
+- Highlight selected node and 1–2 hop neighbours
+- Fade others to 0.05 opacity
+- Smooth 200–300 ms transition
+
+---
+
+## 5. DARK THEME COLOUR SCHEMES
+
+Background
+- Canvas: #1a1a1e (very dark grey, not pure black)
+- Gradient: #1a1a1e to #0f0f12
+
+Nodes
+- Hub (high degree): #00d084 (bright teal)
+- Normal: #4a90e2 (medium blue)
+- Secondary: #b4a7d6 (muted purple)
+- Leaf: #888888 (grey)
+- Accent: #ffff00 (yellow) or #ff6b6b (coral)
+
+Connections
+- Normal: #4a90e2 @ 0.25
+- Cluster: #666666 @ 0.1
+- Highlight: #ffff00 @ 0.8
+
+Text & UI
+- Labels: #e0e0e0 (off-white)
+- Dim: #888888 (grey)
+- Selection: #ffff00 or #00d084
+
+---
+
+## 6. IMPLEMENTATION CHECKLIST
+
+Physics
+✓ Velocity Verlet: position += velocity; velocity *= decay
+✓ Charge scaled: -30 * sqrt(nodeCount)
+✓ Link strength: 0.8
+✓ Velocity decay: 0.4
+✓ Alpha decay: 0.0228
+✓ Pause after 15 seconds
+
+Rendering
+✓ Edges first, nodes second
+✓ Quadratic Bézier curves
+✓ Line width: 1 px
+✓ Node radius: sqrt(degree) * 1.5 + 4
+✓ Collision: 8–12 px min
+✓ Labels at zoom > 0.8x
+
+Interaction
+✓ Hover: edge opacity 0.8, node border
+✓ Click: fade non-connected, highlight
+✓ Drag: pan (translate)
+✓ Scroll: zoom (scale)
+✓ Semantic zoom: hide low-degree at < 1.0x
+
+Performance
+✓ requestAnimationFrame
+✓ 60 FPS cap
+✓ Cache calculations
+✓ 500+ nodes: spatial partitioning (quadtree)
+
+---
+
+## 7. SPECIFIC PARAMETER VALUES
+
+const graphConfig = {
+  // Physics
+  linkStrength: 0.8,
+  chargeStrength: -60,
+  velocityDecay: 0.4,
+  alphaDecay: 0.0228,
+  alphaMin: 0.001,
+  centreForce: 0.1,
+  linkRestLength: 60,
+  nodeCollisionDistance: 10,
+  
+  // Rendering
+  edgeThickness: 1,
+  edgeOpacity: 0.25,
+  edgeOpacityHover: 0.8,
+  nodeRadiusMin: 4,
+  nodeRadiusMax: 18,
+  
+  // Interaction
+  zoomSensitivity: 1.1,
+  panDamping: 0.85,
+  focusTransitionMs: 300,
+  
+  // Zoom tiers
+  zoomThresholdOverview: 0.5,
+  zoomThresholdExplore: 1.2,
+  zoomThresholdDetail: 2.0,
+  
+  // Theme
+  bgColor: '#1a1a1e',
+  nodeHubColor: '#00d084',
+  nodeNormalColor: '#4a90e2',
+  edgeColor: '#4a90e2',
+  highlightColor: '#ffff00'
+};
+
+---
+
+## SOURCES
+
+- D3.js Force Module: https://d3js.org/d3-force
+- D3 Force Layout (GitHub): https://github.com/d3/d3-force
+- Force-Graph Canvas: https://github.com/vasturiano/force-graph
+- Force-Directed Graph Drawing: https://en.wikipedia.org/wiki/Force-directed_graph_drawing
+- Knowledge Graph Visualisation: https://www.yfiles.com/resources/how-to/guide-to-visualizing-knowledge-graphs
+- Semantic Zooming: https://dl.acm.org/doi/10.1145/3148011.3148015
+- Dark Theme Visualisation: https://ananyadeka.medium.com/implementing-dark-mode-for-data-visualizations-design-considerations-66cd1ff2ab67
+- Canvas Bezier Curves: https://www.sitepoint.com/html5-canvas-draw-bezier-curves/
+- Color Palettes: https://www.datawrapper.de/blog/colors-for-data-vis-style-guides
+- Force-Based Layouts: https://cs.brown.edu/people/rtamassi/gdhandbook/chapters/force-directed.pdf

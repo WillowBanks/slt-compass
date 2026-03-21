@@ -1,0 +1,1437 @@
+<!DOCTYPE html>
+<html lang="en-NZ">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SLT Knowledge Graph | Arc Diagram</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0a1a;
+            --surface: rgba(255,255,255,0.04);
+            --surface-hover: rgba(255,255,255,0.08);
+            --border: rgba(255,255,255,0.08);
+            --text: #e6edf3;
+            --text-muted: rgba(255,255,255,0.5);
+            --diag: #e74c8b;
+            --assess: #4da6ff;
+            --interv: #34d399;
+            --accent: #7B2FF7;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(circle at center, var(--bg), #0d1117);
+            color: var(--text);
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 30% 50%, rgba(123,47,247,0.03), transparent 50%),
+                        radial-gradient(circle at 70% 50%, rgba(77,166,255,0.02), transparent 50%);
+            animation: gradientShift 20s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 0.8; }
+        }
+
+        /* Loading Screen */
+        #loading {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at center, var(--bg), #0d1117);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+        }
+
+        #loading.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        #loading h1 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 32px;
+            background: linear-gradient(135deg, var(--accent), var(--assess));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        #loading p {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+        }
+
+        .loading-dots {
+            display: flex;
+            gap: 8px;
+        }
+
+        .loading-dots span {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent);
+            animation: dotPulse 1.5s ease-in-out infinite;
+        }
+
+        .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes dotPulse {
+            0%, 100% { opacity: 0.3; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        /* Header Bar */
+        #header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            background: rgba(10,10,26,0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            z-index: 100;
+        }
+
+        #header h1 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 20px;
+            background: linear-gradient(135deg, var(--accent), var(--assess));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        #searchContainer {
+            position: relative;
+            width: 300px;
+        }
+
+        #searchIcon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        #search {
+            width: 100%;
+            height: 40px;
+            padding: 0 12px 0 36px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #search:focus {
+            outline: none;
+            background: var(--surface-hover);
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(123,47,247,0.1);
+        }
+
+        #search::placeholder {
+            color: var(--text-muted);
+        }
+
+        #searchBadge {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--accent);
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 24px;
+            opacity: 0;
+            transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #searchBadge.visible {
+            opacity: 1;
+        }
+
+        #categoryFilters {
+            display: flex;
+            gap: 8px;
+        }
+
+        .category-pill {
+            height: 40px;
+            padding: 0 16px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-family: 'Poppins', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .category-pill:hover {
+            background: var(--surface-hover);
+        }
+
+        .category-pill.active {
+            border-width: 2px;
+        }
+
+        .category-pill.active.diagnosis {
+            border-color: var(--diag);
+            box-shadow: 0 0 16px rgba(231,76,139,0.3);
+        }
+
+        .category-pill.active.assessment {
+            border-color: var(--assess);
+            box-shadow: 0 0 16px rgba(77,166,255,0.3);
+        }
+
+        .category-pill.active.intervention {
+            border-color: var(--interv);
+            box-shadow: 0 0 16px rgba(52,211,153,0.3);
+        }
+
+        .pill-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .pill-dot.diagnosis { background: var(--diag); }
+        .pill-dot.assessment { background: var(--assess); }
+        .pill-dot.intervention { background: var(--interv); }
+
+        .pill-badge {
+            background: var(--surface-hover);
+            color: var(--text-muted);
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 7px;
+            border-radius: 12px;
+        }
+
+        /* Stats Bar */
+        #stats {
+            position: fixed;
+            top: 70px;
+            left: 0;
+            right: 0;
+            height: 80px;
+            background: rgba(10,10,26,0.6);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 32px;
+            padding: 0 24px;
+            z-index: 90;
+        }
+
+        .stat-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(123,47,247,0.08);
+            min-width: 160px;
+        }
+
+        .stat-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .stat-icon.total {
+            background: rgba(123,47,247,0.1);
+        }
+
+        .stat-icon.diagnosis {
+            background: rgba(231,76,139,0.1);
+        }
+
+        .stat-icon.assessment {
+            background: rgba(77,166,255,0.1);
+        }
+
+        .stat-icon.intervention {
+            background: rgba(52,211,153,0.1);
+        }
+
+        .stat-content {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-number {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 24px;
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .stat-number.animated {
+            animation: countUp 0.8s ease-out;
+        }
+
+        @keyframes countUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .stat-label {
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            font-weight: 400;
+            color: var(--text-muted);
+        }
+
+        /* Canvas Container */
+        #canvasContainer {
+            position: fixed;
+            top: 150px;
+            left: 0;
+            right: 0;
+            bottom: 32px;
+        }
+
+        canvas {
+            display: block;
+            cursor: grab;
+        }
+
+        canvas:active {
+            cursor: grabbing;
+        }
+
+        /* Legend */
+        #legend {
+            position: fixed;
+            bottom: 64px;
+            left: 24px;
+            background: rgba(10,10,26,0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(123,47,247,0.08);
+            z-index: 100;
+        }
+
+        .legend-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+            font-size: 13px;
+        }
+
+        .legend-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .legend-separator {
+            height: 1px;
+            background: var(--border);
+            margin: 12px 0;
+        }
+
+        .legend-hint {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 8px;
+            font-style: italic;
+        }
+
+        /* Tooltip */
+        #tooltip {
+            position: fixed;
+            background: rgba(10,10,26,0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 16px;
+            max-width: 320px;
+            box-shadow: 0 8px 32px rgba(123,47,247,0.15);
+            z-index: 200;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #tooltip.visible {
+            opacity: 1;
+        }
+
+        #tooltip h3 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 15px;
+            margin-bottom: 8px;
+        }
+
+        #tooltip .tooltip-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 24px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            color: white;
+        }
+
+        #tooltip .tooltip-badge.diagnosis { background: var(--diag); }
+        #tooltip .tooltip-badge.assessment { background: var(--assess); }
+        #tooltip .tooltip-badge.intervention { background: var(--interv); }
+
+        #tooltip p {
+            font-size: 12px;
+            line-height: 1.6;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        #tooltip .tooltip-connections {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        /* Detail Panel */
+        #detailPanel {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 400px;
+            height: 100vh;
+            background: rgba(10,10,26,0.95);
+            backdrop-filter: blur(20px);
+            border-left: 1px solid var(--border);
+            box-shadow: -8px 0 32px rgba(0,0,0,0.3);
+            z-index: 300;
+            padding: 24px;
+            overflow-y: auto;
+            transform: translateX(100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #detailPanel.visible {
+            transform: translateX(0);
+        }
+
+        #detailPanel::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #detailPanel::-webkit-scrollbar-track {
+            background: var(--surface);
+        }
+
+        #detailPanel::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px;
+        }
+
+        #detailPanel::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
+        }
+
+        #closeDetail {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 32px;
+            height: 32px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 20px;
+            color: var(--text-muted);
+        }
+
+        #closeDetail:hover {
+            background: var(--surface-hover);
+            color: var(--text);
+        }
+
+        #detailTitle {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 20px;
+            line-height: 1.3;
+            margin-bottom: 12px;
+            padding-right: 40px;
+        }
+
+        #detailBadge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 24px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+            color: white;
+        }
+
+        #detailBadge.diagnosis { background: var(--diag); }
+        #detailBadge.assessment { background: var(--assess); }
+        #detailBadge.intervention { background: var(--interv); }
+
+        #detailDesc {
+            font-size: 14px;
+            line-height: 1.7;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+        }
+
+        .detail-section {
+            margin-bottom: 24px;
+        }
+
+        .detail-section h4 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        .connection-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .connection-pill {
+            padding: 8px 14px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .connection-pill:hover {
+            background: var(--surface-hover);
+            border-color: var(--accent);
+        }
+
+        #compassBtn {
+            width: 100%;
+            height: 48px;
+            background: linear-gradient(135deg, var(--accent), var(--assess));
+            border: none;
+            border-radius: 16px;
+            color: white;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-top: auto;
+        }
+
+        #compassBtn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(123,47,247,0.3);
+        }
+
+        /* Status Bar */
+        #statusBar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 32px;
+            background: rgba(10,10,26,0.9);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            font-size: 11px;
+            color: var(--text-muted);
+            z-index: 80;
+        }
+
+        .status-left, .status-right {
+            display: flex;
+            gap: 16px;
+        }
+
+        .status-right kbd {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Loading Screen -->
+<div id="loading">
+    <h1>SLT Knowledge Graph</h1>
+    <p>Arc Diagram — 108 Nodes</p>
+    <div class="loading-dots">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+</div>
+
+<!-- Header Bar -->
+<div id="header">
+    <h1>Arc Diagram</h1>
+
+    <div id="searchContainer">
+        <svg id="searchIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/>
+            <path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input type="text" id="search" placeholder="Search nodes...">
+        <span id="searchBadge"></span>
+    </div>
+
+    <div id="categoryFilters">
+        <div class="category-pill active diagnosis" data-category="diagnosis">
+            <span class="pill-dot diagnosis"></span>
+            <span>Diagnoses</span>
+            <span class="pill-badge">22</span>
+        </div>
+        <div class="category-pill active assessment" data-category="assessment">
+            <span class="pill-dot assessment"></span>
+            <span>Assessments</span>
+            <span class="pill-badge">38</span>
+        </div>
+        <div class="category-pill active intervention" data-category="intervention">
+            <span class="pill-dot intervention"></span>
+            <span>Interventions</span>
+            <span class="pill-badge">48</span>
+        </div>
+    </div>
+</div>
+
+<!-- Stats Bar -->
+<div id="stats">
+    <div class="stat-card">
+        <div class="stat-icon total">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7B2FF7" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <circle cx="12" cy="12" r="3"/>
+                <path d="M12 2v4m0 12v4M2 12h4m12 0h4"/>
+            </svg>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number animated" id="totalNodes">108</div>
+            <div class="stat-label">Total Nodes</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon diagnosis">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e74c8b" stroke-width="2">
+                <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+            </svg>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number animated" id="diagNodes" style="color: var(--diag);">22</div>
+            <div class="stat-label">Diagnoses</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon assessment">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4da6ff" stroke-width="2">
+                <path d="M9 11l3 3L22 4"/>
+                <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+            </svg>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number animated" id="assessNodes" style="color: var(--assess);">38</div>
+            <div class="stat-label">Assessments</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon intervention">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2">
+                <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 00-2.91-.09z"/>
+                <path d="m12 15-3-3a22 22 0 012-3.95A12.88 12.88 0 0122 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 01-4 2z"/>
+                <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/>
+                <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/>
+            </svg>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number animated" id="intervNodes" style="color: var(--interv);">48</div>
+            <div class="stat-label">Interventions</div>
+        </div>
+    </div>
+</div>
+
+<!-- Canvas Container -->
+<div id="canvasContainer">
+    <canvas id="canvas"></canvas>
+</div>
+
+<!-- Legend -->
+<div id="legend">
+    <div class="legend-row">
+        <span class="legend-dot" style="background: var(--diag);"></span>
+        <span>Diagnosis (<span id="legendDiag">22</span>)</span>
+    </div>
+    <div class="legend-row">
+        <span class="legend-dot" style="background: var(--assess);"></span>
+        <span>Assessment (<span id="legendAssess">38</span>)</span>
+    </div>
+    <div class="legend-row">
+        <span class="legend-dot" style="background: var(--interv);"></span>
+        <span>Intervention (<span id="legendInterv">48</span>)</span>
+    </div>
+    <div class="legend-separator"></div>
+    <div class="legend-row">
+        <span><span id="legendConnections">85</span> connections</span>
+    </div>
+    <div class="legend-hint">Hover to explore · Click for details</div>
+</div>
+
+<!-- Tooltip -->
+<div id="tooltip">
+    <h3 id="tooltipTitle"></h3>
+    <div id="tooltipBadge" class="tooltip-badge"></div>
+    <p id="tooltipDesc"></p>
+    <div class="tooltip-connections" id="tooltipConnections"></div>
+</div>
+
+<!-- Detail Panel -->
+<div id="detailPanel">
+    <div id="closeDetail">&times;</div>
+    <h2 id="detailTitle"></h2>
+    <div id="detailBadge"></div>
+    <p id="detailDesc"></p>
+    <div class="detail-section">
+        <h4>Connections (<span id="connectionCount">0</span>)</h4>
+        <div class="connection-pills" id="connectionPills"></div>
+    </div>
+    <button id="compassBtn">Open in Communication Compass</button>
+</div>
+
+<!-- Status Bar -->
+<div id="statusBar">
+    <div class="status-left">
+        <span id="statusNodes">108 nodes</span>
+        <span>·</span>
+        <span id="statusConnections">85 connections</span>
+        <span>·</span>
+        <span>Canvas interactive</span>
+    </div>
+    <div class="status-right">
+        <span><kbd>R</kbd> reset</span>
+        <span><kbd>F</kbd> fullscreen</span>
+        <span><kbd>1-3</kbd> toggle categories</span>
+    </div>
+</div>
+
+<script>
+// Data
+const N = [
+{i:'d1',t:'Developmental Language Disorder (DLD)',c:'diagnosis',d:'A neurodevelopmental disorder characterised by persistent difficulties in acquiring and using language across modalities.',r:['CELF','PLS','Language Sample Analysis','Modelling','Recasting','Shape Coding','Colourful Semantics']},
+{i:'d2',t:'Childhood Apraxia of Speech (CAS)',c:'diagnosis',d:'A motor speech disorder where children have difficulty planning and coordinating the precise movements needed for speech.',r:['PROMPT Therapy','Nuffield Dyspraxia Programme (NDP3)','AAC','GFTA','Stimulability Testing']},
+{i:'d3',t:'Phonological Disorder',c:'diagnosis',d:'A speech sound disorder characterised by predictable, rule-based errors affecting groups of sounds.',r:['Minimal Pairs Approach','Cycles Approach','Core Vocabulary Approach','GFTA','Phonological Assessment','Phonological Awareness']},
+{i:'d4',t:'Stuttering (Fluency Disorder)',c:'diagnosis',d:'Disruptions in the flow of speech characterised by repetitions, prolongations, and blocks.',r:['Lidcombe Program','Fluency Shaping','Stuttering Modification','OASES']},
+{i:'d5',t:'Selective Mutism',c:'diagnosis',d:'An anxiety disorder where a child consistently fails to speak in specific social situations despite speaking normally elsewhere.',r:['Sliding-In Technique','Brave Programme','Stimulus Fading']},
+{i:'d6',t:'Dysarthria',c:'diagnosis',d:'A motor speech disorder resulting from neurological damage affecting muscles used for speech.',r:['Oral Motor Exercises','AAC','Lee Silverman Voice Treatment (LSVT)']},
+{i:'d7',t:'Receptive Language Disorder',c:'diagnosis',d:'Difficulty understanding spoken language, affecting comprehension of vocabulary, grammar, and complex instructions.',r:['CELF','PLS','ROWPVT','Visual Supports','Scaffolding']},
+{i:'d8',t:'Expressive Language Disorder',c:'diagnosis',d:'Difficulty using words and sentences to express thoughts and needs.',r:['CELF','PLS','Focused Stimulation','Modelling','Milieu Teaching']},
+{i:'d9',t:'Articulation Disorder',c:'diagnosis',d:'Difficulty producing specific speech sounds correctly due to motor or placement issues.',r:['GFTA','Traditional Articulation Therapy','Phonetic Placement']},
+{i:'d10',t:'Language Delay',c:'diagnosis',d:'Slower-than-expected language development where skills emerge in typical sequence but at a delayed rate.',r:['Hanen Approach','Modelling','Expansion','Parallel Talk']},
+{i:'d11',t:'Social Communication Disorder',c:'diagnosis',d:'Persistent difficulties using verbal and nonverbal communication for social purposes.',r:['Social Thinking','PEERS Program','Video Modelling','Pragmatic Language Assessment']},
+{i:'d12',t:'Auditory Processing Disorder (APD)',c:'diagnosis',d:'Difficulty processing auditory information despite normal hearing.',r:['Auditory Training','Compensatory Strategies','FM Systems']},
+{i:'d13',t:'Voice Disorder (Dysphonia)',c:'diagnosis',d:'Abnormal voice quality, pitch, loudness, or resonance.',r:['Vocal Hygiene','Resonant Voice Therapy','GRBAS Scale']},
+{i:'d14',t:'Cleft Palate Speech',c:'diagnosis',d:'Speech difficulties from structural abnormalities of the palate.',r:['Nasometry','Pressure Consonant Assessment','Speech Surgery']},
+{i:'d15',t:'Specific Learning Disability',c:'diagnosis',d:'A neurological condition affecting reading, writing, or mathematical skills.',r:['Phonological Awareness','DIBELS','PAT-2']},
+{i:'d16',t:'Autism Spectrum Disorder',c:'diagnosis',d:'A neurodevelopmental condition characterised by differences in social communication and restricted interests.',r:['PECS','AAC','Social Stories','Visual Supports','ADOS-2']},
+{i:'d17',t:'Intellectual Disability',c:'diagnosis',d:'Significant limitations in both intellectual functioning and adaptive behaviour.',r:['AAC','Functional Communication Training','Makaton']},
+{i:'d18',t:'Hearing Loss',c:'diagnosis',d:'Reduced ability to hear sounds, affecting speech and language development.',r:['Auditory-Verbal Therapy','Sign Language','FM Systems','Cochlear Implant']},
+{i:'d19',t:'Traumatic Brain Injury',c:'diagnosis',d:'Acquired brain injury affecting cognitive-communication skills.',r:['Cognitive-Communication Therapy','AAC']},
+{i:'d20',t:'Literacy Difficulties',c:'diagnosis',d:'Challenges in developing reading and writing skills.',r:['Phonological Awareness','DIBELS','Vocabulary Assessment']},
+{i:'d21',t:'Feeding & Swallowing Difficulties',c:'diagnosis',d:'Difficulties with oral intake of food and liquids.',r:['Oral Motor Exercises','Food Chaining','SOS Approach']},
+{i:'d22',t:'Late Talker',c:'diagnosis',d:'Children aged 18-30 months with limited expressive vocabulary (<50 words).',r:['Hanen Approach','Modelling','Parent Coaching','Vocabulary Assessment']},
+{i:'a1',t:'Standardised Assessment',c:'assessment',d:'A formal, norm-referenced test with standardised administration and scoring.',r:[]},
+{i:'a2',t:'CELF',c:'assessment',d:'Clinical Evaluation of Language Fundamentals.',r:['Developmental Language Disorder (DLD)','Receptive Language Disorder','Expressive Language Disorder']},
+{i:'a3',t:'PLS',c:'assessment',d:'Preschool Language Scales.',r:['Developmental Language Disorder (DLD)','Receptive Language Disorder','Expressive Language Disorder']},
+{i:'a4',t:'GFTA',c:'assessment',d:'Goldman-Fristoe Test of Articulation.',r:['Childhood Apraxia of Speech (CAS)','Phonological Disorder','Articulation Disorder']},
+{i:'a5',t:'ADOS-2',c:'assessment',d:'Autism Diagnostic Observation Schedule.',r:['Autism Spectrum Disorder']},
+{i:'a6',t:'Norm-Referenced Assessment',c:'assessment',d:'Assessment comparing performance to same-age peers.',r:[]},
+{i:'a7',t:'Criterion-Referenced Assessment',c:'assessment',d:'Assessment against specific criteria.',r:[]},
+{i:'a8',t:'Language Sample Analysis',c:'assessment',d:'Analysis of spontaneous speech.',r:['Developmental Language Disorder (DLD)']},
+{i:'a9',t:'Dynamic Assessment',c:'assessment',d:'Test-teach-retest format.',r:[]},
+{i:'a10',t:'Oral Motor Assessment',c:'assessment',d:'Examination of oral structures.',r:[]},
+{i:'a11',t:'Fluency Assessment',c:'assessment',d:'Assessment of stuttering.',r:[]},
+{i:'a12',t:'Pragmatic Language Assessment',c:'assessment',d:'Assessment of social communication skills.',r:['Social Communication Disorder']},
+{i:'a13',t:'ROWPVT',c:'assessment',d:'Receptive One-Word Picture Vocabulary Test.',r:['Receptive Language Disorder']},
+{i:'a14',t:'EOWPVT',c:'assessment',d:'Expressive One-Word Picture Vocabulary Test.',r:[]},
+{i:'a15',t:'MLU',c:'assessment',d:'Mean Length of Utterance.',r:[]},
+{i:'a16',t:'Phonological Assessment',c:'assessment',d:'Identifies phonological error patterns.',r:['Phonological Disorder']},
+{i:'a17',t:'Stimulability Testing',c:'assessment',d:'Assesses ability to produce target sounds.',r:['Childhood Apraxia of Speech (CAS)']},
+{i:'a18',t:'Informal Assessment',c:'assessment',d:'Non-standardised observation.',r:[]},
+{i:'a19',t:'Narrative Assessment',c:'assessment',d:'Assessment of story-telling.',r:[]},
+{i:'a20',t:'Play-Based Assessment',c:'assessment',d:'Assessment through play.',r:[]},
+{i:'a21',t:'KSPT',c:'assessment',d:'Kaufman Speech Praxis Test.',r:[]},
+{i:'a22',t:'VMPAC',c:'assessment',d:'Verbal Motor Production Assessment.',r:[]},
+{i:'a23',t:'PIPA',c:'assessment',d:'Preschool & Primary Inventory of Phonological Awareness.',r:[]},
+{i:'a24',t:'PAT-2',c:'assessment',d:'Photo Articulation Test.',r:['Specific Learning Disability']},
+{i:'a25',t:'DIBELS',c:'assessment',d:'Dynamic Indicators of Basic Early Literacy Skills.',r:['Specific Learning Disability','Literacy Difficulties']},
+{i:'a26',t:'Vocabulary Assessment',c:'assessment',d:'Assessment of receptive and expressive vocabulary.',r:['Late Talker','Literacy Difficulties']},
+{i:'a27',t:'Phonological Awareness Assessment',c:'assessment',d:'Assessment of sound awareness.',r:[]},
+{i:'a28',t:'OASES',c:'assessment',d:'Overall Assessment of the Speaker\u2019s Experience of Stuttering.',r:['Stuttering (Fluency Disorder)']},
+{i:'a29',t:'Nasometry',c:'assessment',d:'Acoustic measurement of nasality.',r:['Cleft Palate Speech']},
+{i:'a30',t:'Pressure Consonant Assessment',c:'assessment',d:'Assessment of pressure-sensitive consonants.',r:['Cleft Palate Speech']},
+{i:'a31',t:'GRBAS Scale',c:'assessment',d:'Perceptual rating scale for voice quality.',r:['Voice Disorder (Dysphonia)']},
+{i:'a32',t:'Auditory Training',c:'assessment',d:'Exercises improving auditory discrimination.',r:['Auditory Processing Disorder (APD)']},
+{i:'a33',t:'Hearing Screening',c:'assessment',d:'Brief assessment to identify hearing loss.',r:[]},
+{i:'a34',t:'Speech Intelligibility Assessment',c:'assessment',d:'Measures how well speech is understood.',r:[]},
+{i:'a35',t:'Functional Communication Assessment',c:'assessment',d:'Real-world communication abilities.',r:[]},
+{i:'a36',t:'Milestone Screening',c:'assessment',d:'Screening for developmental delays.',r:[]},
+{i:'a37',t:'Parent Questionnaire',c:'assessment',d:'Parent report of communication skills.',r:[]},
+{i:'a38',t:'FM System Assessment',c:'assessment',d:'Assessment of assistive listening benefit.',r:[]},
+{i:'i1',t:'Modelling',c:'intervention',d:'Demonstrating target language without requiring imitation.',r:['Developmental Language Disorder (DLD)','Expressive Language Disorder','Language Delay','Late Talker']},
+{i:'i2',t:'Recasting',c:'intervention',d:'Reformulating a child\u2019s utterance to provide a correct model.',r:['Developmental Language Disorder (DLD)']},
+{i:'i3',t:'Expansion',c:'intervention',d:'Adding elements to a child\u2019s utterance.',r:['Language Delay']},
+{i:'i4',t:'Hanen Approach',c:'intervention',d:'Parent-implemented intervention using Observe, Wait, Listen.',r:['Language Delay','Late Talker']},
+{i:'i5',t:'PROMPT Therapy',c:'intervention',d:'Tactile-kinaesthetic approach for motor speech.',r:['Childhood Apraxia of Speech (CAS)']},
+{i:'i6',t:'Nuffield Dyspraxia Programme (NDP3)',c:'intervention',d:'Structured intervention for CAS.',r:['Childhood Apraxia of Speech (CAS)']},
+{i:'i7',t:'Minimal Pairs Approach',c:'intervention',d:'Using word pairs to highlight contrasts.',r:['Phonological Disorder']},
+{i:'i8',t:'Cycles Approach',c:'intervention',d:'Targeting error patterns in cycles.',r:['Phonological Disorder']},
+{i:'i9',t:'Core Vocabulary Approach',c:'intervention',d:'Targeting consistent production of functional words.',r:['Phonological Disorder']},
+{i:'i10',t:'Lidcombe Program',c:'intervention',d:'Parent-delivered treatment for early stuttering.',r:['Stuttering (Fluency Disorder)']},
+{i:'i11',t:'Fluency Shaping',c:'intervention',d:'Teaching slow, controlled speech.',r:['Stuttering (Fluency Disorder)']},
+{i:'i12',t:'Stuttering Modification',c:'intervention',d:'Techniques to stutter more easily.',r:['Stuttering (Fluency Disorder)']},
+{i:'i13',t:'Sliding-In Technique',c:'intervention',d:'Gradual exposure for selective mutism.',r:['Selective Mutism']},
+{i:'i14',t:'Brave Programme',c:'intervention',d:'CBT for selective mutism.',r:['Selective Mutism']},
+{i:'i15',t:'Shape Coding',c:'intervention',d:'Visual system using shapes for sentence structure.',r:['Developmental Language Disorder (DLD)']},
+{i:'i16',t:'Colourful Semantics',c:'intervention',d:'Colour-coded approach to sentence structure.',r:['Developmental Language Disorder (DLD)']},
+{i:'i17',t:'AAC',c:'intervention',d:'Augmentative and Alternative Communication.',r:['Childhood Apraxia of Speech (CAS)','Dysarthria','Autism Spectrum Disorder','Intellectual Disability','Traumatic Brain Injury']},
+{i:'i18',t:'PECS',c:'intervention',d:'Picture Exchange Communication System.',r:['Autism Spectrum Disorder']},
+{i:'i19',t:'Social Thinking',c:'intervention',d:'Framework for teaching social cognition.',r:['Social Communication Disorder']},
+{i:'i20',t:'Social Stories',c:'intervention',d:'Short stories teaching social responses.',r:['Autism Spectrum Disorder']},
+{i:'i21',t:'Video Modelling',c:'intervention',d:'Using video to demonstrate target behaviours.',r:['Social Communication Disorder']},
+{i:'i22',t:'Visual Supports',c:'intervention',d:'Visual aids for communication.',r:['Receptive Language Disorder','Autism Spectrum Disorder']},
+{i:'i23',t:'Scaffolding',c:'intervention',d:'Graded support for children.',r:['Receptive Language Disorder']},
+{i:'i24',t:'Focused Stimulation',c:'intervention',d:'Intensive modelling of targets.',r:['Expressive Language Disorder']},
+{i:'i25',t:'Milieu Teaching',c:'intervention',d:'Naturalistic intervention.',r:['Expressive Language Disorder']},
+{i:'i26',t:'Makaton',c:'intervention',d:'Speech, signs, and symbols programme.',r:['Intellectual Disability']},
+{i:'i27',t:'Parent Coaching',c:'intervention',d:'Training parents in language facilitation.',r:['Late Talker']},
+{i:'i28',t:'Oral Motor Exercises',c:'intervention',d:'Exercises for oral structure strength.',r:['Dysarthria','Feeding & Swallowing Difficulties']},
+{i:'i29',t:'Traditional Articulation Therapy',c:'intervention',d:'Structured therapy for correct sound production.',r:['Articulation Disorder']},
+{i:'i30',t:'Phonetic Placement',c:'intervention',d:'Teaching correct tongue/lip placement.',r:['Articulation Disorder']},
+{i:'i31',t:'Parallel Talk',c:'intervention',d:'Describing what the child is doing.',r:['Language Delay']},
+{i:'i32',t:'Auditory-Verbal Therapy',c:'intervention',d:'Developing listening and spoken language.',r:['Hearing Loss']},
+{i:'i33',t:'Vocal Hygiene',c:'intervention',d:'Promoting healthy voice use.',r:['Voice Disorder (Dysphonia)']},
+{i:'i34',t:'Resonant Voice Therapy',c:'intervention',d:'Easy, forward-focused voice production.',r:['Voice Disorder (Dysphonia)']},
+{i:'i35',t:'Stimulus Fading',c:'intervention',d:'Gradual removal of prompts.',r:['Selective Mutism']},
+{i:'i36',t:'Lee Silverman Voice Treatment (LSVT)',c:'intervention',d:'Intensive voice treatment for dysarthria.',r:['Dysarthria']},
+{i:'i37',t:'Phonological Awareness',c:'intervention',d:'Teaching sound awareness: rhyming, segmenting, blending.',r:['Phonological Disorder','Specific Learning Disability','Literacy Difficulties']},
+{i:'i38',t:'PEERS Program',c:'intervention',d:'Evidence-based social skills intervention.',r:['Social Communication Disorder']},
+{i:'i39',t:'Compensatory Strategies',c:'intervention',d:'Alternative methods to bypass difficulties.',r:['Auditory Processing Disorder (APD)']},
+{i:'i40',t:'FM Systems',c:'intervention',d:'Assistive listening technology.',r:['Auditory Processing Disorder (APD)','Hearing Loss']},
+{i:'i41',t:'Speech Surgery',c:'intervention',d:'Surgical correction of speech-affecting structures.',r:['Cleft Palate Speech']},
+{i:'i42',t:'Functional Communication Training',c:'intervention',d:'Teaching functional communication alternatives.',r:['Intellectual Disability']},
+{i:'i43',t:'Sign Language',c:'intervention',d:'Visual-manual language for Deaf communities.',r:['Hearing Loss']},
+{i:'i44',t:'Cochlear Implant',c:'intervention',d:'Implanted device for severe hearing loss.',r:['Hearing Loss']},
+{i:'i45',t:'Cognitive-Communication Therapy',c:'intervention',d:'Targeting cognitive processes affecting communication.',r:['Traumatic Brain Injury']},
+{i:'i46',t:'Food Chaining',c:'intervention',d:'Gradual food introduction.',r:['Feeding & Swallowing Difficulties']},
+{i:'i47',t:'SOS Approach',c:'intervention',d:'Sequential Oral Sensory feeding approach.',r:['Feeding & Swallowing Difficulties']},
+];
+
+// Build edge graph
+const byTitle = {};
+N.forEach(n => {
+    byTitle[n.t] = n;
+    n.deg = 0;
+});
+
+const edges = [];
+N.forEach(n => {
+    n.r.forEach(rt => {
+        const target = byTitle[rt];
+        if (target && !edges.find(e => (e.a===n && e.b===target) || (e.a===target && e.b===n))) {
+            edges.push({a: n, b: target});
+            n.deg++;
+            target.deg++;
+        }
+    });
+});
+
+// Sort nodes by category then degree
+const order = ['diagnosis', 'assessment', 'intervention'];
+N.sort((a, b) => {
+    const catA = order.indexOf(a.c);
+    const catB = order.indexOf(b.c);
+    if (catA !== catB) return catA - catB;
+    return b.deg - a.deg;
+});
+
+// Category colours
+const catColors = {
+    diagnosis: '#e74c8b',
+    assessment: '#4da6ff',
+    intervention: '#34d399'
+};
+
+// State
+let hoveredNode = null;
+let selectedNode = null;
+let activeFilters = new Set(['diagnosis', 'assessment', 'intervention']);
+let searchQuery = '';
+let isFullscreen = false;
+
+// Canvas setup
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const container = document.getElementById('canvasContainer');
+
+function resizeCanvas() {
+    const rect = container.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    canvas.style.width = rect.width + 'px';
+    canvas.style.height = rect.height + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    calculatePositions();
+    render();
+}
+
+// Layout calculation
+function calculatePositions() {
+    const rect = container.getBoundingClientRect();
+    const W = rect.width;
+    const H = rect.height;
+    const baseline = H * 0.75;
+    const padding = 60;
+    const totalWidth = W - 2 * padding;
+    const spacing = totalWidth / (N.length - 1);
+
+    N.forEach((n, idx) => {
+        n.x = padding + idx * spacing;
+        n.y = baseline;
+
+        // Size by degree
+        const maxDeg = Math.max(...N.map(node => node.deg));
+        const t = maxDeg > 0 ? n.deg / maxDeg : 0;
+        n.r = 4 + t * 12;
+    });
+}
+
+// Filtering
+function filterNodes() {
+    return N.filter(n => {
+        if (!activeFilters.has(n.c)) return false;
+        if (searchQuery && !n.t.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+        return true;
+    });
+}
+
+function filterEdges(visibleNodes) {
+    const visibleSet = new Set(visibleNodes);
+    return edges.filter(e => visibleSet.has(e.a) && visibleSet.has(e.b));
+}
+
+// Rendering
+function render() {
+    const rect = container.getBoundingClientRect();
+    const W = rect.width;
+    const H = rect.height;
+    const baseline = H * 0.75;
+
+    ctx.clearRect(0, 0, W, H);
+
+    const visible = filterNodes();
+    const visibleEdges = filterEdges(visible);
+
+    // Draw category separators & labels
+    drawCategorySections(baseline);
+
+    // Draw edges
+    visibleEdges.forEach(e => {
+        const isHighlighted = hoveredNode && (e.a === hoveredNode || e.b === hoveredNode);
+        const alpha = hoveredNode ? (isHighlighted ? 0.6 : 0.05) : 0.12;
+        drawArc(e.a, e.b, alpha, isHighlighted);
+    });
+
+    // Draw nodes
+    const labelsToDraw = [];
+    visible.forEach(n => {
+        const isHighlighted = hoveredNode === n;
+        const isConnected = hoveredNode && visibleEdges.some(e =>
+            (e.a === hoveredNode && e.b === n) || (e.b === hoveredNode && e.a === n)
+        );
+        const isDimmed = hoveredNode && !isHighlighted && !isConnected;
+
+        drawNode(n, isDimmed ? 0.15 : 1.0, isHighlighted);
+
+        // Collect labels to draw
+        if (isHighlighted || (!hoveredNode && n.deg > 3)) {
+            labelsToDraw.push({node: n, priority: isHighlighted ? 2 : 1});
+        }
+    });
+
+    // Draw labels with collision detection
+    drawLabelsWithCollisionDetection(labelsToDraw);
+}
+
+function drawCategorySections(baseline) {
+    const rect = container.getBoundingClientRect();
+    const W = rect.width;
+
+    let lastCat = null;
+    let boundaries = [];
+    let categories = [];
+
+    N.forEach((n, idx) => {
+        if (lastCat !== n.c) {
+            if (lastCat !== null) {
+                boundaries.push(idx);
+            }
+            categories.push({cat: n.c, startIdx: idx});
+        }
+        lastCat = n.c;
+    });
+
+    // Draw separators
+    boundaries.forEach(idx => {
+        if (idx > 0 && idx < N.length) {
+            const x = (N[idx-1].x + N[idx].x) / 2;
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([4, 4]);
+            ctx.beginPath();
+            ctx.moveTo(x, baseline - 60);
+            ctx.lineTo(x, baseline + 30);
+            ctx.stroke();
+            ctx.setLineDash([]);
+        }
+    });
+
+    // Draw category labels
+    categories.forEach((cat, idx) => {
+        const startIdx = cat.startIdx;
+        const endIdx = idx < categories.length - 1 ? categories[idx + 1].startIdx : N.length;
+        const startX = N[startIdx].x;
+        const endX = N[endIdx - 1].x;
+        const centerX = (startX + endX) / 2;
+
+        const labels = {
+            diagnosis: 'Diagnoses',
+            assessment: 'Assessments',
+            intervention: 'Interventions'
+        };
+
+        ctx.save();
+        ctx.fillStyle = catColors[cat.cat];
+        ctx.font = '600 13px Poppins';
+        ctx.textAlign = 'center';
+        ctx.fillText(labels[cat.cat], centerX, baseline - 80);
+        ctx.restore();
+    });
+}
+
+function drawArc(a, b, alpha, highlighted) {
+    const rect = container.getBoundingClientRect();
+    const baseline = rect.height * 0.75;
+    const dx = Math.abs(b.x - a.x);
+    const controlHeight = baseline - dx * 0.45;
+    const controlX = (a.x + b.x) / 2;
+
+    // Create gradient between node colours
+    let strokeColor;
+    if (highlighted) {
+        const gradient = ctx.createLinearGradient(a.x, a.y, b.x, b.y);
+        gradient.addColorStop(0, catColors[a.c]);
+        gradient.addColorStop(1, catColors[b.c]);
+        strokeColor = gradient;
+        ctx.globalAlpha = alpha;
+    } else {
+        ctx.globalAlpha = alpha;
+        strokeColor = 'rgba(255, 255, 255, 1)';
+    }
+
+    ctx.strokeStyle = strokeColor;
+    ctx.lineWidth = highlighted ? 2 : 1;
+    ctx.beginPath();
+    ctx.moveTo(a.x, a.y);
+    ctx.quadraticCurveTo(controlX, controlHeight, b.x, b.y);
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+}
+
+function drawNode(n, alpha, highlighted) {
+    const color = catColors[n.c];
+    const r = parseInt(color.slice(1,3), 16);
+    const g = parseInt(color.slice(3,5), 16);
+    const b = parseInt(color.slice(5,7), 16);
+
+    // Glow effect on hover
+    if (highlighted) {
+        ctx.shadowColor = color;
+        ctx.shadowBlur = 16;
+    }
+
+    ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    ctx.beginPath();
+    ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+    ctx.fill();
+
+    if (highlighted) {
+        ctx.shadowBlur = 0;
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 3;
+        ctx.stroke();
+    }
+}
+
+function drawLabelsWithCollisionDetection(labelsToDraw) {
+    // Sort by priority (highlighted first)
+    labelsToDraw.sort((a, b) => b.priority - a.priority);
+
+    const drawn = [];
+
+    labelsToDraw.forEach(item => {
+        const n = item.node;
+        const labelWidth = ctx.measureText(n.t).width * 0.8 + 20;
+        const labelX = n.x;
+        const labelY = n.y + n.r + 20;
+
+        // Check collision
+        let hasCollision = false;
+        for (let d of drawn) {
+            const dx = Math.abs(labelX - d.x);
+            const dy = Math.abs(labelY - d.y);
+            if (dx < (labelWidth + d.width) / 2 && dy < 20) {
+                hasCollision = true;
+                break;
+            }
+        }
+
+        // Always draw if highlighted
+        if (!hasCollision || item.priority === 2) {
+            ctx.save();
+            ctx.translate(n.x, n.y + n.r + 4);
+            ctx.rotate(-Math.PI / 4);
+            ctx.fillStyle = `rgba(230, 237, 243, ${item.priority === 2 ? 1 : 0.7})`;
+            ctx.font = '11px Inter';
+            ctx.textAlign = 'left';
+            ctx.fillText(n.t, 0, 0);
+            ctx.restore();
+
+            drawn.push({x: labelX, y: labelY, width: labelWidth});
+        }
+    });
+}
+
+// Interaction
+function getNodeAtPoint(x, y) {
+    const visible = filterNodes();
+    for (let i = visible.length - 1; i >= 0; i--) {
+        const n = visible[i];
+        const dx = x - n.x;
+        const dy = y - n.y;
+        if (dx*dx + dy*dy <= (n.r + 6) * (n.r + 6)) {
+            return n;
+        }
+    }
+    return null;
+}
+
+// Tooltip
+const tooltip = document.getElementById('tooltip');
+
+canvas.addEventListener('mousemove', e => {
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    const node = getNodeAtPoint(x, y);
+
+    if (node !== hoveredNode) {
+        hoveredNode = node;
+        render();
+
+        if (node) {
+            showTooltip(node, e.clientX, e.clientY);
+        } else {
+            hideTooltip();
+        }
+    } else if (node) {
+        // Update tooltip position
+        tooltip.style.left = (e.clientX + 20) + 'px';
+        tooltip.style.top = (e.clientY + 20) + 'px';
+    }
+
+    canvas.style.cursor = node ? 'pointer' : 'grab';
+});
+
+function showTooltip(node, x, y) {
+    document.getElementById('tooltipTitle').textContent = node.t;
+    document.getElementById('tooltipBadge').textContent = node.c;
+    document.getElementById('tooltipBadge').className = 'tooltip-badge ' + node.c;
+    document.getElementById('tooltipDesc').textContent = node.d;
+    document.getElementById('tooltipConnections').textContent = `${node.r.length} connections`;
+
+    tooltip.style.left = (x + 20) + 'px';
+    tooltip.style.top = (y + 20) + 'px';
+    tooltip.classList.add('visible');
+}
+
+function hideTooltip() {
+    tooltip.classList.remove('visible');
+}
+
+// Detail Panel
+const detailPanel = document.getElementById('detailPanel');
+
+canvas.addEventListener('click', e => {
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    const node = getNodeAtPoint(x, y);
+    if (node) {
+        showDetailPanel(node);
+    }
+});
+
+function showDetailPanel(node) {
+    selectedNode = node;
+
+    document.getElementById('detailTitle').textContent = node.t;
+    document.getElementById('detailBadge').textContent = node.c;
+    document.getElementById('detailBadge').className = node.c;
+    document.getElementById('detailDesc').textContent = node.d;
+    document.getElementById('connectionCount').textContent = node.r.length;
+
+    const connectionPills = document.getElementById('connectionPills');
+    connectionPills.innerHTML = '';
+    node.r.forEach(rt => {
+        const target = byTitle[rt];
+        if (target) {
+            const pill = document.createElement('div');
+            pill.className = 'connection-pill';
+            pill.textContent = rt;
+            pill.onclick = () => {
+                highlightNode(target);
+            };
+            connectionPills.appendChild(pill);
+        }
+    });
+
+    detailPanel.classList.add('visible');
+    hideTooltip();
+}
+
+function hideDetailPanel() {
+    detailPanel.classList.remove('visible');
+    selectedNode = null;
+}
+
+function highlightNode(node) {
+    hoveredNode = node;
+    render();
+    setTimeout(() => {
+        hoveredNode = null;
+        render();
+    }, 2000);
+}
+
+document.getElementById('closeDetail').addEventListener('click', hideDetailPanel);
+
+document.getElementById('compassBtn').addEventListener('click', () => {
+    window.open('communication-compass-v31.html', '_blank');
+});
+
+// Search
+const searchInput = document.getElementById('search');
+const searchBadge = document.getElementById('searchBadge');
+
+searchInput.addEventListener('input', e => {
+    searchQuery = e.target.value;
+    updateStats();
+    render();
+
+    if (searchQuery) {
+        const visible = filterNodes();
+        searchBadge.textContent = visible.length;
+        searchBadge.classList.add('visible');
+    } else {
+        searchBadge.classList.remove('visible');
+    }
+});
+
+// Category filters
+document.querySelectorAll('.category-pill').forEach(pill => {
+    pill.addEventListener('click', () => {
+        const cat = pill.dataset.category;
+        if (activeFilters.has(cat)) {
+            activeFilters.delete(cat);
+            pill.classList.remove('active');
+        } else {
+            activeFilters.add(cat);
+            pill.classList.add('active');
+        }
+        updateStats();
+        render();
+    });
+});
+
+// Update stats
+function updateStats() {
+    const visible = filterNodes();
+    const visibleEdges = filterEdges(visible);
+
+    const counts = {
+        diagnosis: 0,
+        assessment: 0,
+        intervention: 0
+    };
+
+    visible.forEach(n => counts[n.c]++);
+
+    document.getElementById('totalNodes').textContent = visible.length;
+    document.getElementById('diagNodes').textContent = counts.diagnosis;
+    document.getElementById('assessNodes').textContent = counts.assessment;
+    document.getElementById('intervNodes').textContent = counts.intervention;
+
+    document.getElementById('legendDiag').textContent = counts.diagnosis;
+    document.getElementById('legendAssess').textContent = counts.assessment;
+    document.getElementById('legendInterv').textContent = counts.intervention;
+    document.getElementById('legendConnections').textContent = visibleEdges.length;
+
+    document.getElementById('statusNodes').textContent = `${visible.length} nodes`;
+    document.getElementById('statusConnections').textContent = `${visibleEdges.length} connections`;
+}
+
+// Keyboard shortcuts
+document.addEventListener('keydown', e => {
+    if (e.key === 'r' || e.key === 'R') {
+        // Reset
+        searchInput.value = '';
+        searchQuery = '';
+        searchBadge.classList.remove('visible');
+        activeFilters = new Set(['diagnosis', 'assessment', 'intervention']);
+        document.querySelectorAll('.category-pill').forEach(p => p.classList.add('active'));
+        updateStats();
+        render();
+    } else if (e.key === 'f' || e.key === 'F') {
+        // Fullscreen
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen();
+        } else {
+            document.exitFullscreen();
+        }
+    } else if (e.key === '1') {
+        document.querySelector('.category-pill.diagnosis').click();
+    } else if (e.key === '2') {
+        document.querySelector('.category-pill.assessment').click();
+    } else if (e.key === '3') {
+        document.querySelector('.category-pill.intervention').click();
+    } else if (e.key === 'Escape') {
+        hideDetailPanel();
+    }
+});
+
+// Resize handling
+window.addEventListener('resize', resizeCanvas);
+
+// Initial setup
+calculatePositions();
+resizeCanvas();
+
+// Loading screen
+setTimeout(() => {
+  const ld = document.getElementById('loading');
+  ld.style.opacity = '0';
+  ld.style.pointerEvents = 'none';
+  setTimeout(() => { ld.style.display = 'none'; }, 900);
+}, 800);
+
+// Initial stats
+updateStats();
+</script>
+
+</body>
+</html>

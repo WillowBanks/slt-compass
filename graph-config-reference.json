@@ -1,0 +1,88 @@
+{
+  "physics": {
+    "linkForce": {
+      "strength": 0.8,
+      "restLength": {
+        "tight": 40,
+        "normal": 60,
+        "spacious": 80,
+        "largeGraph": 120
+      }
+    },
+    "manyBodyForce": {
+      "description": "Repulsion charge - more negative = stronger repulsion",
+      "small": -75,
+      "medium": -40,
+      "large": -25,
+      "formula": "Coulomb: F = k(Q1*Q2/r²)"
+    },
+    "centerForce": 0.1,
+    "velocityDecay": 0.4,
+    "alphaDecay": 0.0228,
+    "alphaMin": 0.001,
+    "cooldownMs": 15000
+  },
+  "rendering": {
+    "edges": {
+      "thickness": 1,
+      "curveType": "quadraticBezier",
+      "opacityDefault": 0.25,
+      "opacityHover": 0.8,
+      "opacityCluster": 0.1
+    },
+    "nodes": {
+      "radiusFormula": "sqrt(degree) * 1.5 + 4",
+      "radiusMin": 4,
+      "radiusMax": 18,
+      "collisionDistance": 10
+    }
+  },
+  "colors": {
+    "background": "#1a1a1e",
+    "backgroundGradient": "#0f0f12",
+    "nodeHubColor": "#00d084",
+    "nodeNormalColor": "#4a90e2",
+    "nodeSecondaryColor": "#b4a7d6",
+    "nodeLeafColor": "#888888",
+    "edgePrimary": "#4a90e2",
+    "edgeSecondary": "#888888",
+    "edgeStrong": "#00d084",
+    "edgeWeak": "#333333",
+    "highlight": "#ffff00",
+    "textColor": "#e0e0e0",
+    "textDim": "#888888"
+  },
+  "zoom": {
+    "thresholds": {
+      "overview": 0.5,
+      "explore": 1.2,
+      "detail": 2.0
+    },
+    "sensitivity": 1.1,
+    "panDamping": 0.85,
+    "transitionMs": 300
+  },
+  "semanticZoom": {
+    "tier1": {
+      "minZoom": 0.3,
+      "maxZoom": 0.8,
+      "showDegreeThreshold": 3,
+      "edgeOpacity": 0.1,
+      "purpose": "hubs only, global structure"
+    },
+    "tier2": {
+      "minZoom": 0.8,
+      "maxZoom": 2.0,
+      "showDegreeThreshold": 2,
+      "edgeOpacity": 0.25,
+      "purpose": "all nodes, navigation"
+    },
+    "tier3": {
+      "minZoom": 2.0,
+      "maxZoom": null,
+      "showDegreeThreshold": 0,
+      "edgeOpacity": 0.4,
+      "purpose": "full metadata, inspection"
+    }
+  }
+}

@@ -1,0 +1,69 @@
+You are making massive improvements to the SLT Communication Compass — a Speech-Language Therapy dashboard.
+
+PROJECT CONTEXT:
+- Original (READ ONLY reference): "Communication Compass v40.html" (~4.2MB single-file HTML)
+- Your working copy: "Communication Compass v41-dev.html" — start from this file
+- Single-file HTML app — all CSS, JS, and data embedded in one file
+- Read README.md for context on what this tool is and who uses it
+
+STEP 1: Deep review
+Read README.md and DELIVERABLE_STATUS.md.
+Then read "Communication Compass v41-dev.html" carefully — understand ALL sections, tabs, features, data, and UI patterns.
+Note every bug, visual issue, incomplete section, and missing feature you find.
+
+STEP 2: Write SLT_V41_IMPROVEMENT_PLAN.md in the 04-outputs\ directory
+Include:
+- Full audit of current state
+- Every bug and visual issue found
+- UI/UX improvements needed (dramatic visual overhaul required)
+- Feature expansion ideas (clinical SLT tool should be comprehensive)
+- Data expansion (more therapy terms, categories, clinical content)
+- New sections or tabs to add
+- Prioritised implementation plan
+
+STEP 3: Implement improvements in "Communication Compass v41-dev.html"
+
+UI/UX Overhaul:
+- Modern clean clinical aesthetic — professional but approachable
+- Better navigation (tabs, search, filtering should feel effortless)
+- Improved typography and spacing
+- Better colour system (accessible, high contrast where needed)
+- Smooth animations and transitions
+- Better mobile/responsive layout
+- Loading states and feedback
+
+Data Expansion:
+- Add more therapy categories and terms
+- Expand clinical definitions and explanations
+- Add more communication strategies
+- More AAC (Augmentative and Alternative Communication) content
+- More case examples or clinical scenarios
+- Better cross-referencing between terms
+
+Feature Expansion:
+- Better search (fuzzy search, search by category)
+- Bookmarking and favourites system
+- Print-friendly view for clinical use
+- Progress tracking or checklist features
+- Comparison views
+- Export options (print, PDF-ready layout)
+- Keyboard navigation support
+- Better glossary organisation (alphabetical and by category)
+- Quick reference cards for common terms
+- Clinical decision support hints
+
+STEP 4: Save final output
+Overwrite "Communication Compass v41-dev.html" with the completed improved version.
+Also save a copy as "Communication Compass v41-final.html".
+
+STEP 5: Write AGENT_PROGRESS.md in 04-outputs\ directory
+Update this regularly so the orchestrator can track your progress.
+
+STEP 6: Notify when done
+Run: openclaw system event --text "SLT Communication Compass V41 improvements complete - ready for review" --mode now
+
+RULES:
+- NZ/UK English (colour, organise, analyse, programme, behaviour)
+- Single-file HTML — keep everything embedded (no new external CDN dependencies)
+- Clinical accuracy matters — expand on existing content, do not invent fake therapy terms
+- Work autonomously and make this genuinely impressive

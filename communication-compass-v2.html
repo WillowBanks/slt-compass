@@ -1,0 +1,1818 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Communication Compass v2 — Speech &amp; Language Guide for Parents &amp; Teachers</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* ===== Reset & Base ===== */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --bg: #f7f8fa;
+            --surface: #ffffff;
+            --surface-hover: #f0f4ff;
+            --border: #e2e6ef;
+            --text: #1a1d26;
+            --text-secondary: #5a6178;
+            --text-muted: #8b90a0;
+            --accent: #4a6cf7;
+            --accent-light: #eef1ff;
+            --accent-dark: #3451d1;
+            --success: #22c55e;
+            --success-bg: #f0fdf4;
+            --warning: #f59e0b;
+            --warning-bg: #fffbeb;
+            --danger: #ef4444;
+            --diagnosis: #8b5cf6;
+            --diagnosis-bg: #f3f0ff;
+            --assessment: #0891b2;
+            --assessment-bg: #ecfeff;
+            --intervention: #059669;
+            --intervention-bg: #ecfdf5;
+            --programme: #d97706;
+            --programme-bg: #fffbeb;
+            --radius: 12px;
+            --radius-sm: 8px;
+            --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+            --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+            --transition: 0.2s ease;
+        }
+        html { font-size: 15px; scroll-behavior: smooth; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* ===== Header ===== */
+        .header {
+            background: linear-gradient(135deg, #4a6cf7 0%, #6366f1 50%, #8b5cf6 100%);
+            color: white;
+            padding: 2rem 1.5rem 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0; right: 0;
+            height: 24px;
+            background: var(--bg);
+            border-radius: 24px 24px 0 0;
+        }
+        .header-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 0.75rem;
+        }
+        .header-icon {
+            width: 44px; height: 44px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            backdrop-filter: blur(8px);
+        }
+        .header h1 { font-size: 1.6rem; font-weight: 700; letter-spacing: -0.02em; }
+        .header-sub { font-size: 0.9rem; opacity: 0.85; max-width: 600px; font-weight: 300; }
+
+        /* ===== Search ===== */
+        .search-wrap {
+            max-width: 1200px;
+            margin: -1.5rem auto 1.5rem;
+            padding: 0 1.5rem;
+            position: relative;
+            z-index: 10;
+        }
+        .search-box {
+            background: var(--surface);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-md);
+            display: flex;
+            align-items: center;
+            padding: 0 1rem;
+            border: 2px solid transparent;
+            transition: border-color var(--transition);
+        }
+        .search-box:focus-within { border-color: var(--accent); }
+        .search-icon { color: var(--text-muted); flex-shrink: 0; }
+        .search-input {
+            flex: 1; border: none; outline: none;
+            padding: 1rem 0.75rem; font-size: 1rem;
+            font-family: inherit; background: transparent; color: var(--text);
+        }
+        .search-input::placeholder { color: var(--text-muted); }
+        .search-clear {
+            display: none; background: none; border: none;
+            color: var(--text-muted); cursor: pointer; padding: 4px;
+            border-radius: 50%; transition: background var(--transition);
+        }
+        .search-clear:hover { background: var(--border); }
+        .search-clear.visible { display: block; }
+        .search-count { font-size: 0.8rem; color: var(--text-muted); padding: 0 0.5rem; white-space: nowrap; }
+
+        /* ===== Layout ===== */
+        .main { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem 3rem; }
+
+        /* ===== Controls ===== */
+        .controls-bar {
+            display: flex; flex-wrap: wrap; gap: 0.75rem;
+            align-items: center; margin-bottom: 1.5rem;
+        }
+        .age-toggle {
+            display: flex; align-items: center; gap: 0.5rem;
+            background: var(--surface); padding: 0.4rem 0.75rem;
+            border-radius: var(--radius-sm); box-shadow: var(--shadow); font-size: 0.85rem;
+        }
+        .age-toggle label { color: var(--text-secondary); font-weight: 500; white-space: nowrap; }
+        .age-input {
+            width: 42px; border: 1px solid var(--border); border-radius: 6px;
+            padding: 0.3rem 0.4rem; text-align: center; font-family: inherit;
+            font-size: 0.85rem; color: var(--text); background: var(--bg);
+        }
+        .age-input:focus { outline: none; border-color: var(--accent); }
+        .age-display { font-weight: 600; color: var(--accent); min-width: 80px; }
+        .age-stage-badge {
+            display: inline-block; font-size: 0.7rem; font-weight: 600;
+            padding: 0.15rem 0.5rem; border-radius: 100px;
+            background: var(--accent-light); color: var(--accent-dark);
+            margin-left: 0.25rem;
+        }
+        .tab-bar { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .tab-btn {
+            padding: 0.45rem 1rem; border: 1.5px solid var(--border);
+            border-radius: 100px; background: var(--surface); font-family: inherit;
+            font-size: 0.82rem; font-weight: 500; color: var(--text-secondary);
+            cursor: pointer; transition: all var(--transition);
+        }
+        .tab-btn:hover { border-color: var(--accent); color: var(--accent); }
+        .tab-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+        .tab-btn[data-cat="diagnosis"].active { background: var(--diagnosis); border-color: var(--diagnosis); }
+        .tab-btn[data-cat="assessment"].active { background: var(--assessment); border-color: var(--assessment); }
+        .tab-btn[data-cat="intervention"].active { background: var(--intervention); border-color: var(--intervention); }
+
+        /* ===== Sections ===== */
+        .section { margin-bottom: 2rem; }
+        .section.hidden { display: none; }
+        .section-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; }
+        .section-dot { width: 10px; height: 10px; border-radius: 50%; }
+        .section-title { font-size: 1.1rem; font-weight: 600; }
+        .section-count {
+            font-size: 0.75rem; color: var(--text-muted);
+            background: var(--bg); padding: 0.15rem 0.5rem; border-radius: 100px;
+        }
+
+        /* ===== Cards ===== */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 0.75rem;
+        }
+        .card {
+            background: var(--surface); border-radius: var(--radius);
+            border: 1px solid var(--border); overflow: hidden;
+            transition: all var(--transition); cursor: pointer;
+        }
+        .card:hover { box-shadow: var(--shadow-md); border-color: var(--accent); transform: translateY(-1px); }
+        .card.hidden { display: none; }
+        .card-header {
+            padding: 1rem 1.25rem 0.75rem;
+            display: flex; align-items: flex-start; justify-content: space-between; gap: 0.5rem;
+        }
+        .card-title { font-size: 0.95rem; font-weight: 600; }
+        .card-badge {
+            font-size: 0.65rem; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 0.05em; padding: 0.2rem 0.5rem; border-radius: 100px; flex-shrink: 0;
+        }
+        .badge-diagnosis { background: var(--diagnosis-bg); color: var(--diagnosis); }
+        .badge-assessment { background: var(--assessment-bg); color: var(--assessment); }
+        .badge-intervention { background: var(--intervention-bg); color: var(--intervention); }
+        .card-body { padding: 0 1.25rem 1rem; }
+        .card-definition { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.55; }
+        .card-expand {
+            display: none; padding: 0 1.25rem 1.25rem;
+            border-top: 1px solid var(--border); margin-top: 0.5rem;
+        }
+        .card.expanded .card-expand { display: block; padding-top: 1rem; }
+        .card.expanded { border-color: var(--accent); box-shadow: var(--shadow-md); }
+        .expand-section { margin-bottom: 1rem; }
+        .expand-label {
+            font-size: 0.72rem; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 0.06em; color: var(--text-muted); margin-bottom: 0.4rem;
+        }
+        .expand-text { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.55; }
+        .expand-text ul { padding-left: 1.2rem; margin-top: 0.3rem; }
+        .expand-text li { margin-bottom: 0.25rem; }
+
+        /* ===== Key Points ===== */
+        .key-point {
+            display: flex; align-items: flex-start; gap: 0.5rem;
+            padding: 0.5rem 0.75rem; background: var(--bg);
+            border-radius: var(--radius-sm); margin-bottom: 0.4rem;
+            font-size: 0.82rem; color: var(--text-secondary);
+        }
+        .key-point-icon { color: var(--accent); flex-shrink: 0; margin-top: 2px; }
+
+        /* ===== Programme Structure (NEW v2) ===== */
+        .programme-block {
+            background: var(--programme-bg); border: 1px solid #fde68a;
+            border-radius: var(--radius-sm); padding: 1rem; margin-top: 0.5rem;
+        }
+        .programme-block-title {
+            font-size: 0.78rem; font-weight: 700; color: var(--programme);
+            text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.6rem;
+            display: flex; align-items: center; gap: 0.4rem;
+        }
+        .programme-steps { list-style: none; counter-reset: step; }
+        .programme-steps li {
+            counter-increment: step; position: relative;
+            padding: 0.4rem 0 0.4rem 2rem; font-size: 0.82rem;
+            color: var(--text-secondary); border-left: 2px solid #fde68a;
+            margin-left: 0.6rem;
+        }
+        .programme-steps li::before {
+            content: counter(step); position: absolute; left: -0.7rem; top: 0.35rem;
+            width: 1.3rem; height: 1.3rem; border-radius: 50%;
+            background: var(--programme); color: white; font-size: 0.65rem;
+            font-weight: 700; display: flex; align-items: center; justify-content: center;
+        }
+        .programme-steps li:last-child { border-left-color: transparent; }
+
+        /* ===== Cross-links (NEW v2) ===== */
+        .cross-links {
+            display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.4rem;
+        }
+        .cross-link {
+            display: inline-flex; align-items: center; gap: 0.25rem;
+            font-size: 0.72rem; font-weight: 500; padding: 0.2rem 0.5rem;
+            border-radius: 100px; cursor: pointer; border: none;
+            transition: all var(--transition); text-decoration: none;
+        }
+        .cross-link-assessment { background: var(--assessment-bg); color: var(--assessment); }
+        .cross-link-assessment:hover { background: var(--assessment); color: white; }
+        .cross-link-intervention { background: var(--intervention-bg); color: var(--intervention); }
+        .cross-link-intervention:hover { background: var(--intervention); color: white; }
+
+        /* ===== Age-adapted content (NEW v2) ===== */
+        .age-content { display: none; }
+        .age-content.active { display: block; }
+        .age-content-label {
+            display: inline-block; font-size: 0.68rem; font-weight: 600;
+            padding: 0.15rem 0.45rem; border-radius: 4px;
+            background: var(--accent-light); color: var(--accent-dark);
+            margin-bottom: 0.3rem;
+        }
+
+        /* ===== Resource Links ===== */
+        .resource-link {
+            display: block; padding: 0.6rem 0.75rem;
+            background: var(--accent-light); border-radius: var(--radius-sm);
+            margin-bottom: 0.4rem; text-decoration: none;
+            transition: all var(--transition); border: 1px solid transparent;
+        }
+        .resource-link:hover { border-color: var(--accent); background: white; }
+        .resource-link-title { font-size: 0.82rem; font-weight: 600; color: var(--accent-dark); }
+        .resource-link-desc { font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.15rem; }
+
+        /* ===== MoE Panel ===== */
+        .moe-panel {
+            background: var(--surface); border-radius: var(--radius);
+            border: 1px solid var(--border); padding: 1.5rem;
+            margin-bottom: 2rem; box-shadow: var(--shadow);
+        }
+        .moe-panel.hidden { display: none; }
+        .moe-title {
+            font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem;
+            display: flex; align-items: center; gap: 0.5rem;
+        }
+        .moe-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+        .moe-card { background: var(--bg); border-radius: var(--radius-sm); padding: 1rem; }
+        .moe-card h4 { font-size: 0.85rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--accent-dark); }
+        .moe-card p { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5; }
+
+        /* ===== Bonus Panels ===== */
+        .bonus-section {
+            background: var(--surface); border-radius: var(--radius);
+            border: 1px solid var(--border); padding: 1.5rem;
+            margin-bottom: 1.5rem; box-shadow: var(--shadow);
+        }
+        .bonus-section.hidden { display: none; }
+        .bonus-title {
+            font-size: 1rem; font-weight: 700; margin-bottom: 0.75rem;
+            display: flex; align-items: center; gap: 0.5rem;
+        }
+        .bonus-list { list-style: none; }
+        .bonus-list li {
+            padding: 0.5rem 0; border-bottom: 1px solid var(--border);
+            font-size: 0.85rem; color: var(--text-secondary);
+            display: flex; align-items: flex-start; gap: 0.5rem;
+        }
+        .bonus-list li:last-child { border-bottom: none; }
+        .bonus-list .q-icon { color: var(--accent); font-weight: 700; flex-shrink: 0; }
+
+        /* ===== Red Flags Panel (NEW v2) ===== */
+        .red-flags-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 0.75rem;
+        }
+        .red-flag-card {
+            background: #fff5f5; border: 1px solid #fecaca;
+            border-radius: var(--radius-sm); padding: 0.75rem 1rem;
+        }
+        .red-flag-age {
+            font-size: 0.72rem; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 0.05em; color: var(--danger); margin-bottom: 0.3rem;
+        }
+        .red-flag-card ul { list-style: none; font-size: 0.8rem; color: var(--text-secondary); }
+        .red-flag-card li {
+            padding: 0.2rem 0; display: flex; align-items: flex-start; gap: 0.4rem;
+        }
+        .rf-icon { color: var(--danger); flex-shrink: 0; font-weight: 700; }
+
+        /* ===== Milestones ===== */
+        .milestone-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 0.75rem;
+        }
+        .milestone-card { background: var(--bg); border-radius: var(--radius-sm); padding: 0.75rem 1rem; }
+        .milestone-age {
+            font-size: 0.72rem; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 0.05em; color: var(--accent); margin-bottom: 0.3rem;
+        }
+        .milestone-card ul { list-style: none; font-size: 0.8rem; color: var(--text-secondary); }
+        .milestone-card li { padding: 0.2rem 0; display: flex; align-items: flex-start; gap: 0.4rem; }
+        .milestone-check { color: var(--success); flex-shrink: 0; }
+
+        /* ===== Key Resources ===== */
+        .resources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 0.75rem;
+        }
+        .ext-resource {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 1.25rem;
+            text-decoration: none; transition: all var(--transition); display: block;
+        }
+        .ext-resource:hover { border-color: var(--accent); box-shadow: var(--shadow-md); transform: translateY(-1px); }
+        .ext-resource-title { font-size: 0.9rem; font-weight: 600; color: var(--accent-dark); margin-bottom: 0.3rem; }
+        .ext-resource-desc { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.5rem; line-height: 1.5; }
+        .ext-resource-how {
+            font-size: 0.75rem; color: var(--text-muted);
+            padding: 0.4rem 0.6rem; background: var(--bg);
+            border-radius: 6px; line-height: 1.4;
+        }
+        .ext-resource-how strong { color: var(--text-secondary); }
+
+        /* ===== Footer ===== */
+        .footer {
+            text-align: center; padding: 2rem 1.5rem; font-size: 0.75rem;
+            color: var(--text-muted); border-top: 1px solid var(--border);
+            max-width: 1200px; margin: 0 auto;
+        }
+
+        /* ===== No Results ===== */
+        .no-results { text-align: center; padding: 3rem 1rem; color: var(--text-muted); display: none; }
+        .no-results.visible { display: block; }
+
+        /* ===== Responsive ===== */
+        @media (max-width: 768px) {
+            html { font-size: 14px; }
+            .header { padding: 1.5rem 1rem 2.5rem; }
+            .search-wrap { padding: 0 1rem; }
+            .main { padding: 0 1rem 2rem; }
+            .cards-grid, .moe-grid, .resources-grid { grid-template-columns: 1fr; }
+            .milestone-grid, .red-flags-grid { grid-template-columns: 1fr 1fr; }
+            .controls-bar { flex-direction: column; align-items: stretch; }
+            .tab-bar { justify-content: center; }
+        }
+        @media (max-width: 480px) {
+            .milestone-grid, .red-flags-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<div class="header">
+    <div class="header-inner">
+        <div class="header-brand">
+            <div class="header-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>
+                </svg>
+            </div>
+            <div>
+                <h1>Communication Compass <span style="font-weight:300;font-size:0.85rem;opacity:0.7">v2</span></h1>
+                <p class="header-sub">A parent &amp; teacher guide to speech and language therapy — plain English, evidence-based, NZ-focused</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== SEARCH ===== -->
+<div class="search-wrap">
+    <div class="search-box">
+        <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="text" class="search-input" id="searchInput" placeholder="Search terms, diagnoses, assessments, or strategies...">
+        <span class="search-count" id="searchCount"></span>
+        <button class="search-clear" id="searchClear" title="Clear search">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+    </div>
+</div>
+
+<!-- ===== MAIN ===== -->
+<div class="main">
+
+    <!-- Controls -->
+    <div class="controls-bar">
+        <div class="age-toggle">
+            <label>Age Range:</label>
+            <input type="number" class="age-input" id="ageMin" value="5" min="0" max="18">
+            <span>to</span>
+            <input type="number" class="age-input" id="ageMax" value="8" min="0" max="18">
+            <span>yrs</span>
+            <span class="age-display" id="ageDisplay">5–8 years</span>
+            <span class="age-stage-badge" id="ageStageBadge">Early School</span>
+        </div>
+        <div class="tab-bar">
+            <button class="tab-btn active" data-cat="all">All</button>
+            <button class="tab-btn" data-cat="overview">MoE Overview</button>
+            <button class="tab-btn" data-cat="diagnosis">Diagnoses</button>
+            <button class="tab-btn" data-cat="assessment">Assessments</button>
+            <button class="tab-btn" data-cat="intervention">Strategies</button>
+            <button class="tab-btn" data-cat="milestones">Milestones</button>
+            <button class="tab-btn" data-cat="redflags">Red Flags</button>
+            <button class="tab-btn" data-cat="resources">Key Resources</button>
+        </div>
+    </div>
+
+    <!-- ===== MoE OVERVIEW ===== -->
+    <div class="moe-panel" id="moePanel">
+        <div class="moe-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+            How SLTs Work Within the NZ Ministry of Education
+        </div>
+        <div class="moe-grid">
+            <div class="moe-card">
+                <h4>What They Do</h4>
+                <p>Ministry of Education SLTs support children and young people (typically ages 3–21) with communication and swallowing needs in educational settings. They work in schools, early childhood centres, and specialist units — not private clinics.</p>
+            </div>
+            <div class="moe-card">
+                <h4>How Referrals Work</h4>
+                <p>Referrals come through schools, parents, or other professionals. The SLT reviews the referral, may observe the child in their learning environment, and decides on next steps. Wait times vary by region and demand.</p>
+            </div>
+            <div class="moe-card">
+                <h4>Assessment Process</h4>
+                <p>Assessment uses a mix of standardised tests, observations, and conversations with teachers and whanau. The goal is to understand how the child communicates in real life — not just in a test room.</p>
+            </div>
+            <div class="moe-card">
+                <h4>Planning Support</h4>
+                <p>After assessment, the SLT creates a plan with specific goals. This is shared with teachers and family so everyone is working towards the same outcomes. Goals are reviewed regularly — typically each term.</p>
+            </div>
+            <div class="moe-card">
+                <h4>Tiered Service Delivery</h4>
+                <p><strong>Universal:</strong> Whole-class strategies any teacher can use.<br><strong>Targeted:</strong> Small-group support for children who need more help.<br><strong>Specialist:</strong> Individual, intensive support for complex needs.</p>
+            </div>
+            <div class="moe-card">
+                <h4>Working With Families</h4>
+                <p>Families are key partners. SLTs share strategies for home, explain what's happening and why, and adjust plans based on family feedback. You know your child best — the SLT brings clinical expertise to combine with your knowledge.</p>
+            </div>
+            <div class="moe-card">
+                <h4>Caseload &amp; Frequency</h4>
+                <p>MoE SLTs carry large caseloads. Direct therapy may be weekly, fortnightly, or termly depending on need. Much of their work is indirect — training teachers, setting up classroom strategies, and coaching parents to deliver support daily.</p>
+            </div>
+            <div class="moe-card">
+                <h4>Discharge &amp; Transition</h4>
+                <p>Children are discharged when goals are met, when the school can maintain strategies independently, or when the child transitions to another service. The SLT provides a handover summary and ongoing recommendations.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== QUESTIONS TO ASK YOUR SLT ===== -->
+    <div class="bonus-section" id="questionsPanel">
+        <div class="bonus-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+            Questions to Ask Your SLT
+        </div>
+        <ul class="bonus-list">
+            <li><span class="q-icon">Q</span> What specific area of communication are you most concerned about for my child?</li>
+            <li><span class="q-icon">Q</span> What does "age-appropriate" look like for my child's age — what should I realistically expect?</li>
+            <li><span class="q-icon">Q</span> What can I do at home to support what you're working on?</li>
+            <li><span class="q-icon">Q</span> How will we know if the approach is working — what are the signs of progress?</li>
+            <li><span class="q-icon">Q</span> How long does this type of support usually take before we see changes?</li>
+            <li><span class="q-icon">Q</span> Are there any apps, books, or resources you'd recommend for our situation?</li>
+            <li><span class="q-icon">Q</span> Should I correct my child when they make errors, or is there a better way to respond?</li>
+            <li><span class="q-icon">Q</span> Will my child's difficulties affect their reading and writing as they get older?</li>
+            <li><span class="q-icon">Q</span> What assessments have you used, and what do the scores actually mean for my child?</li>
+            <li><span class="q-icon">Q</span> Who else should be involved — teacher aide, SENCO, psychologist, audiologist?</li>
+        </ul>
+    </div>
+
+    <!-- ===== HOME PRACTICE IDEAS ===== -->
+    <div class="bonus-section" id="homePracticePanel">
+        <div class="bonus-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--intervention)" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            Home Practice Ideas <span style="font-weight:400;color:var(--text-muted);font-size:0.8rem">(adapted for <span id="homePracticeAge">5–8</span> year olds)</span>
+        </div>
+        <div id="homePracticeContent"></div>
+    </div>
+
+    <!-- ===== DIAGNOSIS CARDS ===== -->
+    <div class="section" id="section-diagnosis">
+        <div class="section-header">
+            <div class="section-dot" style="background:var(--diagnosis)"></div>
+            <h2 class="section-title">Diagnoses</h2>
+            <span class="section-count" id="count-diagnosis">12</span>
+        </div>
+        <div class="cards-grid" id="grid-diagnosis"></div>
+    </div>
+
+    <!-- ===== ASSESSMENT CARDS ===== -->
+    <div class="section" id="section-assessment">
+        <div class="section-header">
+            <div class="section-dot" style="background:var(--assessment)"></div>
+            <h2 class="section-title">Assessments</h2>
+            <span class="section-count" id="count-assessment">13</span>
+        </div>
+        <div class="cards-grid" id="grid-assessment"></div>
+    </div>
+
+    <!-- ===== INTERVENTION/STRATEGY CARDS ===== -->
+    <div class="section" id="section-intervention">
+        <div class="section-header">
+            <div class="section-dot" style="background:var(--intervention)"></div>
+            <h2 class="section-title">Strategies &amp; Approaches</h2>
+            <span class="section-count" id="count-intervention">16</span>
+        </div>
+        <div class="cards-grid" id="grid-intervention"></div>
+    </div>
+
+    <!-- ===== RED FLAGS (NEW v2) ===== -->
+    <div class="section" id="section-redflags">
+        <div class="section-header">
+            <div class="section-dot" style="background:var(--danger)"></div>
+            <h2 class="section-title">Red Flags — When to Seek Help</h2>
+        </div>
+        <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:1rem;">These are signs that a child may need a speech-language assessment. One red flag alone doesn't mean there's a problem, but if you notice several, talk to your child's teacher or GP about a referral.</p>
+        <div class="red-flags-grid" id="redFlagsGrid"></div>
+    </div>
+
+    <!-- ===== MILESTONES ===== -->
+    <div class="section" id="section-milestones">
+        <div class="section-header">
+            <div class="section-dot" style="background:var(--success)"></div>
+            <h2 class="section-title">Speech &amp; Language Milestones</h2>
+        </div>
+        <div class="milestone-grid" id="milestoneGrid"></div>
+    </div>
+
+    <!-- ===== KEY RESOURCES ===== -->
+    <div class="section" id="section-resources">
+        <div class="section-header">
+            <div class="section-dot" style="background:var(--accent)"></div>
+            <h2 class="section-title">Key Resources &amp; Websites</h2>
+        </div>
+        <div class="resources-grid" id="resourcesGrid"></div>
+    </div>
+
+    <!-- No Results -->
+    <div class="no-results" id="noResults">
+        <div style="font-size:2rem;margin-bottom:0.5rem;">&#128269;</div>
+        <p>No terms match your search. Try a different keyword.</p>
+    </div>
+
+</div>
+
+<!-- ===== FOOTER ===== -->
+<div class="footer">
+    Communication Compass v2 &mdash; Built for parents, teachers &amp; whanau &mdash; Not a substitute for professional advice &mdash; 2026
+</div>
+
+<script>
+// ============================================================
+// DATA
+// ============================================================
+const DATA = {
+
+diagnosis: [
+    {
+        title: "Developmental Language Disorder (DLD)",
+        definition: "A lasting difficulty with understanding and/or using spoken language that is not explained by another condition like hearing loss or autism. It affects about 1 in 14 children and often runs in families.",
+        whyItMatters: "DLD can affect how your child follows instructions, tells stories, makes friends, and learns to read. Early identification means earlier support — and better long-term outcomes.",
+        keyPoints: ["Not caused by laziness, bad parenting, or low intelligence", "Children with DLD are often bright but struggle to put their knowledge into words", "Can affect reading, writing, and social relationships if unsupported", "Often persists into adulthood but outcomes improve significantly with intervention"],
+        programme: {
+            early: ["Screen using language sample + parent interview", "Administer PLS-5 or CELF-P to establish baseline", "Set goals targeting vocabulary, sentence length, and following instructions", "Use focused stimulation — modelling target words/structures in play", "Train parents in Hanen 'It Takes Two to Talk' strategies", "Review progress termly; adjust goals based on response"],
+            school: ["Administer CELF-5 to identify receptive vs expressive profile", "Assess literacy impact — phonological awareness, reading comprehension", "Set goals targeting grammar, narrative, and curriculum vocabulary", "Provide direct therapy + teacher training on classroom modifications", "Implement visual supports and pre-teaching of topic vocabulary", "Monitor progress with curriculum-based measures each term"]
+        },
+        assessments: ["CELF", "PLS", "Language Sample Analysis", "Dynamic Assessment"],
+        interventions: ["Modelling", "Recasting", "Expansion", "Hanen Approach", "Narrative Therapy", "Visual Supports"],
+        evidence: ["Bishop et al. (2017) — CATALISE consortium established DLD as the preferred term, replacing 'Specific Language Impairment'", "Ebbels et al. (2019) — Systematic review showing SLT intervention is effective for children with DLD"],
+        resources: [{title: "RADLD — Raising Awareness of DLD", url: "https://radld.org/", desc: "International campaign with free resources for families and schools"}]
+    },
+    {
+        title: "Childhood Apraxia of Speech (CAS)",
+        definition: "A motor speech disorder where the brain has difficulty planning and coordinating the precise movements needed to produce speech. The child knows what they want to say but their mouth doesn't cooperate.",
+        whyItMatters: "CAS requires specific, intensive therapy — general speech therapy approaches are less effective. Correct diagnosis matters because the wrong approach wastes valuable time.",
+        keyPoints: ["Not a muscle weakness — it's a planning problem", "Children may be inconsistent: saying a word clearly once, then differently the next time", "Often requires frequent, intensive therapy sessions (3–5x per week ideally)", "May co-occur with other difficulties including fine motor, reading, and spelling"],
+        programme: {
+            early: ["Detailed motor speech assessment — look for inconsistency, groping, prosody issues", "Trial therapy to confirm diagnosis (CAS responds to motor-based, not phonological approaches)", "Begin NDP3 or DTTC (Dynamic Temporal and Tactile Cueing) — high frequency sessions", "Use multisensory cues: visual (mouth pictures), tactile (PROMPT), auditory (slowed models)", "Introduce core vocabulary approach — small set of functional words practised to mastery", "Consider AAC to support communication while speech develops"],
+            school: ["Continued intensive motor-based therapy (NDP3/DTTC/ReST)", "Target longer words and word combinations systematically", "Monitor literacy closely — CAS has high co-occurrence with reading difficulties", "Phonological awareness instruction alongside speech therapy", "Classroom accommodations: extra processing time, reduced verbal demands", "Gradual transfer of skills to connected speech and conversation"]
+        },
+        assessments: ["Articulation Assessment", "Stimulability Testing", "Oral Motor Examination", "Dynamic Assessment"],
+        interventions: ["PROMPT Therapy", "Nuffield Dyspraxia Programme", "Core Vocabulary Approach", "AAC", "Makaton"],
+        evidence: ["ASHA (2007) — Position statement: CAS requires intensive, individualised motor-based intervention", "Murray et al. (2014) — RCT showing NDP3 and ReST both effective for CAS", "Strand (2020) — Dynamic Temporal and Tactile Cueing shown effective for CAS"],
+        resources: [{title: "Apraxia Kids", url: "https://www.apraxia-kids.org/", desc: "Leading resource with parent guides, webinars, and support community"}]
+    },
+    {
+        title: "Phonological Disorder",
+        definition: "A pattern of sound errors that affect whole groups of sounds rather than individual ones. For example, a child might replace all sounds made at the back of the mouth (k, g) with sounds at the front (t, d) — saying 'tar' for 'car'.",
+        whyItMatters: "Phonological disorders are very common and very treatable. Most children respond well to targeted therapy, often within a few months.",
+        keyPoints: ["Different from articulation disorders — it's about patterns, not individual sounds", "Many phonological patterns are normal at young ages and become a concern only if they persist", "Can affect spelling and reading if not resolved before literacy instruction", "One of the most common reasons for SLT referral"],
+        programme: {
+            early: ["Phonological assessment — identify all error patterns", "Prioritise patterns with greatest impact on intelligibility", "Use minimal pairs approach or cycles approach depending on severity", "Phonological awareness activities alongside speech work", "Train parents to model target sounds in natural conversation", "Reassess every 6–8 weeks to track pattern resolution"],
+            school: ["Target residual phonological patterns affecting intelligibility and literacy", "Link speech therapy to phonics instruction — coordinate with class teacher", "Minimal pairs or maximal oppositions for specific pattern work", "Explicit phonological awareness instruction (rhyme, segmenting, blending)", "Monitor spelling for phonological error patterns", "May need only a block of therapy if patterns resolve quickly"]
+        },
+        assessments: ["Phonological Assessment", "Articulation Assessment", "Stimulability Testing"],
+        interventions: ["Minimal Pairs Approach", "Cycles Approach", "Phonological Awareness"],
+        evidence: ["Dodd (2014) — Differential diagnosis identifies four subtypes requiring different approaches", "Baker & McLeod (2011) — Systematic review of phonological interventions showing strong evidence base"],
+        resources: [{title: "Caroline Bowen — Phonology Resources", url: "https://www.speech-language-therapy.com/", desc: "Extensive free resources on phonological development and therapy approaches"}]
+    },
+    {
+        title: "Stuttering (Fluency Disorder)",
+        definition: "Disruptions to the normal flow of speech — repeating sounds ('b-b-but'), stretching sounds ('ssssnake'), or getting stuck with no sound coming out (blocks). Most children go through a period of normal disfluency; stuttering is when it persists or worsens.",
+        whyItMatters: "Early intervention for stuttering is highly effective — the Lidcombe Programme has strong evidence for preschool-age children. Waiting to 'see if they grow out of it' can miss the optimal treatment window.",
+        keyPoints: ["About 5% of children stutter at some point; ~1% persist into adulthood", "Persistent stuttering (beyond 12 months) is more likely to need support", "Never tell a child to 'slow down' or 'think about what you want to say' — this increases anxiety", "Family history of persistent stuttering increases risk"],
+        programme: {
+            early: ["Assess stuttering severity using rating scales and speech samples", "If under 6: begin Lidcombe Programme — train parents in structured feedback", "Daily 10–15 min practice conversations at home with parent delivering programme", "Weekly SLT sessions to guide parents and adjust approach", "Monitor severity ratings daily (1–10 scale)", "If severity reduces to 1–2 consistently, move to maintenance phase"],
+            school: ["If stuttering persists past 6–7, transition to school-age approaches", "Teach speech modification techniques (easy onset, light contacts, pausing)", "Address emotional and social impact — build confidence and self-advocacy", "Desensitisation: reduce fear/avoidance of speaking situations", "Cognitive-behavioural strategies for anxiety management", "Work with teacher on classroom accommodations (not being put on the spot)"]
+        },
+        assessments: ["Standardised Assessment", "Language Sample Analysis"],
+        interventions: ["Lidcombe Programme"],
+        evidence: ["Jones et al. (2005) — RCT showing Lidcombe Programme significantly more effective than natural recovery", "Onslow et al. (2020) — Updated evidence for early intervention in stuttering"],
+        resources: [{title: "Stuttering Foundation", url: "https://www.stutteringhelp.org/", desc: "Free tip sheets, videos, and guidance for parents and teachers"}]
+    },
+    {
+        title: "Selective Mutism",
+        definition: "A child who can speak normally in some settings (usually at home) but consistently does not speak in others (usually school or with unfamiliar people). It is an anxiety disorder, not a choice or defiance.",
+        whyItMatters: "Selective mutism is often misunderstood as shyness or stubbornness. Understanding it as anxiety changes how adults respond — and the right response makes a significant difference.",
+        keyPoints: ["The child is not choosing to be difficult — they are genuinely unable to speak due to anxiety", "Pushing a child to speak usually makes it worse", "Gradual exposure and reducing pressure are key", "Often co-occurs with social anxiety disorder"],
+        programme: {
+            early: ["Assessment involves observation across settings + parent/teacher interviews", "Establish a 'communication ladder' — from non-verbal to whisper to voice", "Use stimulus fading: bring a comfortable person into the anxiety-provoking setting", "Sliding-in technique: gradually introduce new listeners while child is already talking", "Small, achievable goals — celebrate non-verbal communication as progress", "Coordinate closely with teacher — reduce questioning, allow non-verbal responses"],
+            school: ["Graduated exposure programme across school contexts", "Brave talking programme — systematic desensitisation hierarchy", "Work with a 'talk partner' — one trusted peer in class", "Use technology: voice recordings, video messages to bridge to live speech", "CBT-informed strategies for managing anxiety", "Teacher training: avoid putting child on the spot, use forced alternatives not open questions"]
+        },
+        assessments: ["Dynamic Assessment", "Language Sample Analysis"],
+        interventions: ["Scaffolding", "Visual Supports"],
+        evidence: ["Oerbeck et al. (2014) — Behavioural treatment showed significant improvement in majority of children", "Johnson & Wintgens (2001) — 'The Selective Mutism Resource Manual' — definitive clinical guide"],
+        resources: [{title: "Selective Mutism Information & Research Association", url: "https://www.selectivemutism.org.uk/", desc: "Guides for parents, teachers, and clinicians"}]
+    },
+    {
+        title: "Dysarthria",
+        definition: "A motor speech disorder caused by weakness or lack of control in the muscles used for speech (lips, tongue, jaw, soft palate). Speech may sound slurred, slow, quiet, or 'thick'. Unlike CAS, it is a muscle execution problem, not a planning problem.",
+        whyItMatters: "Dysarthria often occurs alongside other physical conditions (cerebral palsy, brain injury). Understanding it helps set realistic expectations and choose the right support strategies.",
+        keyPoints: ["Caused by neurological conditions that affect muscle control", "May also affect eating and drinking", "AAC may be helpful alongside speech work", "Severity ranges from mild (slightly unclear) to severe (largely unintelligible)"],
+        programme: {
+            early: ["Assess oral motor function — strength, range, coordination, endurance", "Assess intelligibility across contexts and listeners", "Oro-motor exercises if evidence supports it for the specific presentation", "Introduce AAC early — low-tech (picture boards) initially", "Work on respiratory support for voice volume", "Coordinate with OT and physio for overall motor programme"],
+            school: ["Target compensatory strategies to maximise intelligibility", "Adjust rate, loudness, and articulation precision", "High-tech AAC assessment if speech is insufficient for classroom participation", "Train teachers and peers in communication partner strategies", "Classroom amplification systems if volume is an issue", "Regular review as motor skills change with growth"]
+        },
+        assessments: ["Oral Motor Examination", "Articulation Assessment", "Standardised Assessment"],
+        interventions: ["AAC", "Visual Supports"],
+        evidence: ["Pennington et al. (2010) — Systematic review of speech interventions for dysarthria in cerebral palsy"],
+        resources: [{title: "Scope UK — Communication Guide", url: "https://www.scope.org.uk/", desc: "Disability equality charity with accessible information on communication difficulties"}]
+    },
+    {
+        title: "Receptive Language Disorder",
+        definition: "Difficulty understanding spoken language — following instructions, understanding questions, or grasping the meaning of words and sentences. The child hears the words but struggles to process what they mean.",
+        whyItMatters: "Receptive difficulties are often less obvious than expressive ones because the child may mask their confusion. It can look like behavioural issues or inattention when the real problem is comprehension.",
+        keyPoints: ["A child who 'doesn't listen' may actually not understand", "Often co-occurs with expressive language difficulties", "Affects learning across all subjects, not just English", "Visual supports and simplified language help significantly"],
+        programme: {
+            early: ["Assess with PLS-5 auditory comprehension + informal tasks", "Establish what level of instruction the child can follow (1-step, 2-step, with/without context)", "Teach vocabulary explicitly — not just labels, but concepts and categories", "Use visual supports to augment verbal instructions", "Simplify language input: shorter sentences, key words stressed", "Train parents and ECE staff in 'language-rich' interaction strategies"],
+            school: ["Administer CELF-5 receptive subtests + classroom observation", "Assess impact on curriculum access — which subjects are most affected?", "Pre-teach topic vocabulary before new units", "Visual timetables, task strips, graphic organisers in classroom", "Teacher training: check understanding, don't just ask 'do you understand?'", "Teach the child to self-advocate: 'I didn't understand, can you show me?'"]
+        },
+        assessments: ["CELF", "PLS", "Receptive & Expressive Vocabulary Tests", "Dynamic Assessment"],
+        interventions: ["Visual Supports", "Scaffolding", "Modelling", "Hanen Approach"],
+        evidence: ["Tomblin et al. (1997) — Epidemiological study establishing prevalence and profiles", "Ebbels (2014) — Shape Coding for grammar comprehension shown effective"],
+        resources: [{title: "ASHA — Language Disorders", url: "https://www.asha.org/public/speech/disorders/language/", desc: "Overview with practical suggestions for parents"}]
+    },
+    {
+        title: "Expressive Language Disorder",
+        definition: "Difficulty putting thoughts into words — using sentences, finding the right words, telling stories in order, or using grammar correctly. The child understands more than they can express.",
+        whyItMatters: "Children with expressive difficulties often become frustrated because they know what they want to say but can't get it out. This can affect behaviour, confidence, and social relationships.",
+        keyPoints: ["Understanding is usually stronger than spoken output", "May use gestures, pointing, or short phrases to compensate", "Written language is often affected too", "Can be very effectively supported with the right strategies"],
+        programme: {
+            early: ["Assess with PLS-5 expressive communication + language sample", "Calculate MLU (mean length of utterance) to establish baseline", "Target next grammatical structures in developmental sequence", "Focused stimulation: flood the child's environment with target forms", "Recasting and expansion in natural conversation", "Hanen parent training to maximise language opportunities at home"],
+            school: ["CELF-5 expressive subtests + narrative assessment + writing sample", "Set goals targeting grammar, vocabulary, and narrative structure", "Direct therapy for specific grammatical targets (e.g., past tense, conjunctions)", "Word-finding strategies: semantic mapping, word webs, category sorting", "Narrative intervention: story grammar marker, story mapping", "Coordinate with teacher for written language support"]
+        },
+        assessments: ["CELF", "PLS", "Language Sample Analysis", "Receptive & Expressive Vocabulary Tests"],
+        interventions: ["Modelling", "Recasting", "Expansion", "Narrative Therapy", "Scaffolding", "Hanen Approach"],
+        evidence: ["Leonard (2014) — 'Children with Specific Language Impairment' — comprehensive profiles and intervention", "Cleave et al. (2015) — Meta-analysis supporting focused stimulation for expressive language"],
+        resources: [{title: "Talking Point", url: "https://www.talkingpoint.org.uk/", desc: "UK resource with communication checklists and advice by age"}]
+    },
+    {
+        title: "Social Communication Disorder",
+        definition: "Difficulty using language in social situations — taking turns in conversation, understanding sarcasm or jokes, knowing what to say and when, reading body language, or adjusting language for different listeners.",
+        whyItMatters: "Social communication difficulties can significantly affect friendships and school participation. They can occur on their own or alongside autism, ADHD, or other conditions.",
+        keyPoints: ["The child may speak in full sentences but still struggle in conversations", "May talk at length about their interests without reading listener cues", "Social communication rules are often unwritten — they need to be explicitly taught", "Pragmatic language difficulties are common but often under-identified"],
+        programme: {
+            early: ["Observe social communication across settings (home, ECE, playground)", "Assess pragmatic language using CELF-5 pragmatics profile or similar", "Social stories for specific situations (greetings, turn-taking, sharing)", "Small-group intervention targeting turn-taking, topic maintenance, listening", "Teach emotion recognition using facial expressions and body language", "Coach peers to be communication partners"],
+            school: ["Formal pragmatic language assessment + teacher/parent questionnaires", "Social thinking curriculum — expected vs unexpected behaviours", "Video modelling of social interactions for self-reflection", "Structured lunchtime social skills group", "Teach conversation skills explicitly: topic initiation, maintenance, closure", "Work with teacher on group work strategies and peer pairing"]
+        },
+        assessments: ["CELF", "Language Sample Analysis", "Dynamic Assessment"],
+        interventions: ["Narrative Therapy", "Visual Supports", "Scaffolding"],
+        evidence: ["Adams et al. (2012) — Social Communication Intervention Programme showed measurable gains", "Gerber et al. (2012) — Review of pragmatic language interventions for children"],
+        resources: [{title: "Social Thinking", url: "https://www.socialthinking.com/", desc: "Frameworks and resources for teaching social communication"}]
+    },
+    {
+        title: "Voice Disorder",
+        definition: "When a child's voice sounds persistently hoarse, breathy, strained, too loud, too quiet, or at an unusual pitch. Common in children who shout a lot but can also indicate nodules or other medical causes.",
+        whyItMatters: "Most childhood voice problems are caused by how the child uses their voice and can be improved with habit changes. Persistent hoarseness (>2 weeks) should always be checked by an ENT specialist.",
+        keyPoints: ["Chronic hoarseness is not normal and should be investigated", "Vocal nodules are common in loud, active children", "Voice rest and vocal hygiene education are usually first-line treatments", "Medical clearance from ENT is essential before voice therapy begins"],
+        programme: {
+            early: ["ENT referral for laryngoscopy to identify cause", "Voice assessment: pitch, loudness, quality, resonance", "Vocal hygiene education for child and family (hydration, no shouting, no whispering)", "Identify and reduce vocally abusive behaviours", "Voice rest periods if nodules are present", "Reassess after 6–8 weeks of hygiene programme"],
+            school: ["Coordinate with ENT for ongoing monitoring", "Vocal hygiene programme: classroom poster, daily reminders", "Teach alternative attention-getting strategies (clapping, hand-raising)", "Resonant voice therapy exercises if appropriate", "Work with PE teacher/coach on vocal behaviours during sport", "Monitor for improvement or need for surgical intervention"]
+        },
+        assessments: ["Standardised Assessment", "Oral Motor Examination"],
+        interventions: [],
+        evidence: ["Carding et al. (2006) — Prevalence of voice disorders in children estimated at 6–9%"],
+        resources: [{title: "ASHA — Voice Disorders", url: "https://www.asha.org/practice-portal/clinical-topics/voice-disorders/", desc: "Clinical overview with parent-friendly sections"}]
+    },
+    {
+        title: "Cleft Palate Speech",
+        definition: "Speech patterns that result from a cleft lip and/or palate — a gap in the roof of the mouth present from birth. Even after surgical repair, some children have ongoing speech differences because of how air flows through the nose during speech.",
+        whyItMatters: "Children born with cleft palate are followed by a specialist team from birth. SLT is a key member of that team and monitors speech development through childhood.",
+        keyPoints: ["Speech may sound nasal or have specific sound substitutions", "Many children develop normal speech after surgery; some need additional therapy", "Regular monitoring by the cleft team is essential through childhood", "Hearing should be monitored closely — glue ear is common with cleft palate"],
+        programme: {
+            early: ["Part of cleft team from birth — feeding support, palate repair monitoring", "Speech assessment at 18 months and 3 years as standard", "Target pressure consonants (p, b, t, d, k, g) if absent or backed", "Articulation therapy focusing on correct oral airflow", "Monitor velopharyngeal function (soft palate closure)", "Speech surgery assessment if hypernasality persists"],
+            school: ["Annual cleft team review including speech assessment", "Targeted articulation therapy for residual cleft speech characteristics", "May need further surgery (pharyngoplasty) if nasality remains significant", "Monitor literacy — some cleft-related speech patterns affect phonics", "Social and emotional support for visible difference", "Coordinate with audiologist for hearing management"]
+        },
+        assessments: ["Phonological Assessment", "Articulation Assessment", "Oral Motor Examination", "Standardised Assessment"],
+        interventions: ["Minimal Pairs Approach"],
+        evidence: ["Sell et al. (2001) — Cleft Audit Protocol for Speech (CAPS) — standardised assessment", "Lohmander & Olsson (2004) — Speech outcomes following cleft palate repair"],
+        resources: [{title: "CLAPA — Cleft Lip & Palate Association", url: "https://www.clapa.com/", desc: "Comprehensive parent resources covering feeding, speech, and emotional support"}]
+    },
+    {
+        title: "Auditory Processing Disorder (APD)",
+        definition: "The ears hear normally, but the brain has difficulty making sense of what it hears — especially in noisy environments, with fast speech, or when following complex instructions. It is not a hearing loss.",
+        whyItMatters: "APD is often confused with ADHD or inattention. Accurate diagnosis helps ensure the right accommodations — environmental changes can make a huge difference to a child's learning.",
+        keyPoints: ["Hearing tests come back normal, but the child struggles to listen in real-world conditions", "Background noise makes things much harder", "Classroom accommodations (preferential seating, visual aids, FM systems) are often very effective", "Cannot be reliably diagnosed before age 7"],
+        programme: {
+            early: ["Cannot be formally diagnosed before 7 — monitor and support", "Reduce background noise in learning environments", "Use visual supports alongside all verbal instructions", "Speak clearly, face the child, get their attention before speaking", "Refer to audiologist for monitoring", "Consider whether difficulties are better explained by language disorder"],
+            school: ["Audiological assessment for APD (age 7+)", "FM system trial — personal amplification in classroom", "Preferential seating (close to teacher, away from noise sources)", "Pre-teaching of new vocabulary and concepts", "Written/visual backup for all verbal instructions", "Auditory training programmes if recommended by audiologist"]
+        },
+        assessments: ["Standardised Assessment"],
+        interventions: ["Visual Supports", "Scaffolding"],
+        evidence: ["BSA (2018) — British Society of Audiology position statement on APD diagnosis and management", "Cameron & Dillon (2011) — Evidence for auditory training in children with APD"],
+        resources: [{title: "ASHA — Auditory Processing Disorder", url: "https://www.asha.org/public/hearing/auditory-processing-disorder/", desc: "Parent-friendly overview including signs, diagnosis, and management strategies"}]
+    }
+],
+
+assessment: [
+    {
+        title: "Standardised Assessment",
+        definition: "A formal test given in the same way to every child, with results compared to a large group of children the same age. This gives the SLT an objective measure of where your child sits compared to their peers.",
+        whyItMatters: "Standardised scores help determine whether a child's skills are within the expected range or significantly below. They're often required for accessing funding or specialist services.",
+        keyPoints: ["Scores are compared to 'norms' — what most children that age can do", "A percentile rank of 10 means the child scored higher than 10% of same-age children", "Standardised tests are one piece of the puzzle — they don't capture everything", "Results may be reported as standard scores (mean 100, SD 15) or percentiles"]
+    },
+    {
+        title: "Norm-Referenced Assessment",
+        definition: "A type of standardised test where the child's performance is compared to a large 'normative' sample of children the same age. Results are given as standard scores, percentiles, or age equivalents.",
+        whyItMatters: "Tells you how your child compares to typically developing peers. Useful for identifying whether there is a significant delay.",
+        keyPoints: ["Most common type of formal assessment used by SLTs", "Results may be reported as 'within normal limits', 'mild delay', 'moderate delay', or 'severe delay'", "NZ norms are not always available — many tests use UK, US, or Australian norms", "Age equivalents (e.g., 'language of a 4-year-old') are commonly reported but can be misleading"]
+    },
+    {
+        title: "Criterion-Referenced Assessment",
+        definition: "Instead of comparing to other children, this measures whether a child can do specific skills — like 'can follow a two-part instruction' or 'can use past tense correctly'. It answers 'what can this child do?' rather than 'how does this child compare?'",
+        whyItMatters: "Particularly useful for setting therapy goals and tracking progress over time.",
+        keyPoints: ["No comparison to other children — focuses on the individual", "Good for tracking progress between therapy sessions", "Often used alongside norm-referenced tests", "Directly links to goal setting — 'can the child do X? Not yet. That's the goal.'"]
+    },
+    {
+        title: "Dynamic Assessment",
+        definition: "The SLT teaches the child something new during the assessment and observes how quickly they learn it. This 'test-teach-retest' approach reveals the child's learning potential, not just current performance.",
+        whyItMatters: "Especially valuable for children from diverse cultural or linguistic backgrounds, where standardised tests may not be fair or accurate.",
+        keyPoints: ["Shows learning potential, not just current ability", "Reduces cultural and linguistic bias", "Helps distinguish between a language disorder and a language difference (e.g., in bilingual children)", "Tells the SLT what type and amount of support the child needs to learn"]
+    },
+    {
+        title: "Language Sample Analysis",
+        definition: "The SLT records and analyses a sample of the child's natural conversation — counting vocabulary, sentence length, grammar structures, and how they organise their ideas. It captures real-world communication.",
+        whyItMatters: "What a child does in a test room doesn't always match what they do in real life. Language samples bridge that gap and show functional communication.",
+        keyPoints: ["Usually done during play or conversation", "Measures 'mean length of utterance' (MLU) — average sentence length in words or morphemes", "Gives the best picture of functional communication", "Can also analyse social language use (turn-taking, topic maintenance)"]
+    },
+    {
+        title: "Phonological Assessment",
+        definition: "A structured assessment of the speech sounds a child can produce, looking for error patterns. The SLT listens to how the child says specific words and identifies which sounds or patterns are affected.",
+        whyItMatters: "Identifies whether sound errors are age-appropriate or need therapy, and which specific patterns to target first for maximum impact.",
+        keyPoints: ["The child names pictures or objects to produce target sounds", "Errors are analysed as patterns (e.g., all back sounds replaced with front sounds)", "Results guide which sounds to work on first", "Connected speech sample is also important — errors may differ in conversation"]
+    },
+    {
+        title: "Oral Motor Examination",
+        definition: "A physical check of the mouth structures (lips, tongue, teeth, palate, jaw) and how well they move for speech. The SLT will ask the child to do things like poke out their tongue, blow, smile, and move their tongue side to side.",
+        whyItMatters: "Rules out or identifies structural or motor causes for speech difficulties — ensuring the right type of therapy is recommended.",
+        keyPoints: ["Quick, non-invasive examination", "Checks both structure (shape, size) and function (movement, strength, coordination)", "May identify issues like tongue-tie, high palate, or weak lip closure", "Essential for differential diagnosis between articulation, phonological, and motor speech disorders"]
+    },
+    {
+        title: "Stimulability Testing",
+        definition: "Testing whether a child can produce a sound correctly when given a model, cues, or help — even if they can't do it on their own yet. 'Can you copy me? Say sss...'",
+        whyItMatters: "Children who are stimulable for a sound are more likely to learn it quickly in therapy. This helps the SLT decide what to work on first.",
+        keyPoints: ["Helps prioritise which sounds to target in therapy", "A stimulable sound may resolve with minimal intervention", "A non-stimulable sound may need more intensive, structured therapy", "Can also guide whether a phonological or motor-based approach is needed"]
+    },
+    {
+        title: "CELF (Clinical Evaluation of Language Fundamentals)",
+        definition: "One of the most widely used standardised language assessments. Tests understanding and use of language including vocabulary, grammar, sentence structure, and following directions. Different versions exist for different ages.",
+        whyItMatters: "CELF results are often used to determine eligibility for funded support and to pinpoint the specific areas of language that need targeting.",
+        keyPoints: ["Covers both receptive (understanding) and expressive (speaking) language", "Takes 30–60 minutes to administer", "CELF-P2 for ages 3–6, CELF-5 for ages 5–21", "Results include a Core Language Score summarising overall language ability"]
+    },
+    {
+        title: "PLS (Preschool Language Scales)",
+        definition: "A standardised assessment designed specifically for children from birth to age 7. Tests both understanding and expression through play-based tasks appropriate for young children.",
+        whyItMatters: "The go-to formal assessment for younger children. Play-based format means it feels less 'test-like' for little ones.",
+        keyPoints: ["Suitable from birth to 7;11", "Uses toys and pictures to engage young children", "Gives separate scores for auditory comprehension and expressive communication", "PLS-5 is the current edition — often used by MoE SLTs for preschoolers"]
+    },
+    {
+        title: "GFTA (Goldman-Fristoe Test of Articulation)",
+        definition: "A widely used standardised test of speech sound production. The child names pictures while the SLT records which sounds are correct, substituted, omitted, or distorted.",
+        whyItMatters: "Gives a clear, objective measure of articulation ability compared to same-age peers. Quick to administer and easy to interpret.",
+        keyPoints: ["Tests sounds at the beginning, middle, and end of words", "Quick to administer (10–15 minutes)", "GFTA-3 is the current edition", "Results help identify whether speech sound errors are within normal limits"]
+    },
+    {
+        title: "Receptive & Expressive Vocabulary Tests",
+        definition: "Tests that measure how many words a child understands (receptive — e.g., PPVT/BPVS) and how many they can name (expressive — e.g., EVT). The child points to pictures or names them.",
+        whyItMatters: "Vocabulary size is one of the strongest predictors of later academic success. Knowing where a child sits helps focus support.",
+        keyPoints: ["Receptive vocabulary is usually larger than expressive", "Results given as age equivalents and percentiles", "Bilingual children may score lower in one language — test both if possible", "PPVT-5 and EVT-3 are common current editions"]
+    },
+    {
+        title: "Articulation Assessment",
+        definition: "Any assessment of how a child produces individual speech sounds. The SLT checks each sound in different word positions and in connected speech to identify specific errors.",
+        whyItMatters: "Pinpoints exactly which sounds need work and whether errors are consistent or variable — guiding therapy planning.",
+        keyPoints: ["Different from phonological assessment which looks at patterns", "May include both formal and informal components", "Connected speech often reveals errors that single-word tests miss", "Helps distinguish between articulation disorder (motor), phonological disorder (linguistic), and CAS (motor planning)"]
+    }
+],
+
+intervention: [
+    {
+        title: "Modelling",
+        definition: "The adult says the correct form without asking the child to repeat it. If a child says 'tat' for 'cat', you naturally say 'Yes, it's a cat! A big cat!' — without drawing attention to the error.",
+        whyItMatters: "One of the most powerful and natural strategies. Gives the child correct input without pressure, which research shows is more effective than direct correction.",
+        keyPoints: ["No pressure on the child to copy or repeat", "Can be done by anyone, anywhere", "Most effective when done frequently and naturally throughout the day", "Works for speech sounds, grammar, vocabulary, and sentence structure"],
+        evidence: ["Cleave et al. (2015) — Meta-analysis supporting modelling as effective for language intervention"]
+    },
+    {
+        title: "Recasting",
+        definition: "Repeating what the child said but with the error fixed, keeping the meaning the same. Child: 'Her goed to the shops.' Adult: 'Yes, she went to the shops.' No pointing out the mistake.",
+        whyItMatters: "Strong research support. Natural, doesn't interrupt conversation, and gives children the corrected form exactly when they're focused on that meaning.",
+        keyPoints: ["Deliver immediately after the child's utterance", "Keep the same meaning and topic — just fix the form", "More effective than explicit correction for grammar", "Combine with expansion for maximum effect"],
+        evidence: ["Proctor-Williams et al. (2001) — Recasts shown effective for grammatical learning in children with language disorders", "Camarata & Nelson (2006) — Treatment efficiency of recasts compared to imitation-based approaches"]
+    },
+    {
+        title: "Expansion",
+        definition: "Taking what the child says and adding more. Child: 'Doggy run.' Adult: 'The doggy is running fast!' Extends their language by adding words, grammar, and detail.",
+        whyItMatters: "Stretches language just beyond current level — the 'sweet spot' for learning. Models more complex language within a context the child already understands.",
+        keyPoints: ["Add 1–2 words or grammatical elements", "Keep the child's meaning and topic", "Combine with recasting for maximum effect", "Particularly powerful during play and daily routines"]
+    },
+    {
+        title: "Scaffolding",
+        definition: "Providing just enough support for the child to succeed at a task they couldn't do alone, then gradually reducing that support. Like training wheels on a bike.",
+        whyItMatters: "Based on Vygotsky's 'zone of proximal development' — the space between what a child can do alone and what they can do with help. That's where learning happens.",
+        keyPoints: ["Start with more support, reduce as the child succeeds", "Includes prompts, choices, sentence starters, visual cues", "The goal is always independence — scaffolding is temporary", "Can be applied by teachers and parents in everyday interactions"]
+    },
+    {
+        title: "Phonological Awareness",
+        definition: "The ability to hear and manipulate the sounds in words — not the letters, but the sounds. Includes rhyming, syllable counting, and identifying individual sounds ('What sound does cat start with?').",
+        whyItMatters: "The single strongest predictor of reading success. Children who struggle with it often struggle with reading and spelling. It can and should be explicitly taught.",
+        keyPoints: ["Develops in a sequence: rhyme → syllables → onset-rime → individual phonemes", "Must be taught explicitly — some children don't pick it up naturally", "Directly links to phonics and early reading", "Difficulties may indicate a need for further language assessment"],
+        evidence: ["National Reading Panel (2000) — Phonological awareness instruction significantly improves reading outcomes", "Gillon (2004) — Phonological awareness intervention improves both speech and literacy outcomes"]
+    },
+    {
+        title: "Narrative Therapy (Story-based Intervention)",
+        definition: "Teaching children how to tell stories with a clear structure — who, where, what happened, how they felt, what happened next, and how it ended. Uses story maps and visual frameworks.",
+        whyItMatters: "Narrative skills are essential for social communication, literacy, and academic success. Children need to retell events, explain problems, and share experiences.",
+        keyPoints: ["Story structure: setting → problem → action → resolution", "Visual story maps help children organise their ideas", "Links directly to written narrative in school", "Can be done with personal stories, picture sequences, or storybooks"]
+    },
+    {
+        title: "Hanen Approach",
+        definition: "A family-centred programme that trains parents to become their child's primary language teacher. Uses strategies like 'OWL' (Observe, Wait, Listen) and 'follow the child's lead'.",
+        whyItMatters: "Parents spend far more time with their child than any therapist. Training parents multiplies the impact of intervention — it's one of the most cost-effective approaches.",
+        keyPoints: ["'It Takes Two to Talk' for language delays; 'More Than Words' for autism", "Focus on responsive interaction rather than drilling", "Parents learn to create communication opportunities in everyday life", "Delivered in small groups or individually by Hanen-certified SLTs"],
+        evidence: ["Pepper & Weitzman (2004) — Hanen research showing parent-implemented intervention improves outcomes", "Roberts & Kaiser (2011) — Meta-analysis of parent-implemented language interventions showing significant effects"]
+    },
+    {
+        title: "PROMPT Therapy",
+        definition: "Prompts for Restructuring Oral Muscular Phonetic Targets — a hands-on technique where the therapist physically guides the child's jaw, lips, and tongue to produce sounds correctly.",
+        whyItMatters: "Particularly useful for children with motor speech disorders (CAS, dysarthria) where the challenge is in planning and executing mouth movements, not in knowing the sounds.",
+        keyPoints: ["Requires a trained and certified PROMPT therapist", "The therapist touches the child's face to guide movements", "Often combined with other approaches for maximum benefit", "Not suitable for all children — requires tolerance of touch"],
+        evidence: ["Hayden et al. (2010) — Research supporting PROMPT for motor speech disorders", "Dale & Hayden (2013) — Evidence for PROMPT in children with CAS"]
+    },
+    {
+        title: "Lidcombe Programme",
+        definition: "An evidence-based treatment for stuttering in preschool-age children. Parents give specific verbal feedback — praising smooth speech and occasionally, gently acknowledging stuttered speech — during daily practice.",
+        whyItMatters: "Strongest evidence base of any stuttering treatment for young children. Parent-delivered, practical, and effective when started early.",
+        keyPoints: ["Designed for children under 6", "Parent-delivered with weekly SLT guidance", "Uses a daily severity rating scale (1–10)", "Stage 1: weekly therapy until stuttering reduces; Stage 2: maintenance and gradual withdrawal"],
+        evidence: ["Jones et al. (2005) — RCT: Lidcombe Programme significantly reduces stuttering in preschoolers", "Onslow et al. (2020) — Long-term follow-up data showing sustained benefits"]
+    },
+    {
+        title: "Nuffield Dyspraxia Programme (NDP3)",
+        definition: "A structured therapy programme designed specifically for CAS and severe speech sound disorders. Works through a systematic hierarchy from single sounds to words to connected speech.",
+        whyItMatters: "One of the few therapy programmes specifically designed and researched for childhood apraxia of speech. Evidence shows it works.",
+        keyPoints: ["Works through a structured hierarchy of difficulty", "Uses visual cues (mouth pictures) and colour coding", "Requires regular, intensive practice — ideally 3+ sessions per week", "Third edition (NDP3) has a strong evidence base"],
+        evidence: ["Murray et al. (2014) — RCT showing NDP3 effective for children with CAS", "Murray et al. (2015) — Comparison of NDP3 and ReST showing both effective"]
+    },
+    {
+        title: "Makaton",
+        definition: "A language programme using signs (from sign language), symbols, and speech together to support communication. Designed for people who have difficulty communicating through speech alone.",
+        whyItMatters: "Makaton does not replace speech — it supports it. Research consistently shows that signing alongside speech encourages, not hinders, speech development.",
+        keyPoints: ["Uses signs AND speech together — not instead of speech", "Widely used in NZ schools and early childhood settings", "Signs are dropped naturally as the child's speech develops", "Core vocabulary of about 450 concepts covering everyday communication"],
+        evidence: ["Launonen (1996) — Longitudinal study: augmentative signing supports spoken language development"]
+    },
+    {
+        title: "AAC (Augmentative & Alternative Communication)",
+        definition: "Any method that supplements or replaces speech. Ranges from low-tech (picture boards, communication books) to high-tech (speech-generating tablets and apps).",
+        whyItMatters: "Every child has the right to communicate. AAC ensures children who cannot rely on speech alone still have a voice — and research shows it supports rather than hinders speech development.",
+        keyPoints: ["Does not prevent speech development — evidence shows it supports it", "Can be as simple as pointing to pictures or as complex as eye-gaze computers", "Should be introduced as early as possible — don't wait", "The child's AAC system should go everywhere they go"],
+        evidence: ["Millar et al. (2006) — Systematic review: AAC does not inhibit natural speech development", "Romski & Sevcik (2005) — AAC and language development in children with severe disabilities"]
+    },
+    {
+        title: "Visual Supports",
+        definition: "Using pictures, symbols, timetables, social stories, or written cues to support understanding and communication. Makes the invisible (language) visible and permanent.",
+        whyItMatters: "Most children learn and understand better with visual support. They reduce anxiety, support transitions, and clarify expectations. Useful for all children, essential for many.",
+        keyPoints: ["Visual timetables, now/next boards, choice boards, social stories", "Reduce reliance on auditory processing and memory", "Should be used consistently across settings", "Gradually fade as the child develops independence"]
+    },
+    {
+        title: "Core Vocabulary Approach",
+        definition: "Focuses on teaching a small set of highly functional words usable across many situations — 'more', 'go', 'help', 'stop', 'want', 'my'. These core words make up about 80% of daily communication.",
+        whyItMatters: "Instead of teaching lots of nouns, focusing on core words gives children flexible language they can use in any situation — far more powerful for real communication.",
+        keyPoints: ["About 200–400 words make up ~80% of daily communication", "Core words are mostly verbs, adjectives, and pronouns — not nouns", "Particularly important for children using AAC systems", "Can be taught through aided language stimulation — pointing to symbols while talking"],
+        evidence: ["Banajee et al. (2003) — Core vocabulary accounts for ~80% of communicative output"]
+    },
+    {
+        title: "Minimal Pairs Approach",
+        definition: "A therapy technique where the child practises pairs of words differing by one sound — 'tea' and 'key'. When the child says 'tea' for 'key' and the listener picks up the wrong picture, the communication breakdown motivates change.",
+        whyItMatters: "Creates meaningful communication breakdowns that motivate the child to change speech patterns — more effective than drill because the child sees why it matters.",
+        keyPoints: ["Uses picture cards showing the word pairs", "The communication breakdown is the teaching moment", "Helps the child understand that sound differences change meaning", "Can use minimal pairs (one feature different) or maximal pairs (multiple features)"],
+        evidence: ["Weiner (1981) — Original minimal pairs approach", "Barlow & Gierut (2002) — Comparison of minimal pairs and maximal opposition approaches"]
+    },
+    {
+        title: "Cycles Approach",
+        definition: "For children with highly unintelligible speech, the therapist cycles through all target patterns, spending a set period on each before moving on and coming back. Gets sounds 'started' rather than 'perfected'.",
+        whyItMatters: "Designed for children with severe phonological disorders who have so many errors that traditional sound-by-sound approaches would take too long.",
+        keyPoints: ["Each pattern targeted for 2–6 weeks before cycling to the next", "Assumes development is gradual — exposure and practice, not mastery", "Particularly effective for preschool children with multiple error patterns", "Always includes phonological awareness activities"],
+        evidence: ["Hodson & Paden (1991) — 'Targeting Intelligible Speech' — foundational text", "Almost & Rosenbaum (1998) — RCT showing Cycles Approach effective for severe phonological disorders"]
+    }
+],
+
+milestones: [
+    { age: "By 12 months", items: ["Babbles with consonants (ba-ba, da-da)", "Responds to their name", "Understands 'no' and simple instructions with gestures", "Uses 1–2 words (may not be clear)"] },
+    { age: "By 18 months", items: ["Uses 10–20 words (may not all be clear)", "Points to things they want or to show you", "Understands simple questions ('Where's your shoe?')", "Follows simple instructions ('Give it to Mummy')"] },
+    { age: "By 2 years", items: ["Uses 50+ words", "Starts putting 2 words together ('more milk', 'daddy go')", "Follows simple instructions ('get your shoes')", "Points to pictures in books when named"] },
+    { age: "By 3 years", items: ["Uses 3–4 word sentences", "Understood by familiar people most of the time", "Asks 'what' and 'where' questions", "Can follow 2-step instructions"] },
+    { age: "By 4 years", items: ["Tells simple stories", "Uses sentences of 4–5+ words", "Understood by unfamiliar listeners most of the time", "Asks 'why' and 'how' questions"] },
+    { age: "By 5 years", items: ["Uses well-formed sentences with mostly correct grammar", "Can retell a story in sequence", "Speech clear to all listeners (some errors still normal: 'r', 'th')", "Understands most of what is said to them"] },
+    { age: "By 7 years", items: ["All speech sounds produced correctly", "Can explain, persuade, and negotiate verbally", "Understands figurative language (jokes, idioms)", "Reading and writing developing alongside spoken language"] },
+    { age: "By 10 years", items: ["Uses complex sentences with multiple clauses", "Adjusts language for different listeners and situations", "Understands sarcasm, inference, and non-literal language", "Written language becomes a major communication tool"] }
+],
+
+redFlags: [
+    { age: "By 18 months", items: ["No babbling or very limited sound-making", "Not using any words", "Doesn't seem to understand simple words like 'no' or 'bye-bye'", "Not pointing or gesturing to communicate"] },
+    { age: "By 2 years", items: ["Fewer than 50 words", "Not combining two words together", "Loss of words previously used", "Not interested in other children"] },
+    { age: "By 3 years", items: ["Difficult to understand, even for family members", "Not using 3-word phrases", "Struggling to follow simple instructions", "Not asking questions or engaging in simple conversation"] },
+    { age: "By 4 years", items: ["Still difficult to understand for unfamiliar listeners", "Unable to tell a simple story or describe an event", "Not understood by peers — affecting play", "Persistent stuttering (>6 months) with visible tension or struggle"] },
+    { age: "By 5 years (school entry)", items: ["Unable to follow classroom instructions", "Cannot retell a story or describe a picture", "Persistent speech sound errors beyond age-appropriate norms", "Difficulty with phonological awareness (rhyming, initial sounds)"] },
+    { age: "Any age", items: ["Sudden loss of speech or language skills", "Voice persistently hoarse for more than 2 weeks", "Noticeable difficulty with eating, drinking, or swallowing", "Parent or teacher instinct says 'something isn't right'"] }
+],
+
+resources: [
+    {
+        title: "Caroline Bowen — Speech-Language-Therapy.com",
+        url: "https://www.speech-language-therapy.com/",
+        desc: "Comprehensive collection of free resources from Australian speech pathologist Dr Caroline Bowen. Covers phonological development, therapy approaches, parent handouts, and clinical guidance.",
+        howToUse: "Navigate by topic (phonology, language, fluency). The 'parents' section has plain-English handouts you can download. The phonological development chart is particularly useful for checking what sounds your child should have."
+    },
+    {
+        title: "ASHA — American Speech-Language-Hearing Association",
+        url: "https://www.asha.org/public/",
+        desc: "The US professional body with extensive, well-written information on every type of communication disorder, with sections specifically for parents.",
+        howToUse: "Use the 'Public' section for parent-friendly information. Search for your child's specific diagnosis. The practice portals give deeper dives for those who want more detail."
+    },
+    {
+        title: "Talking Point",
+        url: "https://www.talkingpoint.org.uk/",
+        desc: "UK-based resource from the Communication Trust with communication checklists, activity ideas, and guidance organised by age.",
+        howToUse: "Start with 'Ages and Stages' to check communication against expected milestones. Download the communication checklists for specific ages. The activity ideas are practical and easy to implement at home."
+    },
+    {
+        title: "NZ Ministry of Education — Communication Support",
+        url: "https://www.education.govt.nz/school/student-support/special-education/communication/",
+        desc: "Official NZ Government page on communication support in schools. Explains what services are available and how to access them.",
+        howToUse: "Read the overview to understand what support is available. Follow the referral pathway information if you want to make a referral. Check eligibility for Ongoing Resourcing Scheme (ORS) funding."
+    },
+    {
+        title: "Hanen Centre",
+        url: "https://www.hanen.org/",
+        desc: "Canadian centre specialising in parent-implemented language intervention. Website has free articles and practical tips for parents.",
+        howToUse: "Browse 'Helpful Info' for free articles. Ask your SLT if Hanen programmes are available locally. The 'It Takes Two to Talk' guidebook can be purchased separately."
+    },
+    {
+        title: "Apraxia Kids",
+        url: "https://www.apraxia-kids.org/",
+        desc: "Leading resource for Childhood Apraxia of Speech with parent guides, webinars, professional directory, and support community.",
+        howToUse: "If your child has CAS, start with 'Understanding Apraxia'. The webinar library is excellent. Use 'Find a Professional' to locate PROMPT-certified or CAS-experienced therapists."
+    },
+    {
+        title: "Stuttering Foundation",
+        url: "https://www.stutteringhelp.org/",
+        desc: "Free resources on stuttering including tip sheets, videos, FAQs, and guidance on how to respond when a child stutters.",
+        howToUse: "Start with 'For Parents' — read the 7 tips for talking with your child. Download the teacher tip sheet for school. Video library shows what effective support looks like in practice."
+    },
+    {
+        title: "RADLD — Raising Awareness of DLD",
+        url: "https://radld.org/",
+        desc: "International campaign for Developmental Language Disorder awareness. Free posters, factsheets, and resources for everyone.",
+        howToUse: "Download the DLD factsheet for a clear summary. Use 'DLD and Me' for child-friendly explanations. Share the school resources with your child's teacher — DLD is under-recognised."
+    },
+    {
+        title: "The Communication Trust — What Works",
+        url: "https://www.thecommunicationtrust.org.uk/",
+        desc: "UK consortium that reviews evidence for speech, language, and communication interventions. Their 'What Works' database rates intervention programmes by evidence level.",
+        howToUse: "Use the 'What Works' database to check whether a specific intervention programme has research support. Useful for understanding which approaches are evidence-based vs anecdotal."
+    },
+    {
+        title: "NZ Speech-language Therapists' Association",
+        url: "https://speechtherapy.org.nz/",
+        desc: "The professional body for SLTs in New Zealand. Provides a 'Find a Therapist' directory and consumer information about what to expect from SLT services.",
+        howToUse: "Use 'Find a Therapist' if you want to access private SLT services. The consumer information section explains your rights and what to expect from a therapy session."
+    }
+],
+
+homePractice: {
+    early: [
+        {n: 1, title: "Follow their lead:", text: "Watch what your child is interested in and talk about THAT. Language learning happens fastest when children are engaged and motivated."},
+        {n: 2, title: "Narrate your day:", text: "Talk through what you're doing — cooking, getting dressed, tidying. Short, simple sentences. 'I'm cutting the apple. Mmm, a red apple!'"},
+        {n: 3, title: "Read together daily:", text: "Even 5 minutes of shared reading builds vocabulary. Point to pictures, make sound effects, let them turn pages. Don't worry about reading every word."},
+        {n: 4, title: "Sing songs and nursery rhymes:", text: "Songs teach rhythm, rhyme, and repetition — all building blocks for language. Action songs (Heads, Shoulders, Knees and Toes) combine language with movement."},
+        {n: 5, title: "Expand, don't correct:", text: "If your child says 'doggy go,' respond with 'Yes! The doggy is going for a walk!' — modelling the full form without making them feel wrong."},
+        {n: 6, title: "Wait and listen:", text: "After asking a question or making a comment, wait 5–10 seconds. Young children need much longer to process and respond than adults expect."}
+    ],
+    school: [
+        {n: 1, title: "Read together daily:", text: "Even 10 minutes of shared reading builds vocabulary, comprehension, and narrative skills. Pause and ask 'what do you think happens next?' or 'why did he do that?'"},
+        {n: 2, title: "Play word games:", text: "'I spy' for sounds (not letters), rhyming games, 20 questions, Scrabble Junior, Boggle. These build phonological awareness and vocabulary naturally."},
+        {n: 3, title: "Talk about the day:", text: "At dinner, ask specific questions: 'What was the funniest thing that happened today?' This practises narrative skills — sequencing events, including details."},
+        {n: 4, title: "Expand, don't correct:", text: "If your child says 'him goed park,' respond with 'Yes! He went to the park. What did he do there?' — model, then extend the conversation."},
+        {n: 5, title: "Give processing time:", text: "After asking a question, wait 5–10 seconds. Many children need longer to formulate their response than adults expect. Silence is productive."},
+        {n: 6, title: "Limit screen time, maximise talk time:", text: "Real conversations with real people are irreplaceable. Screens are passive; talking is active. If using screens, watch together and talk about what you see."},
+        {n: 7, title: "Pre-teach new vocabulary:", text: "If your child is starting a new topic at school, look up key words together beforehand. Draw pictures, act them out, use them in sentences."},
+        {n: 8, title: "Play board games:", text: "Games like Guess Who, Headbanz, and Articulate practise questioning, describing, categorising, and explaining — all key language skills."}
+    ]
+}
+
+};
+
+// ============================================================
+// EXTENDED DATA: Deep-dives, Case Studies, Home Activities, FAQs, Classroom Strategies
+// ============================================================
+
+const DEEP_DIVES = {
+
+"Developmental Language Disorder (DLD)": {
+    caseStudy: {
+        title: "Case Study: Aroha, Age 6",
+        scenario: "Aroha was referred by her teacher in Term 1 of Year 2. Her teacher noticed she struggled to follow multi-step instructions, often looked confused during mat time, and used short, simple sentences compared to her peers. At home, her parents noticed she mixed up word order and often couldn't find the right word, saying 'the thing' or 'you know' instead. She was a happy, social child with no hearing concerns.",
+        assessment: "The SLT assessed Aroha using the CELF-5 (Core Language Score: 72, 3rd percentile — significantly below average), a language sample (MLU 3.8, expected ~5.5 for her age), and dynamic assessment to check learning potential. Dynamic assessment showed Aroha could learn new vocabulary with 3–4 exposures and visual support — indicating good learning potential with the right scaffolding.",
+        goals: ["Increase mean length of utterance from 3.8 to 5.0 morphemes within two terms", "Use regular past tense (-ed) correctly in 80% of opportunities in structured tasks", "Follow 2-step classroom instructions without visual support in 70% of opportunities", "Use tier-2 vocabulary (topic-specific words) in oral and written work"],
+        programme: "Aroha received fortnightly direct therapy sessions (30 min) plus weekly in-class support from a teacher aide trained by the SLT. Sessions targeted grammar using Shape Coding (colour-coded sentence strips), vocabulary through semantic mapping, and narrative structure using story grammar markers. Her parents attended a Hanen 'It Takes Two to Talk' group and implemented strategies at home — particularly modelling and expansion during daily routines. After two terms, Aroha's MLU increased to 4.9, she was using past tense correctly in 65% of opportunities, and her teacher reported she was participating more confidently in class discussions.",
+        keyTakeaway: "DLD doesn't go away, but with consistent, evidence-based support across home and school, children like Aroha make meaningful progress. The combination of direct therapy, teacher training, and parent coaching is what made the difference."
+    },
+    homeActivities: [
+        {title: "Category sorting game", desc: "Sort household items into categories (things you wear, things you eat, things in the bathroom). Talk about WHY each item belongs in its group. Builds vocabulary organisation and word-finding skills.", ageRange: "3–7 years"},
+        {title: "Story retelling with props", desc: "Read a short story, then use toys or household objects to act it out. Ask 'what happened first?', 'then what?', 'how did it end?' Builds narrative structure.", ageRange: "4–8 years"},
+        {title: "Barrier games", desc: "Sit facing each other with a barrier between you (e.g., a book). One person describes how to draw a picture or arrange objects, the other follows instructions without seeing. Practises giving and following instructions.", ageRange: "5–10 years"},
+        {title: "Word web walks", desc: "While walking, pick a topic (e.g., 'things that are cold'). Take turns naming items. Then try harder categories ('things that are soft AND can fit in your hand'). Builds vocabulary networks.", ageRange: "5–12 years"},
+        {title: "'What's the same, what's different?'", desc: "Compare two objects (e.g., an apple and an orange). What's the same? What's different? Start simple, increase complexity. Builds comparison language and descriptive vocabulary.", ageRange: "4–9 years"},
+        {title: "Sentence building with cards", desc: "Write words on cards (who/what/where/when). Pick one from each pile and make a sentence. Practises sentence structure in a fun, visual way.", ageRange: "6–10 years"},
+        {title: "Following instructions treasure hunt", desc: "Give multi-step instructions to find hidden objects: 'First go to the kitchen, then look under the blue bowl, and bring me what you find.' Gradually increase complexity.", ageRange: "3–8 years"},
+        {title: "Conversation starters jar", desc: "Fill a jar with prompt cards: 'Tell me about the best thing that happened today', 'If you could be any animal...', 'Describe your favourite place.' Pull one at dinner and practise extended talking.", ageRange: "5–12 years"}
+    ],
+    parentFAQ: [
+        {q: "Will my child grow out of DLD?", a: "DLD is a lifelong condition — it doesn't go away. However, with good support, children learn strategies to manage their difficulties and can achieve well academically and socially. Many adults with DLD lead successful, fulfilling lives. The key is early, consistent intervention."},
+        {q: "Is DLD the same as a learning disability?", a: "No. Children with DLD have specific difficulties with language, but their overall intelligence is in the normal range. They may struggle in school because so much learning depends on language, but they are not intellectually impaired. DLD is sometimes called a 'hidden disability' because these children often look and behave typically."},
+        {q: "Did I cause my child's DLD?", a: "Absolutely not. DLD is a neurodevelopmental condition — it's how the brain is wired for language processing. It's not caused by parenting, screen time, or not reading enough to your child. It often runs in families, suggesting a genetic component."},
+        {q: "Should my bilingual child only speak one language?", a: "No. Research is clear: bilingualism does not cause or worsen DLD. Children with DLD who are bilingual should continue to use both languages. Restricting language input actually reduces overall language exposure, which is harmful. The DLD will be present in both languages, but the benefits of bilingualism are preserved."},
+        {q: "How long will therapy take?", a: "DLD typically requires long-term support — not a quick fix. Therapy may be intensive initially (weekly or fortnightly) and then taper to monitoring and consultation. Many children need support at key transition points (starting school, moving to intermediate, starting secondary). Think of it as ongoing management, like wearing glasses for vision."},
+        {q: "Will DLD affect my child's reading?", a: "It can. Children with DLD are at higher risk for reading difficulties, particularly reading comprehension (understanding what they read, even if they can decode the words). Phonological awareness intervention alongside language therapy helps reduce this risk. Work closely with the teacher and SLT to monitor literacy development."},
+        {q: "What can the school do to help?", a: "A lot. Key strategies include: visual supports for instructions, pre-teaching new vocabulary, simplified language from teachers, checking understanding (not just asking 'do you understand?'), extra processing time, small-group instruction for language-heavy tasks, and a consistent approach between teacher, teacher aide, and SLT."},
+        {q: "Is DLD the same as autism?", a: "No. DLD and autism are separate conditions, though they can co-occur. In DLD, the core difficulty is with language structure (grammar, vocabulary, sentence construction). In autism, the core difficulties are with social communication and restricted/repetitive behaviours. A child with DLD typically has normal social motivation and play skills."},
+        {q: "My child gets frustrated and has meltdowns — is that related?", a: "Very likely. Imagine knowing what you want to say but not being able to get it out, or not understanding what people are saying to you. That's incredibly frustrating. Behavioural difficulties in children with DLD are often a direct result of communication frustration. As language skills improve, behaviour often improves too."},
+        {q: "Should I simplify my language when talking to my child?", a: "Simplify, but don't dumb down. Use clear, short sentences. Stress key words. Give one instruction at a time. Use gestures and visual cues alongside speech. But don't stop using new vocabulary — just make sure you explain it. The goal is to make your language accessible while still providing a rich model."}
+    ],
+    literacyImpact: {
+        reading: "Children with DLD are at significantly higher risk for reading difficulties. Decoding (sounding out words) may be affected if phonological awareness is weak, but the bigger risk is reading comprehension — understanding the meaning of what they read. This is because reading comprehension depends heavily on vocabulary, grammar, and inferencing — all areas affected by DLD.",
+        writing: "Written expression is often significantly affected. Children may write short, grammatically simple sentences, struggle with story structure, have difficulty organising ideas, and find spelling challenging. Writing requires all the language skills that are difficult for children with DLD, plus the additional demands of transcription.",
+        strategies: ["Explicit vocabulary instruction before reading new texts", "Graphic organisers for writing (story maps, paragraph planners)", "Sentence frames and starters to scaffold written output", "Read-aloud and shared reading to build comprehension without decoding demands", "Audio books alongside text to build vocabulary and comprehension", "Extra time for reading and writing tasks", "Pre-teaching of key vocabulary for each curriculum topic"],
+        evidence: "Snowling et al. (2019) — Longitudinal study showing DLD is a significant risk factor for reading and spelling difficulties through to adolescence."
+    },
+    classroomStrategies: [
+        {strategy: "Visual timetable", desc: "Display the day's schedule using pictures and words. Reduce anxiety about transitions and help the child anticipate what's coming.", level: "Universal"},
+        {strategy: "Pre-teach vocabulary", desc: "Before a new topic, teach 5–10 key words using pictures, definitions, and examples. Revisit throughout the unit.", level: "Targeted"},
+        {strategy: "Check understanding actively", desc: "Don't ask 'do you understand?' (they'll say yes). Instead, ask the child to show you, tell you in their own words, or demonstrate the task.", level: "Universal"},
+        {strategy: "Chunk instructions", desc: "Give one instruction at a time. Wait for completion before giving the next. For multi-step tasks, use a visual task strip.", level: "Universal"},
+        {strategy: "Processing time", desc: "After asking a question, wait 10 seconds. Use a 'think time' signal so the child doesn't feel pressured. This benefits ALL learners.", level: "Universal"},
+        {strategy: "Sentence starters", desc: "Provide written sentence starters for oral and written tasks: 'I think... because...', 'First... then... finally...'", level: "Targeted"},
+        {strategy: "Buddy system", desc: "Pair the child with a language-strong peer who can model language and clarify instructions. Rotate buddies to avoid dependency.", level: "Targeted"},
+        {strategy: "Graphic organisers", desc: "Use mind maps, Venn diagrams, flow charts, and tables to make abstract concepts visual and structured.", level: "Targeted"},
+        {strategy: "Reduce language load in assessments", desc: "Simplify question language, provide visual options, allow oral responses where possible. Assess the KNOWLEDGE, not the language.", level: "Specialist"},
+        {strategy: "Daily narrative practice", desc: "5-minute 'news time' where the child tells a short personal story using a visual framework (who/where/what happened/how did you feel).", level: "Targeted"}
+    ]
+},
+
+"Childhood Apraxia of Speech (CAS)": {
+    caseStudy: {
+        title: "Case Study: Liam, Age 4",
+        scenario: "Liam was referred at age 3 because he had very few words and was almost impossible to understand. His parents described him as a late talker — he didn't babble much as a baby, used only 5–6 words at age 2, and relied heavily on pointing and gestures. He seemed to understand everything said to him and was a bright, engaged child. Previous therapy using a phonological approach (minimal pairs) had not resulted in progress.",
+        assessment: "The SLT conducted a comprehensive motor speech assessment. Key findings: highly inconsistent errors (saying the same word differently each time), difficulty sequencing sounds in longer words, groping movements when attempting challenging words, flat prosody (monotone speech), and a significant gap between receptive language (age-appropriate) and expressive output. Stimulability testing showed he could produce most sounds in isolation but could not combine them reliably. The profile was consistent with CAS.",
+        goals: ["Produce 20 functional core words consistently and intelligibly", "Combine 2 words using mastered targets (e.g., 'more drink', 'go car')", "Use AAC (PECS board) to communicate needs when speech is unclear", "Increase sound repertoire to include bilabial, alveolar, and velar consonants in CV and CVC structures"],
+        programme: "Liam began intensive therapy — 3 sessions per week, 30 minutes each. The SLT used the Nuffield Dyspraxia Programme (NDP3), starting at single sounds and building to CV combinations. Sessions used multisensory cues: mouth pictures (visual), hand cues (tactile), and slowed models (auditory). A core vocabulary of 20 functional words was selected with the family and practised to mastery. A PECS communication board was introduced for immediate communication needs. Parents practised target words 5 minutes twice daily. After 6 months, Liam was producing 35 words consistently, combining 2 words, and beginning to use 3-word phrases. His frustration levels dropped significantly as his communication options expanded.",
+        keyTakeaway: "CAS requires intensive, motor-based therapy — not a phonological approach. The key differences are intensity (3+ sessions/week), motor learning principles (practice, repetition, multisensory cues), and the role of AAC to support communication while speech develops."
+    },
+    homeActivities: [
+        {title: "Daily practice drills (5 min, 2x daily)", desc: "Practise the specific words your SLT has set as targets. Use the cue cards they've given you. Keep it short, fun, and successful — end on a win.", ageRange: "3–8 years"},
+        {title: "Core word of the week", desc: "Pick one core word (go, more, help, stop, my) and use it EVERYWHERE during the week. Model it, point to it, celebrate when your child attempts it.", ageRange: "2–6 years"},
+        {title: "Singing and chanting", desc: "Songs with repetitive phrases give motor practice in a fun context. The melody provides a different pathway to the brain that can help access words. 'Old MacDonald' is brilliant for practising consonant-vowel combinations.", ageRange: "2–7 years"},
+        {title: "Mouth mirror play", desc: "Sit with your child in front of a mirror and make funny faces. Copy mouth shapes. Play 'Simon Says' with mouth movements. This builds awareness of oral movements without pressure to speak.", ageRange: "3–6 years"},
+        {title: "Choice-making with models", desc: "Instead of asking 'what do you want?', offer two choices and model both words clearly: 'Do you want MILK or JUICE?' This reduces demand while giving a clear model to attempt.", ageRange: "2–5 years"},
+        {title: "Video recording progress", desc: "Record your child's speech monthly. This helps you (and them, when older) see progress that's hard to notice day-to-day. Share with your SLT to track development.", ageRange: "All ages"}
+    ],
+    parentFAQ: [
+        {q: "How is CAS different from a speech delay?", a: "A speech delay means the child is following the normal path of development but more slowly — they'll catch up with time and general support. CAS is a motor planning disorder — the brain has difficulty coordinating the movements for speech. It requires specific, intensive, motor-based therapy. General stimulation and 'wait and see' approaches are not effective for CAS."},
+        {q: "How often should my child have therapy?", a: "Research recommends 3–5 sessions per week for children with CAS, at least initially. This intensity is critical because CAS responds to motor learning principles — frequent practice with feedback. Some families manage this through a combination of SLT sessions, parent-delivered practice at home, and school-based support."},
+        {q: "Will my child ever speak normally?", a: "Many children with CAS do develop clear, functional speech with intensive, appropriate therapy — but it takes time, often years. Some children with severe CAS may always have some degree of speech difference. The key is to ensure your child can COMMUNICATE effectively, whether through speech, AAC, or a combination."},
+        {q: "Should we use sign language or an AAC device?", a: "Yes — if your SLT recommends it. Research consistently shows that AAC and signing SUPPORT speech development, they don't replace it. Children naturally prefer speech when they can use it. AAC provides a communication bridge while speech is developing, reducing frustration and supporting language learning."},
+        {q: "My child said a word perfectly once and now can't say it again — why?", a: "This is one of the hallmark features of CAS. The motor plan for that word was accessed successfully once, but the child can't reliably retrieve and execute it again. It's not regression — it's inconsistency, which is a core feature of the disorder. With practice, consistent production develops."},
+        {q: "Can CAS be diagnosed before age 3?", a: "A definitive diagnosis is difficult before age 3 because young children's motor speech systems are still developing. However, an experienced SLT can identify 'signs consistent with CAS' and begin appropriate intervention. Early red flags include limited babbling, very few first words, and difficulty imitating speech sounds."},
+        {q: "Will CAS affect my child's reading and writing?", a: "Children with CAS are at higher risk for literacy difficulties, particularly with phonological awareness (hearing and manipulating sounds in words) and spelling. This is because the motor speech difficulty affects how sounds are represented in the brain. Early, explicit phonological awareness instruction alongside speech therapy is important."},
+        {q: "What therapy approaches work for CAS?", a: "Evidence-based approaches include: NDP3 (Nuffield Dyspraxia Programme), DTTC (Dynamic Temporal and Tactile Cueing), ReST (Rapid Syllable Transition Treatment), and PROMPT. These are all motor-based approaches that use principles of motor learning. Traditional articulation therapy and phonological approaches (like minimal pairs) are NOT effective for CAS."}
+    ],
+    literacyImpact: {
+        reading: "Children with CAS often struggle with phonological awareness — the ability to hear, identify, and manipulate sounds in words. This is because the motor speech difficulty affects how sounds are stored and retrieved in the brain. Decoding (sounding out words) can be significantly delayed.",
+        writing: "Spelling is often significantly affected because the child's internal representations of sounds and words are less stable. They may spell the same word differently each time. Handwriting may also be affected if there are co-occurring fine motor difficulties (common in CAS).",
+        strategies: ["Intensive phonological awareness instruction — make it visual and tactile, not just auditory", "Letter-sound correspondence using mouth position photos alongside letter cards", "Modified phonics instruction that doesn't rely solely on 'sounding out'", "Whole-word recognition approaches alongside phonics", "Assistive technology for writing if fine motor is also affected", "Extra time for reading and writing", "Coordinate literacy instruction closely with speech therapy goals"],
+        evidence: "McNeill et al. (2009) — Children with CAS show persistent phonological awareness difficulties that impact literacy development."
+    },
+    classroomStrategies: [
+        {strategy: "Give extra time", desc: "Allow significantly more time for verbal responses. The child needs time to plan and execute the motor movements for speech.", level: "Universal"},
+        {strategy: "Reduce verbal demands", desc: "Don't require the child to answer verbally in front of the class unless they volunteer. Offer alternatives: pointing, thumbs up/down, writing, whispering to a buddy.", level: "Targeted"},
+        {strategy: "Accept approximations", desc: "If the child attempts a word, respond to the meaning, not the accuracy. Acknowledge the attempt, model the correct form, and move on. Don't ask them to 'say it again properly.'", level: "Universal"},
+        {strategy: "Use the child's AAC in class", desc: "If the child has an AAC device or communication board, ensure it's accessible at all times. Model its use. Normalise it with peers.", level: "Specialist"},
+        {strategy: "Visual schedule and task strips", desc: "Reduce reliance on verbal instructions. Provide visual, step-by-step task guides the child can follow independently.", level: "Targeted"},
+        {strategy: "Coordinate with SLT on targets", desc: "Know what words and phrases the child is currently working on in therapy. Create natural opportunities to practise those targets in class.", level: "Specialist"}
+    ]
+},
+
+"Phonological Disorder": {
+    caseStudy: {
+        title: "Case Study: Mia, Age 4.5",
+        scenario: "Mia was referred by her early childhood centre because other children and new adults found her very difficult to understand. Her parents could understand most of what she said because they were familiar with her patterns. She was a chatty, confident child with age-appropriate language understanding and vocabulary — the difficulty was purely in how she produced sounds.",
+        assessment: "Phonological assessment revealed multiple active phonological processes beyond age expectations: fronting (saying 't' for 'k' and 'd' for 'g'), stopping (saying 't' for 's' and 'd' for 'z'), cluster reduction ('poon' for 'spoon'), and final consonant deletion ('ca' for 'cat'). These patterns combined to make her speech approximately 40% intelligible to unfamiliar listeners. Stimulability testing showed she could produce /k/ and /s/ in isolation with a model.",
+        goals: ["Eliminate fronting pattern (produce /k/ and /g/ correctly in words)", "Eliminate stopping of /s/ (produce /s/ correctly in initial position)", "Increase intelligibility to unfamiliar listeners from 40% to 70% within two terms", "Develop phonological awareness skills to support reading readiness"],
+        programme: "The SLT used a cycles approach given the multiple error patterns. Cycle 1 (6 weeks) targeted final consonants using auditory bombardment and production practice. Cycle 2 (6 weeks) targeted velars (/k/, /g/) using minimal pairs ('tea' vs 'key'). Cycle 3 (6 weeks) targeted /s/ clusters. Each session included phonological awareness activities (rhyming, initial sound identification). Parents were given word lists for daily home practice (5 min) and trained in recasting. After 4 months (2 cycles), Mia's intelligibility increased to approximately 65%. Fronting was nearly resolved. The stopping pattern was improving but needed continued work.",
+        keyTakeaway: "Phonological disorders are among the most treatable speech difficulties. The cycles approach is particularly effective for children with multiple patterns because it doesn't require mastery of one pattern before moving to the next — it mirrors natural phonological development."
+    },
+    homeActivities: [
+        {title: "Sound detective", desc: "Go on a 'sound hunt' around the house or neighbourhood. 'Can you find something that starts with the /k/ sound?' Focus on SOUNDS, not letters.", ageRange: "3–6 years"},
+        {title: "Rhyming games", desc: "Take turns thinking of rhyming words (real or silly): 'cat, bat, hat, dat, fat...' Rhyming is a foundational phonological awareness skill.", ageRange: "3–6 years"},
+        {title: "Minimal pairs card game", desc: "Use picture cards your SLT provides (e.g., 'tea' and 'key'). Play memory/snap/go fish with them. The child must say the word clearly to claim the card.", ageRange: "3–7 years"},
+        {title: "Listening walk", desc: "Go for a walk and listen to all the sounds you can hear. Talk about them. What sounds are loud? Quiet? High? Low? Builds auditory attention and discrimination.", ageRange: "3–6 years"},
+        {title: "Syllable clapping", desc: "Clap the beats in words: 'el-e-phant' (3 claps), 'cat' (1 clap), 'but-ter-fly' (3 claps). Turn it into a game — who can find the longest word?", ageRange: "3–7 years"},
+        {title: "Sound of the day", desc: "Pick one sound and spot it everywhere — in words, in books, on signs. 'Today is /s/ day! Sausages for Supper!' Makes sound practice natural and fun.", ageRange: "3–6 years"}
+    ],
+    parentFAQ: [
+        {q: "When should I be concerned about my child's speech sounds?", a: "As a rough guide: by age 3, familiar listeners should understand about 75% of what the child says. By age 4, unfamiliar listeners should understand most of it. By age 5, speech should be clear to everyone with only minor errors (like 'r' and 'th') remaining. If your child is significantly harder to understand than their peers, it's worth getting an assessment."},
+        {q: "Is it normal for a 3-year-old to say 'tat' for 'cat'?", a: "Yes — fronting (replacing back sounds like /k/ and /g/ with front sounds like /t/ and /d/) is normal up to about age 3–3.5. If it persists beyond this, it may indicate a phonological disorder. Many phonological processes are normal at young ages and only become a concern if they persist past the expected age of elimination."},
+        {q: "Should I correct my child's speech?", a: "Don't explicitly correct ('No, say CAT not TAT'). Instead, recast: 'Yes! A CAT. A big fluffy CAT.' This gives the child the correct model without pressure or negative feedback. Research consistently shows recasting is more effective than correction."},
+        {q: "Will phonological difficulties affect reading?", a: "They can. Phonological awareness (hearing and manipulating sounds in words) is the strongest predictor of reading success, and children with phonological disorders often have weak phonological awareness. That's why good SLT programmes include phonological awareness activities alongside speech work — addressing both in parallel."},
+        {q: "How long will therapy take?", a: "Phonological disorders are among the most responsive to therapy. Many children make significant progress in 1–2 blocks of therapy (8–16 sessions). Some children with more severe or persistent patterns may need longer. The cycles approach works quickly because it targets multiple patterns simultaneously."},
+        {q: "What's the difference between a phonological disorder and an articulation disorder?", a: "An articulation disorder is a problem with the physical production of a specific sound (e.g., a lisp on /s/). A phonological disorder is a pattern-based problem where whole groups of sounds are affected by a 'rule' the child is applying (e.g., replacing ALL back sounds with front sounds). The distinction matters because they require different therapy approaches."}
+    ],
+    literacyImpact: {
+        reading: "Phonological disorders and phonological awareness are closely linked. Children with phonological disorders often struggle with rhyming, sound segmenting, and blending — all critical foundations for reading. Research shows that addressing phonological awareness alongside speech sound therapy improves both speech AND reading outcomes.",
+        writing: "Spelling errors often mirror speech sound errors. A child who says 'tat' for 'cat' may also write 'tat' for 'cat'. As speech patterns resolve with therapy, spelling typically improves too. However, some children may need explicit spelling instruction for words they previously misspelled.",
+        strategies: ["Phonological awareness instruction integrated with speech therapy", "Modified phonics instruction that accounts for the child's current sound system", "Multi-sensory letter-sound learning (see it, hear it, feel it, write it)", "Avoid sounding out strategies that rely on sounds the child cannot yet produce", "Use onset-rime approaches alongside synthetic phonics"],
+        evidence: "Gillon (2004) — Integrated phonological awareness intervention improves both speech production and early literacy in children with phonological disorders."
+    },
+    classroomStrategies: [
+        {strategy: "Recast, don't correct", desc: "Model the correct pronunciation naturally without drawing attention to the error. Respond to the MEANING of what the child says.", level: "Universal"},
+        {strategy: "Phonological awareness groups", desc: "Small-group activities targeting rhyming, syllable counting, and initial sound identification benefit the whole class and particularly support children with phonological difficulties.", level: "Universal"},
+        {strategy: "Accept the child's contribution", desc: "If a child's speech is unclear, respond to the message. If you genuinely can't understand, ask clarifying questions gently rather than asking them to repeat.", level: "Universal"},
+        {strategy: "Coordinate with SLT", desc: "Know which sounds are being targeted in therapy. Provide natural practice opportunities in class. Don't target sounds the SLT hasn't addressed yet.", level: "Targeted"},
+        {strategy: "Peer education", desc: "If peers are commenting on the child's speech, have a simple, matter-of-fact conversation about how everyone is different and learning different things.", level: "Targeted"}
+    ]
+},
+
+"Stuttering (Fluency Disorder)": {
+    caseStudy: {
+        title: "Case Study: Ethan, Age 4",
+        scenario: "Ethan's parents contacted the SLT service when he began stuttering at age 3.5. Initially it was occasional repetitions ('I-I-I want juice'), but over 3 months it worsened to include prolongations ('ssssnake') and blocks (mouth open, no sound, visible tension). His father had stuttered as a child but grew out of it. Ethan was beginning to show frustration — sometimes stopping mid-sentence and walking away.",
+        assessment: "The SLT assessed Ethan's fluency using a standardised severity rating (Stuttering Severity Instrument: moderate), a conversational sample (12% syllables stuttered), and parent interview. Risk factors for persistence were identified: male, family history of stuttering lasting beyond childhood, presence of secondary behaviours (tension, avoidance), and stuttering for more than 6 months. The SLT recommended immediate intervention rather than 'wait and see.'",
+        goals: ["Reduce stuttering severity from moderate (SSI-4 score 25) to mild or minimal", "Parents confidently delivering Lidcombe Programme at home", "Reduce secondary behaviours (tension, head movement, avoidance)", "Ethan talking freely without frustration or avoidance of speaking situations"],
+        programme: "The SLT began the Lidcombe Programme. Parents attended weekly sessions for training: how to conduct 10–15 minute practice conversations, how to praise smooth speech ('That was really smooth talking!'), and how to occasionally, gently acknowledge stuttering ('That was a bit bumpy — try that one again'). Parents rated Ethan's stuttering daily on a 1–10 scale. Initially, Severity Ratings averaged 5–6. After 12 weeks of consistent daily practice and weekly SLT sessions, ratings reduced to 2–3. By 6 months, Ethan was consistently rated at 1–2 (essentially fluent) and moved to Stage 2 (maintenance). The SLT gradually reduced session frequency while monitoring that fluency was maintained.",
+        keyTakeaway: "Early intervention for stuttering is highly effective. The Lidcombe Programme's structured, parent-delivered approach means the child gets daily practice in their natural environment. Waiting to 'see if they grow out of it' risks missing the optimal treatment window."
+    },
+    homeActivities: [
+        {title: "Structured practice conversations (Lidcombe)", desc: "10–15 minutes daily of practice conversation where you praise smooth speech. Keep it natural and fun — during play, cooking, or reading together.", ageRange: "2–6 years"},
+        {title: "Slow down YOUR speech", desc: "Model a slightly slower speaking rate yourself. Don't say 'slow down' to your child — just slow down your own speech. Children naturally mirror the pace around them.", ageRange: "All ages"},
+        {title: "Reduce time pressure", desc: "Don't rush your child. Give them time to finish. Maintain natural eye contact and show you're listening. Don't fill their pauses.", ageRange: "All ages"},
+        {title: "Take turns talking at dinner", desc: "Establish a 'talking stick' or turn-taking system so the child doesn't have to compete for speaking time. Reduces time pressure and interruptions.", ageRange: "3–10 years"},
+        {title: "One-on-one time", desc: "Spend 10 minutes daily in 1:1 time where the child leads the activity and conversation. No questions, no pressure. Just follow their lead and comment on what they're doing.", ageRange: "All ages"},
+        {title: "Read together at a relaxed pace", desc: "Shared reading with no pressure to read aloud or answer questions. Just enjoy the story together. If the child wants to read, let them set the pace.", ageRange: "All ages"}
+    ],
+    parentFAQ: [
+        {q: "Should I tell my child to 'slow down' or 'take a breath'?", a: "No. This is one of the most common and most harmful pieces of advice. It implies the child is doing something wrong and increases self-consciousness and anxiety, which makes stuttering worse. Instead, slow down YOUR own speech, maintain relaxed eye contact, and show that you have time to listen."},
+        {q: "Will my child grow out of it?", a: "About 75–80% of children who begin stuttering will recover naturally, usually within 12–18 months. However, we can't reliably predict who will recover and who won't. Risk factors for persistence include: being male, family history of persistent stuttering, stuttering for more than 6–12 months, and presence of tension or avoidance. Don't wait and hope — get assessed."},
+        {q: "Does anxiety cause stuttering?", a: "Anxiety does not cause stuttering. Stuttering is a neurological condition related to speech motor control. However, anxiety can WORSEN stuttering, and living with stuttering can cause anxiety. It's a two-way relationship. Addressing both the speech and the emotional impact is important."},
+        {q: "Should I finish my child's sentences?", a: "No. Even though it might seem helpful, finishing their sentences sends the message that their stuttering is a problem that needs to be fixed quickly. Instead, wait patiently, maintain eye contact, and let them finish. Show that what they're SAYING matters more than HOW they're saying it."},
+        {q: "Is it okay to talk about stuttering with my child?", a: "Yes — if they bring it up. Don't ignore it. If your child says 'my words got stuck', acknowledge it: 'Yes, that happens sometimes. It's okay. I'm listening.' Pretending it isn't happening creates shame. Being open and accepting is protective."},
+        {q: "What should I tell the teacher?", a: "Tell the teacher: don't put the child on the spot for reading aloud or answering questions unless they volunteer. Give processing time. Don't finish their sentences. Treat them the same as other children. Intervene if other children tease. The Stuttering Foundation has a free teacher tip sheet that's excellent."}
+    ],
+    literacyImpact: {
+        reading: "Stuttering does not typically affect reading comprehension or decoding ability. However, children who stutter may avoid reading aloud, which can be mistaken for a reading difficulty. Oral reading assessments may not accurately reflect the child's reading ability — consider allowing silent reading assessments instead.",
+        writing: "Writing is typically unaffected by stuttering. In fact, many children who stutter excel at writing because it provides a fluent channel for communication. Encourage and celebrate written expression.",
+        strategies: ["Never require oral reading in front of the class unless the child volunteers", "Offer alternative assessment methods (written, recorded, small group)", "Allow extra time for verbal responses", "Don't draw attention to fluency — focus on the content of the response", "Pair reading or choral reading can reduce stuttering significantly"],
+        evidence: "Guitar (2014) — 'Stuttering: An Integrated Approach' — comprehensive text on assessment and management including school-age considerations."
+    },
+    classroomStrategies: [
+        {strategy: "Don't put them on the spot", desc: "Never call on a child who stutters unexpectedly. If oral participation is required, give advance warning ('I'm going to ask you next') or let them choose when to contribute.", level: "Universal"},
+        {strategy: "Model a relaxed pace", desc: "Speak slightly more slowly yourself. Pause before responding. This sets a relaxed communication environment that benefits all students.", level: "Universal"},
+        {strategy: "Choral/paired reading", desc: "Reading in unison with the class or a partner often eliminates stuttering due to the 'chorus effect'. This allows participation without singling out the child.", level: "Targeted"},
+        {strategy: "Focus on WHAT, not HOW", desc: "Respond to the content of what the child says, not how they say it. Show genuine interest in their ideas.", level: "Universal"},
+        {strategy: "Intervene with teasing", desc: "Take a zero-tolerance approach to teasing about stuttering. Address it matter-of-factly: 'Stuttering is something some people's brains do. We listen to everyone.'", level: "Universal"},
+        {strategy: "Talk to the child privately", desc: "Ask (privately) what helps them: 'Is there anything I can do to make talking in class easier for you?' Respect their preferences.", level: "Targeted"}
+    ]
+},
+
+"Selective Mutism": {
+    caseStudy: {
+        title: "Case Study: Jade, Age 5",
+        scenario: "Jade spoke freely and confidently at home — full sentences, complex stories, constant chatter. At school, she had never spoken a single word. Not to her teacher, not to other children, not to visiting specialists. She used nods, head shakes, and pointing. Her teacher initially thought she was just shy and would 'come out of her shell', but after a full term of silence, concerns were raised. Jade's parents were surprised — she talked non-stop at home.",
+        assessment: "The SLT assessed Jade indirectly (in the classroom, observing) and through parent and teacher interviews. A video of Jade talking freely at home confirmed age-appropriate speech and language. The Selective Mutism Questionnaire showed high anxiety in school and community settings but none at home. The SLT confirmed selective mutism — an anxiety disorder preventing speech in specific settings, not a language or speech disorder.",
+        goals: ["Jade communicating non-verbally with confidence in school (pointing, nodding, choosing, writing)", "Jade whispering to one trusted peer ('talk partner') within one term", "Jade using audible voice with talk partner and teacher within two terms", "Jade participating in small-group spoken activities by end of year"],
+        programme: "The SLT established a graduated exposure hierarchy: (1) Non-verbal communication valued and accepted, (2) Sound-making through play (animal noises, sound effects — not 'real' talking), (3) Whispering to Mum in the classroom with the door closed, (4) Whispering to Mum with the teacher in the room but not listening, (5) Stimulus fading — teacher gradually moves closer while Jade talks to Mum, (6) Whispering directly to teacher, (7) Whispering to talk partner, (8) Audible voice in small group. Each step was achieved before moving to the next. The process took the entire year, with progress in small, careful increments. By Term 4, Jade was whispering to her teacher and talk partner, and had used an audible voice in two small-group activities. Her parents described this as 'miraculous' — the SLT described it as 'systematic desensitisation.'",
+        keyTakeaway: "Selective mutism requires patience, a structured plan, and absolute avoidance of pressure. Pushing a child to speak makes anxiety worse. The stimulus fading approach — bringing comfort into the anxiety-provoking setting — is the most effective method."
+    },
+    homeActivities: [
+        {title: "Talk at the school gate", desc: "Have conversations with your child on school grounds OUTSIDE of school hours when no one else is around. This begins to pair the school environment with speech.", ageRange: "All ages"},
+        {title: "Voice recordings", desc: "Record your child talking/singing at home. With their permission, play it for the teacher privately. This helps the teacher hear their voice and plan next steps.", ageRange: "4–10 years"},
+        {title: "Video messages", desc: "Help your child record video messages for their teacher or a peer. Start with silly videos (pulling faces) and gradually introduce voice.", ageRange: "5–12 years"},
+        {title: "Phone/video calls to school friends", desc: "Arrange playdates at YOUR home (the comfortable setting) with one school peer. Speech often flows at home. Gradually extend to the peer's home, then school grounds.", ageRange: "4–10 years"},
+        {title: "Don't pressure", desc: "Never say 'just say hello' or 'she's just shy' or 'she CAN talk, she just won't.' Every comment increases anxiety. Treat communication of any kind (nods, pointing, writing) as successful communication.", ageRange: "All ages"},
+        {title: "Celebrate non-verbal communication", desc: "At home, talk about how there are many ways to communicate: 'You did a great thumbs up at school today. That was brave.' Validates their efforts without linking bravery only to speaking.", ageRange: "All ages"}
+    ],
+    parentFAQ: [
+        {q: "Is my child choosing not to talk?", a: "No. Selective mutism is an anxiety disorder. Your child physically cannot speak in anxiety-provoking situations — the speech mechanism 'freezes.' It's comparable to stage fright, but more severe and persistent. Understanding this is crucial because it changes how you and the school respond."},
+        {q: "Is it my fault?", a: "No. Selective mutism has a strong genetic component — it often runs in families alongside anxiety or shyness. It's not caused by trauma, parenting style, or anything you did or didn't do. However, how adults respond can either help or hinder recovery."},
+        {q: "Should I bribe my child to talk at school?", a: "No. Rewards can increase pressure and make anxiety worse. You can't reward away anxiety — you have to reduce it through gradual exposure. Small positive acknowledgements of any communication (including non-verbal) are better than rewards contingent on speech."},
+        {q: "Will my child grow out of it?", a: "Some children do show gradual improvement over time, but many do not without intervention. Without support, selective mutism can persist for years and lead to social isolation, academic underperformance, and social anxiety disorder. Early intervention gives the best outcomes."},
+        {q: "Can medication help?", a: "In some cases, particularly for older children or severe, treatment-resistant cases, SSRI medication (prescribed by a psychiatrist or paediatrician) can reduce anxiety enough for the child to begin engaging in the behavioural programme. Medication alone is not sufficient — it should be combined with graduated exposure therapy."},
+        {q: "How do I explain selective mutism to other parents?", a: "Keep it simple: 'Our daughter has selective mutism — it's an anxiety condition that means she can't speak in certain situations. She's working on it with a programme at school. The best thing you can do is treat her normally and not draw attention to whether she talks or not.'"}
+    ],
+    literacyImpact: {
+        reading: "Selective mutism does not affect reading ability, but it can severely affect reading assessment. If the child cannot read aloud, oral reading fluency measures will be invalid. Provide alternatives: pointing to answers, written responses, reading to a familiar person, or computer-based assessments.",
+        writing: "Writing is often a strength and a lifeline for children with selective mutism. It may be their primary mode of communication at school. Encourage and celebrate written communication — don't treat it as 'less than' verbal.",
+        strategies: ["Accept written responses as equivalent to verbal", "Don't require reading aloud unless the child volunteers", "Use peer/paired reading where the child can participate without solo performance", "Computer-based assessments where possible", "Private assessment with a trusted adult rather than public classroom assessment"],
+        evidence: "Oerbeck et al. (2014) — Behavioural treatment (graduated exposure) effective for selective mutism. Johnson & Wintgens (2016) — Selective Mutism Resource Manual, 2nd edition."
+    },
+    classroomStrategies: [
+        {strategy: "Forced alternatives, not open questions", desc: "Instead of 'What did you do on the weekend?' (requires spontaneous speech), try 'Did you go to the park or stay home?' (the child can nod or point). Gradually require more verbal response.", level: "Targeted"},
+        {strategy: "Talk partner", desc: "Pair with one trusted, patient peer. The child's first spoken words at school are often to one peer, not the teacher. Let this relationship develop naturally.", level: "Targeted"},
+        {strategy: "Accept ALL communication", desc: "A nod, a point, a written note, a whisper — these are ALL successful communication. Respond to them as enthusiastically as you would to speech.", level: "Universal"},
+        {strategy: "Don't draw attention", desc: "Never say 'Oh, Jade talked!' in front of others. This creates performance pressure and can cause regression. Acknowledge privately: 'I heard you whisper to Sarah today — that was great.'", level: "Universal"},
+        {strategy: "Reduce performance demands", desc: "No show-and-tell, no forced reading aloud, no calling on them for answers. Create opportunities but don't force.", level: "Targeted"},
+        {strategy: "Environmental supports", desc: "Small class sizes, consistent routines, advance warning of changes, quiet spaces, and familiar adults all reduce anxiety.", level: "Universal"}
+    ]
+},
+
+"Receptive Language Disorder": {
+    caseStudy: {
+        title: "Case Study: Sam, Age 7",
+        scenario: "Sam was referred in Year 3 because his teacher noticed he frequently did the wrong thing — not out of defiance, but apparently out of confusion. He would start a task while the teacher was still giving instructions, do only part of a multi-step task, or produce work that didn't match the instruction. His reading decoding was age-appropriate, but reading comprehension was well below. In conversation, he used age-appropriate sentences but often answered tangentially, as if he had misunderstood the question.",
+        assessment: "CELF-5 results: Receptive Language Index 68 (2nd percentile — severe), Expressive Language Index 89 (23rd percentile — low average). This significant gap confirmed a primary receptive language disorder. Subtests showed particular difficulty with: Understanding Spoken Paragraphs (2nd percentile), Following Directions (5th percentile), and Semantic Relationships (3rd percentile). Vocabulary was in the low average range receptively and average expressively — he knew more words than he could understand in context.",
+        goals: ["Follow 2-step classroom instructions without visual support 70% of the time", "Answer comprehension questions about a read passage with 75% accuracy", "Identify when he hasn't understood and use a self-advocacy strategy", "Increase understanding of curriculum vocabulary in maths and science"],
+        programme: "The SLT worked with Sam's teacher to implement a comprehensive classroom modification programme. Direct therapy (fortnightly, 30 min) targeted listening comprehension strategies: visualising while listening, identifying key words in instructions, and self-monitoring ('Do I understand? Can I picture what to do?'). The teacher was trained to: chunk instructions (one at a time), use visual task strips, pre-teach topic vocabulary, and check Sam's understanding actively (asking him to repeat back instructions). A 'didn't understand' card was introduced — Sam could show the card to indicate he needed the instruction repeated, without having to verbally say he didn't understand. After two terms, Sam's teacher reported a significant improvement in task completion and confidence. CELF-5 retest showed a 6-point gain on Receptive Language Index.",
+        keyTakeaway: "Receptive language difficulties are the 'invisible' language disorder — the child can talk, so the problem isn't obvious. The breakthrough is often in teacher training and classroom modification rather than direct therapy alone."
+    },
+    homeActivities: [
+        {title: "Following instructions game", desc: "Make it fun: 'Touch your nose, then jump twice, then sit on the red cushion.' Start with 1 step, build to 2, then 3. Celebrate success.", ageRange: "3–8 years"},
+        {title: "Cooking together", desc: "Recipes naturally involve following sequences of instructions. Start with simple recipes and talk through each step. 'First we need to crack the eggs. How many eggs does it say?'", ageRange: "4–12 years"},
+        {title: "I Spy (with descriptions)", desc: "Instead of letters, use descriptions: 'I spy something that is round and you eat it and it's red.' Builds listening comprehension and descriptive vocabulary.", ageRange: "4–8 years"},
+        {title: "Audiobooks with comprehension", desc: "Listen to an audiobook chapter together, then talk about what happened. Who was in it? What was the problem? What do you think will happen next?", ageRange: "5–12 years"},
+        {title: "'Show me' instead of 'tell me'", desc: "Instead of asking your child to explain something verbally, ask them to show you. 'Show me what the teacher said to do.' This checks understanding without verbal demand.", ageRange: "4–10 years"},
+        {title: "Key word highlighting", desc: "When giving instructions, stress the important words: 'Get your BLUE bag from UNDER your bed and bring it to the KITCHEN.' Exaggerate slightly to draw attention to the key information.", ageRange: "All ages"}
+    ],
+    parentFAQ: [
+        {q: "My child seems like they're not listening — is that receptive language disorder?", a: "It might be. Children with receptive language difficulties often look like they're not listening or not paying attention. The difference is that they ARE attending — they just can't process the language fast enough or accurately enough. If you notice your child consistently misunderstanding, following only part of instructions, or asking 'what?' frequently, it's worth getting assessed."},
+        {q: "How is this different from ADHD?", a: "They can look very similar — both can present as inattention, not following instructions, and off-task behaviour. The key difference: ADHD involves difficulty sustaining attention across tasks, while receptive language disorder specifically involves difficulty processing and understanding spoken language. They can co-occur, and sometimes children have both."},
+        {q: "Should I simplify everything I say?", a: "Simplify your delivery (short sentences, key words stressed, one instruction at a time) but don't simplify the content. Your child still needs exposure to rich, complex language to learn. Use gestures, visual aids, and check understanding — but keep using new vocabulary and talking about complex topics."},
+        {q: "Will this affect all school subjects?", a: "Yes. Every subject is taught through language, so receptive language difficulties affect everything — not just English. Maths word problems, science explanations, social studies discussions, PE instructions. The child needs accommodations across the curriculum, not just in 'language' lessons."}
+    ],
+    literacyImpact: {
+        reading: "Reading comprehension is typically much weaker than reading decoding. The child may read fluently aloud but not understand what they've read. This gap often widens as texts become more complex. Inferential comprehension (reading between the lines) is particularly affected.",
+        writing: "Written expression may be limited by vocabulary and grammar understanding. The child may write simple sentences because they're uncertain about complex structures. Explicit teaching of writing structures and vocabulary helps.",
+        strategies: ["Pre-read texts to build background knowledge before classroom reading", "Graphic organisers for comprehension (story maps, character webs)", "Visual vocabulary walls with pictures and definitions", "Reduce the language demand of comprehension questions", "Teach inferencing explicitly — it doesn't develop naturally for these children"],
+        evidence: "Ebbels (2014) — Effectiveness of intervention for receptive language difficulties, including Shape Coding for grammar comprehension."
+    },
+    classroomStrategies: [
+        {strategy: "One instruction at a time", desc: "Break multi-step instructions into single steps. Wait for completion before giving the next step. Use visual task strips for independent work.", level: "Universal"},
+        {strategy: "Visual backup for everything", desc: "Written schedule, task lists, key vocabulary displays, graphic organisers. If it was said verbally, put it in writing or pictures too.", level: "Targeted"},
+        {strategy: "Check understanding actively", desc: "Ask the child to tell you the first thing they need to do, or show you with their hands. 'Thumbs up if you know what to do' — genuinely observe their response.", level: "Universal"},
+        {strategy: "Pre-teach vocabulary", desc: "Before each new topic, explicitly teach 5–10 key words using pictures, definitions, and examples. Revisit throughout the unit.", level: "Targeted"},
+        {strategy: "Reduce question complexity", desc: "Instead of 'Why do you think the character made that decision?', try 'The character chose X. Was that a good choice? Why?'", level: "Targeted"},
+        {strategy: "Self-advocacy card", desc: "Give the child a discreet card or signal to indicate 'I need that repeated' without having to verbally ask — reducing embarrassment.", level: "Specialist"}
+    ]
+}
+
+};
+
+// ============================================================
+// NZ EDUCATION PATHWAYS
+// ============================================================
+
+const NZ_PATHWAYS = {
+    sencoRole: {
+        title: "The SENCO (Special Education Needs Coordinator)",
+        content: "Every NZ school has a SENCO — a teacher responsible for coordinating support for students with additional learning needs. The SENCO is usually your first point of contact if you have concerns about your child's communication. They can: make a referral to the Ministry of Education SLT service, coordinate in-school support, apply for additional funding, and organise IEP (Individual Education Plan) meetings.",
+        steps: ["Talk to your child's classroom teacher about your concerns", "Ask for a meeting with the SENCO", "The SENCO gathers information from teachers and may observe the child", "A referral is made to MoE SLT service (or private SLT if preferred)", "The SENCO coordinates the school's response while waiting for assessment"]
+    },
+    referralProcess: {
+        title: "Getting a Referral to the MoE SLT Service",
+        content: "Anyone can request a referral — parents, teachers, GPs, or other professionals. The referral goes to the local MoE office, where it is triaged by the SLT team. Wait times vary by region and demand, but typically range from 2–12 weeks for initial contact.",
+        steps: ["Concern identified (by parent, teacher, or professional)", "Referral form completed — usually by the school SENCO or GP", "Referral received by MoE local office and triaged", "SLT makes initial contact — may request more information or schedule an observation", "Assessment and/or observation completed", "Results and recommendations shared with family and school", "Intervention plan developed if needed"]
+    },
+    orsFunding: {
+        title: "Ongoing Resourcing Scheme (ORS) Funding",
+        content: "ORS is the highest level of Ministry-funded support for students with the most significant needs. For communication, this typically applies to children with severe speech-language difficulties that significantly impact their ability to access the curriculum. ORS provides: specialist teacher time, SLT input, teacher aide hours, and specialist equipment/technology. Application is made through the school and requires comprehensive assessment data.",
+        criteria: ["Communication difficulty is severe and persistent", "Significantly impacts curriculum access", "Requires specialist support beyond what the school can provide", "Supported by formal assessment data (standardised scores, functional impact evidence)"]
+    },
+    sessFunding: {
+        title: "Supplementary Learning Support (SLS) / SESS",
+        content: "For children who don't meet ORS criteria but still need more support than the school can provide alone. This includes speech-language therapy input, specialist teacher consultation, and short-term funded programmes. Access is through the school's learning support coordinator and the local MoE office.",
+        criteria: ["Communication difficulty impacts learning", "School has implemented strategies but needs additional support", "May be short-term (block of therapy) or ongoing consultation"]
+    },
+    iepGuide: {
+        title: "Individual Education Plan (IEP)",
+        content: "An IEP is a document that outlines the specific learning goals, strategies, and support for a child with additional needs. It is developed collaboratively by the child's parents/whanau, teacher, SENCO, and any specialists involved (including SLT). IEPs are reviewed each term and updated as the child progresses.",
+        tips: ["You have the right to be involved in developing your child's IEP", "Goals should be specific, measurable, and achievable within a term", "Ask for plain-English goals — not jargon", "The IEP should include WHO is responsible for each action", "You can request a review at any time if you have concerns", "Bring someone with you for support if you'd like", "The SLT should provide specific goals and strategies for the IEP", "Ask how progress will be measured — what does success look like?"]
+    },
+    privateSLT: {
+        title: "Private Speech-Language Therapy in NZ",
+        content: "If MoE wait times are long, or if you want more frequent/intensive input than the MoE service can provide, private SLT is an option. Some health insurance policies cover SLT. ACC may fund SLT if the speech difficulty is related to an injury. The NZ Speech-language Therapists' Association has a 'Find a Therapist' directory.",
+        considerations: ["Cost: typically $120–$200 per session (2026 rates)", "Some health insurance covers SLT — check your policy", "ACC covers SLT for accident-related speech difficulties", "No GP referral needed — you can self-refer", "Look for therapists registered with NZSTA", "Ask about their experience with your child's specific difficulty", "Private SLTs can work alongside MoE SLTs — they should coordinate"]
+    }
+};
+
+// ============================================================
+// EVIDENCE LIBRARY — Key Studies Summarised for Parents
+// ============================================================
+
+const EVIDENCE_LIBRARY = [
+    {
+        citation: "Bishop, D.V.M., Snowling, M.J., Thompson, P.A., Greenhalgh, T., & the CATALISE consortium (2017). Phase 2 of CATALISE: a multinational and multidisciplinary Delphi consensus study of problems with language development. Journal of Child Psychology and Psychiatry, 58(10), 1068-1080.",
+        plainSummary: "A major international study that brought together experts from 57 countries to agree on how to identify and name children's language difficulties. They established 'Developmental Language Disorder (DLD)' as the preferred term, replacing confusing older terms like 'Specific Language Impairment'. The study also agreed that DLD should be diagnosed based on functional impact, not just test scores.",
+        whyItMatters: "This is the study that changed how we talk about language difficulties. If your child's reports use the term 'DLD', this is why. It ensures consistent identification and better access to support.",
+        topic: "DLD"
+    },
+    {
+        citation: "Jones, M., Onslow, M., Packman, A., Williams, S., Ormond, T., Schwarz, I., & Gebski, V. (2005). Randomised controlled trial of the Lidcombe programme of early stuttering intervention. BMJ, 331, 659.",
+        plainSummary: "This was the first large-scale randomised controlled trial of the Lidcombe Programme — the gold standard for preschool stuttering treatment. Children who received the Lidcombe Programme had significantly less stuttering than those in the control group. At 9 months, treated children averaged 1.5% syllables stuttered compared to 3.9% in the control group.",
+        whyItMatters: "This study proved that the Lidcombe Programme works — it's not just anecdotal. It's why SLTs recommend early intervention for stuttering rather than 'wait and see.'",
+        topic: "Stuttering"
+    },
+    {
+        citation: "Murray, E., McCabe, P., & Ballard, K.J. (2014). A systematic review of treatment outcomes for children with childhood apraxia of speech. American Journal of Speech-Language Pathology, 23, 486-504.",
+        plainSummary: "This review examined all available research on CAS treatment. They found that motor-based approaches (NDP3, DTTC, ReST, PROMPT) showed positive results, while traditional articulation and phonological approaches did not. The review emphasised the need for intensive therapy (multiple sessions per week) and motor learning principles.",
+        whyItMatters: "This confirms that CAS needs specific therapy approaches — not just any speech therapy. If your child has CAS, ask their SLT which evidence-based motor approach they're using.",
+        topic: "CAS"
+    },
+    {
+        citation: "Gillon, G.T. (2004). Phonological awareness: From research to practice. New York: Guilford Press.",
+        plainSummary: "Professor Gail Gillon (University of Canterbury, NZ) demonstrated that integrating phonological awareness instruction into speech therapy for children with speech sound disorders improved BOTH speech production AND early reading skills. This was groundbreaking because it showed that speech therapy and literacy support don't have to be separate.",
+        whyItMatters: "This NZ research changed how SLTs work. If your child has speech sound difficulties, their SLT should be including phonological awareness activities (rhyming, sound identification, blending) alongside speech work.",
+        topic: "Phonological Disorders"
+    },
+    {
+        citation: "National Reading Panel (2000). Teaching children to read: An evidence-based assessment of the scientific research literature on reading and its implications for reading instruction. National Institute of Child Health and Human Development.",
+        plainSummary: "This landmark US report reviewed all the scientific evidence on reading instruction. It identified five pillars of effective reading instruction: phonemic awareness, phonics, fluency, vocabulary, and comprehension. Phonological awareness instruction was found to be one of the most effective ways to improve reading outcomes.",
+        whyItMatters: "This is why your child's SLT and teacher focus on sounds, rhyming, and blending — the evidence is overwhelming that these skills predict reading success.",
+        topic: "Literacy"
+    },
+    {
+        citation: "Millar, D.C., Light, J.C., & Schlosser, R.W. (2006). The impact of augmentative and alternative communication intervention on the speech production of individuals who use AAC: A research review. Journal of Speech, Language, and Hearing Research, 49, 248-264.",
+        plainSummary: "This review examined 27 studies on whether using AAC (picture boards, communication devices) helps or hinders speech development. The finding was clear: AAC does NOT inhibit speech development. In fact, in many cases, speech production INCREASED when AAC was introduced. No study found that AAC decreased speech.",
+        whyItMatters: "If someone tells you that giving your child a communication device will 'stop them from learning to talk', this study proves otherwise. AAC supports speech — it doesn't replace it.",
+        topic: "AAC"
+    },
+    {
+        citation: "Roberts, M.Y., & Kaiser, A.P. (2011). The effectiveness of parent-implemented language interventions: A meta-analysis. American Journal of Speech-Language Pathology, 20, 180-199.",
+        plainSummary: "This meta-analysis combined results from 18 studies of parent-delivered language intervention. The overall finding was strongly positive: parent-implemented intervention significantly improved children's language outcomes. Effects were seen in both receptive and expressive language, and were maintained over time.",
+        whyItMatters: "This is why SLTs spend time training parents rather than only doing direct therapy. You are your child's most important communication partner — the strategies you use every day matter more than the 30 minutes of therapy each fortnight.",
+        topic: "Parent involvement"
+    },
+    {
+        citation: "Ebbels, S.H., Wright, L., Brockbank, S., Godfrey, C., Harris, C., Leniston, H., ... & Marić, N. (2017). Effectiveness of 1:1 speech and language therapy for older children with (developmental) language disorder. International Journal of Language & Communication Disorders, 52(4), 528-539.",
+        plainSummary: "This large UK study showed that 1:1 SLT intervention produced significant improvements in targeted language areas for school-age children with DLD. Importantly, it showed that therapy targeting specific goals (grammar, vocabulary) produced improvements in those areas, while untargeted areas didn't improve — confirming that the therapy itself was causing the change, not just maturation.",
+        whyItMatters: "This study is important because it proves that SLT works for older children, not just preschoolers. If someone tells you your school-age child is 'too old' for therapy to help, this study says otherwise.",
+        topic: "DLD"
+    },
+    {
+        citation: "Snowling, M.J., Nash, H.M., Gooch, D.C., Hayiou-Thomas, M.E., & Hulme, C. (2019). Developmental outcomes for children at high risk of dyslexia and children with developmental language disorder. Child Development, 90(5), e548-e564.",
+        plainSummary: "This longitudinal study followed children from preschool through primary school to understand the relationship between language difficulties and literacy. Children with DLD at age 3.5 were at significantly elevated risk for reading and spelling difficulties at age 8. The overlap between DLD and dyslexia was substantial.",
+        whyItMatters: "If your child has DLD, this study shows why monitoring literacy development closely is essential. Early language intervention can reduce (but not eliminate) literacy risk.",
+        topic: "DLD and Literacy"
+    },
+    {
+        citation: "Oerbeck, B., Stein, M.B., Wentzel-Larsen, T., Langsrud, Ø., & Kristensen, H. (2014). A randomized controlled trial of a home and school-based intervention for selective mutism. Journal of Child Psychology and Psychiatry, 55(4), 363-370.",
+        plainSummary: "This RCT tested a combined home and school behavioural treatment for children aged 3–9 with selective mutism. After 6 months, 68% of treated children were speaking in both home and school settings, compared to 24% in the waitlist group. The treatment used graduated exposure — systematically increasing speaking demands in small steps.",
+        whyItMatters: "This is the strongest evidence we have that systematic behavioural treatment works for selective mutism. It also shows that 'wait and see' is not the best approach — early, structured intervention produces significantly better outcomes.",
+        topic: "Selective Mutism"
+    }
+];
+
+// ============================================================
+// CLASSROOM STRATEGY BANK — For Teachers
+// ============================================================
+
+const CLASSROOM_STRATEGIES = {
+    universal: [
+        {title: "Slow your pace of instruction", desc: "Speak slightly more slowly, pause between key points, and chunk information. This benefits ALL learners, not just those with communication difficulties."},
+        {title: "Visual schedule/timetable", desc: "Display the day's activities using pictures and/or words. Update it in real-time. Reference it regularly. Reduces anxiety and supports transitions."},
+        {title: "Think-Pair-Share", desc: "Before answering a question to the whole class, give 30 seconds to think, then share with a partner. This gives processing time and builds confidence."},
+        {title: "Processing time after questions", desc: "After asking a question, silently count to 10 before accepting answers. Use a visual cue (e.g., hands on head = thinking time). Transforms classroom dynamics."},
+        {title: "Key word emphasis", desc: "When giving instructions, stress the important words: 'Get your BLUE book and open to page TWELVE.' Helps children identify critical information."},
+        {title: "One instruction at a time", desc: "Give the first instruction. Wait for completion. Give the second. This simple change dramatically reduces confusion for all students."},
+        {title: "Vocabulary walls", desc: "Display key vocabulary for the current topic with pictures and simple definitions. Reference them constantly. Add new words as the topic develops."},
+        {title: "Recast and expand", desc: "When a student speaks with errors, respond to the meaning and model the correct form: Student: 'We goed to the park.' Teacher: 'You went to the park! What happened there?'"},
+        {title: "Model thinking aloud", desc: "Show your thinking process: 'I'm wondering... Let me think about this... I think X because...' This models the language of reasoning for all students."},
+        {title: "Use gesture alongside speech", desc: "Natural gestures support comprehension for all learners. Point, show, demonstrate. The more channels of information, the better."}
+    ],
+    targeted: [
+        {title: "Pre-teaching sessions", desc: "Before a new topic, spend 10 minutes with identified students teaching key vocabulary and concepts. This 'front-loading' means they can access the lesson alongside peers."},
+        {title: "Visual task strips", desc: "For multi-step tasks, create a visual strip showing each step. The student works through it independently, ticking each step as completed."},
+        {title: "Sentence starters/frames", desc: "Provide written sentence structures for oral and written work: 'I think ___ because ___', 'First ___, then ___, finally ___', 'The character felt ___ because ___."},
+        {title: "Graphic organisers", desc: "Mind maps, Venn diagrams, flow charts, tables, story maps. Make abstract thinking visible and structured. Provide templates, don't expect students to create their own initially."},
+        {title: "Communication-friendly seating", desc: "Face the student, close to the teacher. Away from noise sources (windows, doors, fans). Near visual displays. Next to a supportive peer."},
+        {title: "Buddy system", desc: "Pair the student with a language-strong peer who can clarify instructions, model language, and support participation. Rotate to avoid dependency."},
+        {title: "Small-group instruction", desc: "For language-heavy tasks, provide instruction in small groups where there are more opportunities for interaction, repetition, and checking understanding."},
+        {title: "Modified questioning", desc: "Adjust question type: forced choice ('Is it X or Y?'), yes/no, then open-ended as confidence grows. Avoid putting students on the spot with cold-calling."},
+        {title: "Home-school communication book", desc: "A simple notebook that travels between home and school with brief notes about what was learned, what's coming up, and strategies that worked. Keeps parents informed and involved."},
+        {title: "Word prediction tools", desc: "For writing tasks, allow word prediction software or apps that support word-finding and spelling for students with language difficulties."}
+    ],
+    specialist: [
+        {title: "SLT classroom visits", desc: "The SLT observes the student in class, models strategies for the teacher, and provides real-time coaching. More effective than pull-out therapy alone."},
+        {title: "Individual visual supports", desc: "Custom visual supports designed with the SLT: personal vocabulary books, communication passports, topic-specific word mats, social stories for specific situations."},
+        {title: "Assistive technology", desc: "Text-to-speech, speech-to-text, AAC devices, visual timer apps. Technology can bridge the gap between what the student knows and what they can demonstrate."},
+        {title: "Modified assessment", desc: "Adapt assessments to reduce the language barrier while still measuring knowledge: oral instead of written, multiple choice instead of open-ended, visual/practical instead of verbal."},
+        {title: "Individualised programme", desc: "SLT provides specific targets, activities, and progress measures that the teacher aide implements under SLT guidance. Therapy embedded in the school day."}
+    ]
+};
+
+// ============================================================
+// ADDITIONAL GLOSSARY TERMS
+// ============================================================
+
+const ADDITIONAL_TERMS = [
+    {title: "Tongue-tie (Ankyloglossia)", category: "diagnosis", definition: "A condition where the strip of tissue (frenulum) connecting the tongue to the floor of the mouth is shorter than usual, restricting tongue movement. It can affect feeding in infants and speech sound production in older children.", keyPoints: ["Not all tongue-ties affect speech — many children with tongue-tie speak clearly", "Assessment by an SLT or ENT specialist can determine if the tie is affecting speech", "Release (frenectomy) is a simple procedure but doesn't automatically fix speech — therapy may still be needed"]},
+    {title: "Language Delay vs Language Disorder", category: "diagnosis", definition: "A language DELAY means the child is developing language along the normal path but more slowly — they may catch up. A language DISORDER means the child's language development is different from typical patterns — it requires specific intervention.", keyPoints: ["The distinction matters because it affects prognosis and treatment approach", "A 'late talker' at age 2 may have a delay (many catch up by 3) or a disorder (persistent difficulty)", "If language difficulties persist beyond age 4–5, it's more likely a disorder than a delay"]},
+    {title: "Mean Length of Utterance (MLU)", category: "assessment", definition: "The average number of words or word parts (morphemes) in a child's sentences, calculated from a natural conversation sample. It's one of the best indicators of language development.", keyPoints: ["As a rough guide, MLU should approximately equal the child's age in years (age 2 = MLU ~2, age 3 = MLU ~3, up to about age 5)", "Measured from a sample of 50–100 utterances in natural conversation", "MLU in morphemes is more sensitive than MLU in words"]},
+    {title: "Phoneme", category: "assessment", definition: "The smallest unit of sound that changes the meaning of a word. For example, /k/ and /t/ are different phonemes because changing one for the other changes 'cat' to 'tat'. English has about 44 phonemes.", keyPoints: ["Phonemes are sounds, not letters — the word 'ship' has 3 phonemes (/sh/ /i/ /p/) but 4 letters", "Understanding phonemes is the foundation of phonological awareness and reading", "When we say a child 'has difficulty with the /s/ phoneme', we mean the sound, not the letter"]},
+    {title: "Morpheme", category: "assessment", definition: "The smallest unit of meaning in a language. A word can be made up of one or more morphemes. 'Cat' is one morpheme. 'Cats' is two morphemes (cat + -s for plural). 'Unhappiness' is three morphemes (un- + happy + -ness).", keyPoints: ["Morphemes include prefixes, suffixes, and root words", "Children with language difficulties often struggle with grammatical morphemes (plurals, past tense, possessives)", "MLU (Mean Length of Utterance) is often measured in morphemes because it captures grammar development"]},
+    {title: "Pragmatic Language", category: "diagnosis", definition: "The social use of language — knowing what to say, how to say it, when to say it, and how to adjust for different listeners and situations. Includes turn-taking, eye contact, topic maintenance, understanding non-literal language, and reading social cues.", keyPoints: ["A child can have perfect grammar and vocabulary but still struggle with pragmatic language", "Pragmatic difficulties are common in autism, ADHD, and social communication disorder", "Social rules are often unwritten — they need to be explicitly taught"]},
+    {title: "Verbal Dyspraxia", category: "diagnosis", definition: "An older term for Childhood Apraxia of Speech (CAS). Some professionals still use this term, especially in the UK and NZ. It refers to the same condition — a motor planning disorder affecting speech production.", keyPoints: ["'Verbal dyspraxia' and 'Childhood Apraxia of Speech' refer to the same condition", "The term 'developmental verbal dyspraxia (DVD)' is also used in some NZ contexts", "CAS is the preferred term in current international literature"]},
+    {title: "Speech Sound Disorder (SSD)", category: "diagnosis", definition: "An umbrella term covering any difficulty with speech sound production, including articulation disorders, phonological disorders, and childhood apraxia of speech. Used when the specific type hasn't been identified yet, or as a general category.", keyPoints: ["SSD is a broad term — the specific type matters for choosing the right therapy approach", "Articulation disorders, phonological disorders, and CAS all fall under SSD but require different treatment", "About 3–6% of school-age children have a clinically significant SSD"]},
+    {title: "Language Sample", category: "assessment", definition: "A recording and transcription of a child's natural speech, typically 50–100 utterances, collected during play, conversation, or narrative tasks. Analysed for vocabulary, grammar, sentence length, and communicative functions.", keyPoints: ["More ecologically valid than standardised tests — shows what the child does in real life", "Can be analysed for: MLU, grammatical structures used, vocabulary diversity, narrative structure", "Should be collected in a comfortable, naturalistic setting"]},
+    {title: "Percentile Rank", category: "assessment", definition: "A score that tells you what percentage of same-age children scored at or below your child's level. A percentile rank of 25 means your child scored higher than 25% of children the same age (and lower than 75%).", keyPoints: ["50th percentile = average (right in the middle)", "Below 10th percentile usually indicates significant difficulty requiring support", "10th–25th percentile is 'below average' — may or may not need intervention depending on functional impact", "Percentile ranks are NOT percentages correct — they compare your child to other children"]},
+    {title: "Standard Score", category: "assessment", definition: "A score that has been converted to a standard scale (usually mean 100, standard deviation 15). This allows comparison across different tests. A standard score of 85 is one standard deviation below the mean.", keyPoints: ["85–115 = average range", "70–84 = below average (may indicate mild-moderate difficulty)", "Below 70 = significantly below average (likely indicates significant difficulty)", "Standard scores are more reliable than age equivalents for tracking progress"]},
+    {title: "Age Equivalent Score", category: "assessment", definition: "A score that converts test performance into an 'age level' — e.g., 'your child has the language of a 4-year-old.' While commonly reported, these scores are widely criticised by professionals as potentially misleading.", keyPoints: ["Age equivalents are popular with parents because they're intuitive", "But they can be misleading: a 6-year-old scoring at '4-year level' doesn't mean they talk like a 4-year-old", "Standard scores and percentiles are more accurate and informative", "If given age equivalents, always ask for standard scores and percentiles too"]},
+    {title: "Focused Stimulation", category: "intervention", definition: "An intervention technique where the therapist (or parent) provides concentrated exposure to a specific language target — flooding the child's input with that structure. For example, if targeting past tense, the adult uses past tense 20+ times in a play session.", keyPoints: ["The child is NOT required to produce the target — they just hear it many times", "Based on the principle that children learn from input — the more they hear, the more they learn", "Can be done by parents in daily routines, making it very practical", "Research shows it's effective for vocabulary and grammar targets"]},
+    {title: "Aided Language Stimulation", category: "intervention", definition: "When an adult points to symbols on a communication board or AAC device while they talk, modelling how to use the system. The adult 'speaks' in two modalities simultaneously — voice AND visual symbols.", keyPoints: ["Essential for teaching children to use AAC systems", "The child learns by watching the adult use the system, not by being told to use it", "Should happen throughout the day, not just in therapy sessions", "All communication partners (parents, teachers, aides) should use this strategy"]},
+    {title: "Oral Placement Therapy", category: "intervention", definition: "A set of techniques using tools (horns, straws, bite blocks) and tactile cues to improve oral motor function for speech. Sometimes used for children with motor speech disorders. Note: evidence base is mixed.", keyPoints: ["Some SLTs use oral placement therapy as part of a broader programme", "The evidence base is debated — not all professionals agree it's effective for speech", "Non-speech oral motor exercises (blowing, tongue push-ups) alone do NOT improve speech — they must be combined with speech practice", "Ask your SLT about the evidence for any oral motor exercises they recommend"]},
+    {title: "Colourful Semantics", category: "intervention", definition: "A therapy technique that uses colour-coded question words to help children build sentences: WHO (orange) + DID WHAT (yellow) + TO WHAT (green) + WHERE (blue). Children construct sentences by combining colour-coded cards.", keyPoints: ["Developed by Alison Bryan — widely used in NZ and UK", "Makes sentence structure visual and concrete", "Works for both spoken and written sentences", "Can be adapted from simple (who + did what) to complex (who + did what + to what + where + when + why)"]},
+    {title: "Shape Coding", category: "intervention", definition: "A system developed by Dr Susan Ebbels that uses shapes, colours, and arrows to make English grammar visible. Nouns go in circles, verbs in hexagons, adjectives in rectangles, etc. Helps children understand and produce correct grammar.", keyPoints: ["Specifically designed for children with grammatical difficulties (especially DLD)", "Makes abstract grammar rules concrete and visual", "Strong evidence base — multiple studies showing significant improvement in targeted grammar", "Used alongside natural language activities, not instead of them"]},
+    {title: "Derbyshire Language Scheme", category: "intervention", definition: "A structured language programme that teaches language skills in a developmental sequence, from single words to complex sentences. Widely used in NZ schools for children with language delays and disorders.", keyPoints: ["Teaches language in small, carefully sequenced steps", "Used extensively by teacher aides under SLT guidance", "Includes assessment and teaching components", "Well-suited to the NZ school context where teacher aides deliver much of the intervention"]}
+];
+
+// ============================================================
+// HELPER: determine age stage
+// ============================================================
+function getAgeStage(min, max) {
+    const mid = (min + max) / 2;
+    if (mid < 3) return { label: 'Infant/Toddler', key: 'early' };
+    if (mid < 5) return { label: 'Preschool', key: 'early' };
+    if (mid < 8) return { label: 'Early School', key: 'school' };
+    if (mid < 12) return { label: 'Primary', key: 'school' };
+    return { label: 'Secondary', key: 'school' };
+}
+
+// ============================================================
+// APP
+// ============================================================
+document.addEventListener('DOMContentLoaded', () => {
+    const searchInput = document.getElementById('searchInput');
+    const searchClear = document.getElementById('searchClear');
+    const searchCount = document.getElementById('searchCount');
+    const ageMin = document.getElementById('ageMin');
+    const ageMax = document.getElementById('ageMax');
+    const ageDisplay = document.getElementById('ageDisplay');
+    const ageStageBadge = document.getElementById('ageStageBadge');
+    const homePracticeAge = document.getElementById('homePracticeAge');
+    const homePracticeContent = document.getElementById('homePracticeContent');
+    const noResults = document.getElementById('noResults');
+
+    let currentAgeKey = 'school';
+
+    // ---- Render glossary cards ----
+    function renderCards(category, containerId) {
+        const grid = document.getElementById(containerId);
+        const badgeClass = `badge-${category}`;
+        const catLabel = category.charAt(0).toUpperCase() + category.slice(1);
+
+        DATA[category].forEach((item) => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.dataset.category = category;
+            card.dataset.title = item.title;
+            card.dataset.searchText = `${item.title} ${item.definition} ${item.whyItMatters || ''} ${(item.keyPoints || []).join(' ')}`.toLowerCase();
+
+            let expandHTML = '';
+
+            // Why It Matters
+            if (item.whyItMatters) {
+                expandHTML += `<div class="expand-section"><div class="expand-label">Why It Matters</div><div class="expand-text">${item.whyItMatters}</div></div>`;
+            }
+
+            // Key Points
+            if (item.keyPoints && item.keyPoints.length) {
+                expandHTML += `<div class="expand-section"><div class="expand-label">Key Points</div>`;
+                item.keyPoints.forEach(p => {
+                    expandHTML += `<div class="key-point"><span class="key-point-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></span><span>${p}</span></div>`;
+                });
+                expandHTML += `</div>`;
+            }
+
+            // Programme Structure (diagnoses only)
+            if (item.programme) {
+                expandHTML += `<div class="expand-section">
+                    <div class="expand-label">How an SLT Would Approach This</div>
+                    <div class="age-content active" data-age-key="early">
+                        <div class="age-content-label">Early Years Programme</div>
+                        <div class="programme-block"><div class="programme-block-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Structured Programme</div>
+                        <ol class="programme-steps">${item.programme.early.map(s => `<li>${s}</li>`).join('')}</ol></div>
+                    </div>
+                    <div class="age-content" data-age-key="school">
+                        <div class="age-content-label">School-Age Programme</div>
+                        <div class="programme-block"><div class="programme-block-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Structured Programme</div>
+                        <ol class="programme-steps">${item.programme.school.map(s => `<li>${s}</li>`).join('')}</ol></div>
+                    </div>
+                </div>`;
+            }
+
+            // Cross-links
+            if (item.assessments || item.interventions) {
+                expandHTML += `<div class="expand-section"><div class="expand-label">Related Assessments &amp; Strategies</div><div class="cross-links">`;
+                if (item.assessments) {
+                    item.assessments.forEach(a => {
+                        expandHTML += `<button class="cross-link cross-link-assessment" onclick="event.stopPropagation(); scrollToCard('${a}')">${a}</button>`;
+                    });
+                }
+                if (item.interventions && item.interventions.length) {
+                    item.interventions.forEach(i => {
+                        expandHTML += `<button class="cross-link cross-link-intervention" onclick="event.stopPropagation(); scrollToCard('${i}')">${i}</button>`;
+                    });
+                }
+                expandHTML += `</div></div>`;
+            }
+
+            // Evidence
+            if (item.evidence) {
+                const evidenceItems = Array.isArray(item.evidence) ? item.evidence : [item.evidence];
+                expandHTML += `<div class="expand-section"><div class="expand-label">Evidence Base</div>`;
+                evidenceItems.forEach(e => {
+                    expandHTML += `<div class="expand-text" style="font-style:italic;font-size:0.8rem;margin-bottom:0.3rem;">${e}</div>`;
+                });
+                expandHTML += `</div>`;
+            }
+
+            // Resources
+            if (item.resources && item.resources.length) {
+                expandHTML += `<div class="expand-section"><div class="expand-label">Resources</div>`;
+                item.resources.forEach(r => {
+                    expandHTML += `<a href="${r.url}" target="_blank" rel="noopener" class="resource-link"><div class="resource-link-title">${r.title} &#8599;</div><div class="resource-link-desc">${r.desc}</div></a>`;
+                });
+                expandHTML += `</div>`;
+            }
+
+            card.innerHTML = `
+                <div class="card-header">
+                    <div class="card-title">${item.title}</div>
+                    <span class="card-badge ${badgeClass}">${catLabel}</span>
+                </div>
+                <div class="card-body">
+                    <div class="card-definition">${item.definition}</div>
+                </div>
+                <div class="card-expand">${expandHTML}</div>
+            `;
+
+            card.addEventListener('click', (e) => {
+                if (e.target.closest('a') || e.target.closest('button')) return;
+                card.classList.toggle('expanded');
+            });
+
+            grid.appendChild(card);
+        });
+    }
+
+    renderCards('diagnosis', 'grid-diagnosis');
+    renderCards('assessment', 'grid-assessment');
+    renderCards('intervention', 'grid-intervention');
+
+    // ---- Cross-link scroll ----
+    window.scrollToCard = function(title) {
+        const cards = document.querySelectorAll('.card');
+        for (const card of cards) {
+            if (card.dataset.title && card.dataset.title.includes(title)) {
+                // Show the right section
+                setActiveTab('all');
+                card.classList.remove('hidden');
+                card.classList.add('expanded');
+                card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                card.style.boxShadow = '0 0 0 3px var(--accent)';
+                setTimeout(() => card.style.boxShadow = '', 2000);
+                return;
+            }
+        }
+    };
+
+    // ---- Milestones ----
+    function renderMilestones() {
+        const grid = document.getElementById('milestoneGrid');
+        grid.innerHTML = '';
+        DATA.milestones.forEach(m => {
+            const card = document.createElement('div');
+            card.className = 'milestone-card';
+            card.innerHTML = `<div class="milestone-age">${m.age}</div><ul>${m.items.map(i => `<li><span class="milestone-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span><span>${i}</span></li>`).join('')}</ul>`;
+            grid.appendChild(card);
+        });
+    }
+    renderMilestones();
+
+    // ---- Red Flags ----
+    function renderRedFlags() {
+        const grid = document.getElementById('redFlagsGrid');
+        grid.innerHTML = '';
+        DATA.redFlags.forEach(rf => {
+            const card = document.createElement('div');
+            card.className = 'red-flag-card';
+            card.innerHTML = `<div class="red-flag-age">${rf.age}</div><ul>${rf.items.map(i => `<li><span class="rf-icon">!</span><span>${i}</span></li>`).join('')}</ul>`;
+            grid.appendChild(card);
+        });
+    }
+    renderRedFlags();
+
+    // ---- Resources ----
+    function renderResources() {
+        const grid = document.getElementById('resourcesGrid');
+        grid.innerHTML = '';
+        DATA.resources.forEach(r => {
+            const el = document.createElement('a');
+            el.className = 'ext-resource';
+            el.href = r.url;
+            el.target = '_blank';
+            el.rel = 'noopener';
+            el.innerHTML = `<div class="ext-resource-title">${r.title} &#8599;</div><div class="ext-resource-desc">${r.desc}</div><div class="ext-resource-how"><strong>How to use:</strong> ${r.howToUse}</div>`;
+            grid.appendChild(el);
+        });
+    }
+    renderResources();
+
+    // ---- Home Practice (age-adaptive) ----
+    function renderHomePractice() {
+        const items = DATA.homePractice[currentAgeKey] || DATA.homePractice.school;
+        homePracticeContent.innerHTML = `<ul class="bonus-list">${items.map(i => `<li><span class="q-icon" style="color:var(--intervention)">${i.n}</span><span><strong>${i.title}</strong> ${i.text}</span></li>`).join('')}</ul>`;
+    }
+    renderHomePractice();
+
+    // ---- Tab filtering ----
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const sectionMap = {
+        overview: ['moePanel'],
+        diagnosis: ['section-diagnosis'],
+        assessment: ['section-assessment'],
+        intervention: ['section-intervention'],
+        milestones: ['section-milestones'],
+        redflags: ['section-redflags'],
+        resources: ['section-resources']
+    };
+    const bonusPanelIds = ['questionsPanel', 'homePracticePanel'];
+    const allSectionIds = Object.values(sectionMap).flat().concat(bonusPanelIds);
+
+    function setActiveTab(cat) {
+        tabBtns.forEach(b => b.classList.toggle('active', b.dataset.cat === cat));
+        if (cat === 'all') {
+            allSectionIds.forEach(id => document.getElementById(id).classList.remove('hidden'));
+        } else {
+            allSectionIds.forEach(id => document.getElementById(id).classList.add('hidden'));
+            const show = sectionMap[cat] || [];
+            show.forEach(id => document.getElementById(id).classList.remove('hidden'));
+        }
+    }
+
+    tabBtns.forEach(btn => btn.addEventListener('click', () => setActiveTab(btn.dataset.cat)));
+
+    // ---- Search ----
+    function doSearch() {
+        const query = searchInput.value.toLowerCase().trim();
+        searchClear.classList.toggle('visible', query.length > 0);
+        const allCards = document.querySelectorAll('.card');
+        let visible = 0;
+        if (!query) {
+            allCards.forEach(c => c.classList.remove('hidden'));
+            searchCount.textContent = '';
+            noResults.classList.remove('visible');
+            updateCounts();
+            return;
+        }
+        allCards.forEach(card => {
+            const match = card.dataset.searchText.includes(query);
+            card.classList.toggle('hidden', !match);
+            if (match) visible++;
+        });
+        searchCount.textContent = `${visible} result${visible !== 1 ? 's' : ''}`;
+        noResults.classList.toggle('visible', visible === 0);
+        updateCounts();
+    }
+
+    searchInput.addEventListener('input', doSearch);
+    searchClear.addEventListener('click', () => { searchInput.value = ''; doSearch(); searchInput.focus(); });
+
+    function updateCounts() {
+        ['diagnosis', 'assessment', 'intervention'].forEach(cat => {
+            const grid = document.getElementById(`grid-${cat}`);
+            const vis = grid.querySelectorAll('.card:not(.hidden)').length;
+            document.getElementById(`count-${cat}`).textContent = vis;
+        });
+    }
+
+    // ---- Age toggle ----
+    function updateAge() {
+        const min = parseInt(ageMin.value) || 0;
+        const max = parseInt(ageMax.value) || 18;
+        const display = `${min}\u2013${max} years`;
+        ageDisplay.textContent = display;
+        homePracticeAge.textContent = `${min}\u2013${max}`;
+
+        const stage = getAgeStage(min, max);
+        ageStageBadge.textContent = stage.label;
+        currentAgeKey = stage.key;
+
+        // Update age-adaptive content in cards
+        document.querySelectorAll('.age-content').forEach(el => {
+            el.classList.toggle('active', el.dataset.ageKey === stage.key);
+        });
+
+        // Update home practice
+        renderHomePractice();
+    }
+    ageMin.addEventListener('input', updateAge);
+    ageMax.addEventListener('input', updateAge);
+    updateAge(); // initial
+
+    // ---- Keyboard shortcuts ----
+    document.addEventListener('keydown', (e) => {
+        if (e.key === '/' && document.activeElement.tagName !== 'INPUT') {
+            e.preventDefault();
+            searchInput.focus();
+        }
+        if (e.key === 'Escape') {
+            searchInput.value = '';
+            searchInput.blur();
+            doSearch();
+        }
+    });
+});
+</script>
+</body>
+</html>
